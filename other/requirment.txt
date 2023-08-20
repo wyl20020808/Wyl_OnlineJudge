@@ -1,0 +1,6 @@
+npm install element-plus --save
+npm i jquery
+npm i bootstrap
+npm i vuex
+npm install vue-router@4
+npm install vuetify
