@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import {ref} from 'vue';
+import axios from 'axios';
 export default {
   data() {
     return {
@@ -52,9 +54,27 @@ export default {
       this.examples.splice(index, 1);
     },
     save() {
+      console.log(this.examples);
       // 在这里处理保存逻辑
-      console.log(this.title, this.background, this.description, this.inputFormat, this.outputFormat, this.examples, this.hint);
+      // console.log(this.title, this.background, this.description, this.inputFormat, this.outputFormat, this.examples, this.hint);
     }
+  },
+  setup(){
+    const dataSend = ref({
+      title: this.title,
+      background: this.background,
+      description: this.description,
+      inputformat: this.inputFormat,
+      outputformat: this.outputFormat,
+      hint: this.hint
+    })
+    axios.post('',dataSend.value)
+    .then(response =>{
+      console.log(response)
+    })
+    .catch(error => {
+      console.log(error)
+    })
   }
 };
 </script>

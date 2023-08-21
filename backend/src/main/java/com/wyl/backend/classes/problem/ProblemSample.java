@@ -4,6 +4,8 @@ public class ProblemSample {
     private String input;
     private String output;
 
+    private int problem_id;
+
     public String getInput() {
         return input;
     }
