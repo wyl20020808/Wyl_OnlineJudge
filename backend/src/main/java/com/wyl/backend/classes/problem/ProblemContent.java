@@ -12,8 +12,8 @@ public class ProblemContent {
     private int problemid;//题目id
     private String description;//题目描述
     private String background;//题目背景
-    private String inputformat;//题目背景
-    private String outputformat;//题目背景
+    private String inputformat;//输入格式
+    private String outputformat;//输出格式
     private String hint;//提示
 
     private int timelimit;//时间限制

@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import {ref} from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
 export default {
   data() {
     return {
@@ -53,28 +53,43 @@ export default {
     removeExample(index) {
       this.examples.splice(index, 1);
     },
+    rollBackInfo (dataSend){
+        this.title = dataSend.title;
+        this.background = dataSend.background;
+        this.description = dataSend.description;
+        this.inputFormat = dataSend.inputformat;
+        this.outputFormat = dataSend.outputformat;
+        this.hint = dataSend.hint;
+    },
     save() {
-      console.log(this.examples);
-      // 在这里处理保存逻辑
-      // console.log(this.title, this.background, this.description, this.inputFormat, this.outputFormat, this.examples, this.hint);
+      const route = useRouter();
+      const dataSend = {
+        "title": this.title,
+        "background": this.background,
+        "description": this.description,
+        "inputformat": this.inputFormat,
+        "outputformat": this.outputFormat,
+        "hint": this.hint
+      };
+      
+      axios.post('http://localhost:8088/problem/insert', dataSend,)
+        .then(response => {
+          if(response.data === "success") {
+            alert("保存成功！")
+            this.$router.push({ path: '/problems' })
+          }else{
+            alert("保存失败！" + response.data)
+            this.rollBackInfo(dataSend);
+          }          
+        })
+        .catch(error => {
+          alert("保存失败！" + error.data)
+          this.rollBackInfo(dataSend);
+        });
     }
   },
-  setup(){
-    const dataSend = ref({
-      title: this.title,
-      background: this.background,
-      description: this.description,
-      inputformat: this.inputFormat,
-      outputformat: this.outputFormat,
-      hint: this.hint
-    })
-    axios.post('',dataSend.value)
-    .then(response =>{
-      console.log(response)
-    })
-    .catch(error => {
-      console.log(error)
-    })
+  setup()  {
+    
   }
 };
 </script>
