@@ -15,7 +15,7 @@ public class ProblemControllerMapper {
     @GetMapping("/query")
     public List<ProblemContent> query() {
          List<ProblemContent> queryResult = createProblem.selectList(null);
-        System.out.println(queryResult.get(4).getTimelimit());
+//        System.out.println(queryResult.get(4).getTimelimit());
          return queryResult;
     }
     @PostMapping("/insert")

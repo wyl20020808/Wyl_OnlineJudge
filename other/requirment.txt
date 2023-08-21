@@ -5,3 +5,4 @@ npm i vuex
 npm install vue-router@4
 npm install vuetify
 npm install axios
+npm install clipboard --save

@@ -7,6 +7,7 @@ import RankListView from "../components/pages/RankListView.vue"
 import TissueView from "../components/pages/TissueView.vue"
 import UserInfoView from "../components/pages/UserInfoView.vue"
 import CreateProblemView from "../components/pages/Problem/CreateProblemView.vue"
+import ProblemDetailView from "../components/pages/Problem/ProblemDetail/ProblemDetailView.vue"
 const routes = [
   {
     path: '/',
@@ -47,6 +48,12 @@ const routes = [
     path: '/createproblem/',
     name: 'createproblem',
     component: CreateProblemView
+  },
+  {
+    path: '/problemdetail/',
+    name: 'problemdetail',
+    component: ProblemDetailView,
+    props: "true"
   },
 ]
 

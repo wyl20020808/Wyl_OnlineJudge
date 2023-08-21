@@ -33,7 +33,6 @@
 
 <script>
 import axios from 'axios';
-import { useRouter } from 'vue-router'
 export default {
   data() {
     return {
@@ -62,7 +61,6 @@ export default {
         this.hint = dataSend.hint;
     },
     save() {
-      const route = useRouter();
       const dataSend = {
         "title": this.title,
         "background": this.background,
@@ -71,7 +69,6 @@ export default {
         "outputformat": this.outputFormat,
         "hint": this.hint
       };
-      
       axios.post('http://localhost:8088/problem/insert', dataSend,)
         .then(response => {
           if(response.data === "success") {

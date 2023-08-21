@@ -17,19 +17,21 @@
           ></el-input>
           <el-button :icon="Search" circle  @click="handleSearch"></el-button>
         </div>
-        <div class="card-container">
+        <div v-for="problem in questions" :key="problem.problemid" class="card-container">
+          <a @click="push_to_problemcontent(problem)">
           <el-card class="card">
             <div class="card-content">
               <div class="card-row">
-                <span class="id1">P{{ question.id }}</span>
-                <span class="title1">{{ question.title }}</span>
-                <span class="difficulty1">{{ question.difficulty }}</span>
-                <span class="knowledge1">{{ question.knowledge }}</span>
-                <span style="margin: 20px;">{{ question.source }}</span>
-                <span style="margin-left: 100px;">{{ question.submissionCount }}/{{ question.aceptedCount }}</span>
+                <span id="id1" class="id1">P{{ problem.problemid }}</span>
+                <span id="title1" class="title1">{{ problem.title }}</span>
+                <span id="difficulty1" class="difficulty1">{{ problem.difficulty }}</span>
+                <span id="knowledge1" class="knowledge1">{{ problem.algorithm }}</span>
+                <span id="source1" class="source1">{{ problem.source }}</span>
+                <span id="count1" class="count1">{{ problem.aceptedcount }}/{{ problem.submitcount }}</span>
               </div>
             </div>
           </el-card>
+        </a>
         </div>
       </div>
     </div>
@@ -37,38 +39,76 @@
   
   <script>
   import {
-    Check,
-    Delete,
-    Edit,
-    Message,
     Search,
-    Star,
   } from '@element-plus/icons-vue'
+  import axios from 'axios';
+  import { useRouter } from 'vue-router'
   export default {
     setup(){
-        return{
-            Search,
-        }
+      const router = useRouter();
+      const push_to_problemcontent =(problem) =>{
+        router.push({
+          path: '/problemdetail',
+          query: {
+            problemid: problem.problemid,
+            title: problem.title,
+            difficulty: problem.difficulty,
+            algorithm: problem.algorithm,
+            source: problem.source,
+            aceptedcount: problem.aceptedcount,
+            submitcount: problem.submitcount,
+            description: problem.description,
+            hint:problem.hint,
+            timelimit: problem.timelimit,
+            memorylimit: problem.memorylimit,
+            background:problem.background,
+            inputformat: problem.inputformat,
+            outputformat: problem.outputformat,
+          }
+        })
+      }
+      return{
+          Search,
+          push_to_problemcontent
+      }
     },
     data() {
+      
+     
       return {
         searchText: '',
+        questions:[],
         question: {
           id:"0001",
           title: 'A+B',
           difficulty: '简单',
-          knowledge: '模拟',
+          algorithm: '模拟',
           source: '原创',
           submissionCount: '100',
           aceptedCount:'100',
         }
       };
     },
+    created(){
+      // var title = document.getElementById('title1').getboundingClientRect().right;
+      // console.log(title);
+      axios.get('http://localhost:8088/problem/query')
+      .then(response => {
+        console.log(response.data);
+        this.questions = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    },
     methods: {
       handleSearch() {
         // 在这里处理搜索逻辑
         console.log(this.searchText);
-      }
+      },
+      
+      
     }
   };
   </script>
@@ -139,16 +179,35 @@
     display: flex;
     justify-content: space-between;
   }
-    .card-row span.title1 {
-    margin: 0 10px;
+  .card-row span.id1 {
+   position: absolute;
+   left:10px;
+   bottom: 10px;
+  }
+  .card-row span.title1 {
+   position: absolute;
+   left:50px;
+   bottom: 10px;
   }
   .card-row span.difficulty1 {
-    margin: 10px;
-    margin-left: 500px;
+   position: absolute;
+   left:600px;
+   bottom: 10px;
   }
   .card-row span.knowledge1 {
-    margin: 10px;
-    margin-left: 20px;
+    position: absolute;
+   left:700px;
+   bottom: 10px;
+  }
+  .card-row span.source1 {
+    position: absolute;
+   left:800px;
+   bottom: 10px;
+  }
+  .card-row span.count1 {
+    position: absolute;
+   left:940px;
+   bottom: 10px;
   }
   </style>
 

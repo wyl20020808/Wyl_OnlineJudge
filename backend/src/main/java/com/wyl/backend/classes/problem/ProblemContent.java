@@ -15,6 +15,11 @@ public class ProblemContent {
     private String inputformat;//输入格式
     private String outputformat;//输出格式
     private String hint;//提示
+    private String algorithm;//
+
+
+
+    private String source;
 
     private int timelimit;//时间限制
     private int memorylimit;//内存限制
@@ -23,6 +28,26 @@ public class ProblemContent {
     private int submitcount;//提交次数
     private int aceptedcount;//通过次数
     private String difficulty;//难度
+
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void setAceptedcount(int aceptedcount) {
+        this.aceptedcount = aceptedcount;
+    }
     public int getTimelimit() {
         return timelimit;
     }
