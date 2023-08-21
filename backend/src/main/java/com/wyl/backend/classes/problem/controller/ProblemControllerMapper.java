@@ -12,17 +12,17 @@ import java.util.List;
 @RequestMapping(value = "/problem")
 @RestController
 public class ProblemControllerMapper {
-    @Autowired
+    @Autowired //注入，一定要写
     private CreateProblem  createProblem;
     @GetMapping("/query")
     public List<ProblemContent> query() {
          List<ProblemContent> queryResult = createProblem.selectList(null);
+        System.out.println(queryResult.get(0).getTimelimit());
          return queryResult;
     }
     @PostMapping("/insert")
     public String insertCommon(ProblemContent problemContent){
         int i =  createProblem.insert(problemContent);
-        System.out.println(problemContent.getAcepted_count() +" this" );
         if(i > 0)return "yes";
         else return "insert success";
     }
