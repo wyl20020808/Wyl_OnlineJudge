@@ -17,14 +17,12 @@ public class ProblemContent {
     private String hint;//提示
     private String algorithm;//
 
-
-
     private String source;
 
     private int timelimit;//时间限制
     private int memorylimit;//内存限制
-    @TableField(exist = false)
-    private List<ProblemSample> problem_sample;//样例输入输出
+
+    private List<ProblemSample> problemsample;//样例输入输出
     private int submitcount;//提交次数
     private int aceptedcount;//通过次数
     private String difficulty;//难度
@@ -105,12 +103,12 @@ public class ProblemContent {
         this.outputformat = outputformat;
     }
 
-    public List<ProblemSample> getProblem_sample() {
-        return problem_sample;
+    public List<ProblemSample> getProblemsample() {
+        return problemsample;
     }
 
-    public void setProblem_sample(List<ProblemSample> problem_sample) {
-        this.problem_sample = problem_sample;
+    public void setProblemsample(List<ProblemSample> problem_sample) {
+        this.problemsample = problem_sample;
     }
 
     public String getTitle() {

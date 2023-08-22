@@ -3,8 +3,16 @@ package com.wyl.backend.classes.problem;
 public class ProblemSample {
     private String input;
     private String output;
+    private int problemid;
+    public int getProblemid() {
+        return problemid;
+    }
 
-    private int problem_id;
+    public void setProblemid(int problemid) {
+        this.problemid = problemid;
+    }
+
+
 
     public String getInput() {
         return input;

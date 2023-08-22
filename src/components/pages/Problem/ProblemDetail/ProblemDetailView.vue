@@ -9,14 +9,13 @@
     </div>
     
   </template>
-  
   <script>
-import { reactive } from 'vue';
+  import { reactive,toRefs} from 'vue';
   import { useRoute } from 'vue-router';
   import ProblemCardView from './ProblemCardView.vue';
   import ProblemOperateView from './ProblemOperateView.vue';
   import PrombleContentView from './PrombleContentView.vue';
-
+  import axios from 'axios';
   export default {
     name:"problemdetail",
     components:{
@@ -24,16 +23,26 @@ import { reactive } from 'vue';
       ProblemOperateView,
       PrombleContentView
     },
-    setup(){
-      const route = useRoute();
-      const problemId = route.query;
-      const problem = reactive(problemId);
-      console.log(problem);
-      return {
-        problemId,
-        problem
-      }
-
+    setup() {
+    const route = useRoute();
+    const state = reactive({
+      problemid: route.query.problemid,
+      problem: {}
+    });
+    axios.get(`http://localhost:8088/problem/query/${state.problemid}`)
+      .then(response => {
+        state.problem = response.data;
+        console.log(state.problem.pro,"weyuw");
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    return {
+      ...toRefs(state)
+    };
+  },
+    methods:{
+      
     }
 
   }

@@ -60,15 +60,17 @@ export default {
         this.outputFormat = dataSend.outputformat;
         this.hint = dataSend.hint;
     },
-    save() {
+    save() {//向后端传送基本的题目数据
       const dataSend = {
         "title": this.title,
         "background": this.background,
         "description": this.description,
         "inputformat": this.inputFormat,
         "outputformat": this.outputFormat,
-        "hint": this.hint
+        "hint": this.hint,
+        "problemsample": this.examples
       };
+      console.log(this.examples[0]);
       axios.post('http://localhost:8088/problem/insert', dataSend,)
         .then(response => {
           if(response.data === "success") {

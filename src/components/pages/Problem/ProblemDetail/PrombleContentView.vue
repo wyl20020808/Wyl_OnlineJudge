@@ -2,7 +2,7 @@
     <div>
       <el-card class="outer-card" v-if="problem">
         <el-card class="inner-card"><strong>题目背景</strong>
-          <div class="content" v-html="parsedDescription(problem.backgorund)">
+          <div class="content" v-html="parsedDescription(problem.problemid)">
          
         </div>
         </el-card>
@@ -21,16 +21,20 @@
          
         </div>
         </el-card>
-        <div class="example-cards">
-          <el-card class="inner-card">
+        <div class="example-cards" v-for="input in problemSample" :key="input.id" >
+          <el-card class="inner-card"  >
             <strong>输入样例</strong>
             <el-button class="copy-button" @click="copyToClipboard('inputExample')">复制</el-button>
-            <div id="inputExample" ref="inputExample"></div>
+            <div id="inputExample" ref="inputExample">
+              <div>{{input.input}}</div>
+            </div>
           </el-card>
-          <el-card class="inner-card">
+          <el-card class="inner-card" >
             <strong>输出样例</strong>
             <el-button class="copy-button" @click="copyToClipboard('outputExample')">复制</el-button>
-            <div id="outputExample" ref="outputExample">这里是输出样例</div>
+            <div id="outputExample" ref="outputExample">
+              <div>{{input.output}}</div>
+            </div>
           </el-card>
         </div>
         <el-card class="inner-card"><strong>数据范围</strong>
@@ -44,10 +48,11 @@
   
   <script>
  import MarkdownIt from "markdown-it";
-
+  import {watchEffect,toRefs,reactive} from 'vue';
  import 'markdown-it-texmath/css/texmath.css';
   import mk from 'markdown-it-katex';
   import 'katex/dist/katex.min.css';
+  import axios from "axios";
   export default {
     name:"temp",
     props:{/*从父节点接受参数 */
@@ -56,8 +61,28 @@
             required:true,
         },
     },
-    setup(){
-  
+    setup(props) {
+      const state = reactive({
+        problemid: null,
+        problemSample: {}
+      })
+
+      watchEffect(() => {
+        state.problemid = props.problem.problemid
+        if (state.problemid) {
+          axios.get(`http://localhost:8088/problem/query/problemsample/${state.problemid}`)
+            .then(response => {
+              state.problemSample = response.data
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        }
+      })
+
+      return {
+        ...toRefs(state)
+      }
     },
     data(){
       return {
@@ -70,9 +95,7 @@
     },
     methods: {
       parsedDescription(content) {
-        console.log(content)
         return this.md.render(String(content));
-        return "temp";
       },
       copyToClipboard(refName) {
         const textToCopy = this.$refs[refName].innerText;

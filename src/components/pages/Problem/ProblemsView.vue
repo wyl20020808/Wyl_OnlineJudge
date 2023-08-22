@@ -46,24 +46,11 @@
   export default {
     setup(){
       const router = useRouter();
-      const push_to_problemcontent =(problem) =>{
+      const push_to_problemcontent = (problem) =>{
         router.push({
           path: '/problemdetail',
           query: {
             problemid: problem.problemid,
-            title: problem.title,
-            difficulty: problem.difficulty,
-            algorithm: problem.algorithm,
-            source: problem.source,
-            aceptedcount: problem.aceptedcount,
-            submitcount: problem.submitcount,
-            description: problem.description,
-            hint:problem.hint,
-            timelimit: problem.timelimit,
-            memorylimit: problem.memorylimit,
-            background:problem.background,
-            inputformat: problem.inputformat,
-            outputformat: problem.outputformat,
           }
         })
       }
@@ -73,28 +60,14 @@
       }
     },
     data() {
-      
-     
       return {
         searchText: '',
         questions:[],
-        question: {
-          id:"0001",
-          title: 'A+B',
-          difficulty: '简单',
-          algorithm: '模拟',
-          source: '原创',
-          submissionCount: '100',
-          aceptedCount:'100',
-        }
       };
     },
     created(){
-      // var title = document.getElementById('title1').getboundingClientRect().right;
-      // console.log(title);
       axios.get('http://localhost:8088/problem/query')
       .then(response => {
-        console.log(response.data);
         this.questions = response.data;
       })
       .catch(error => {
