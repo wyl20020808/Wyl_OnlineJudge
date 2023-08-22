@@ -37,11 +37,11 @@
     </div>
   </template>
   
-  <script>
+  <script >
   import { reactive } from 'vue';
   import { useStore } from 'vuex';
+ 
   
-  import router from '@/router/router';
   export default {
     setup() {
       const store = useStore();
@@ -62,10 +62,12 @@
           console.error('Action failed:', error);
         });
       };
+      
   
       return {
         data,
-        login
+        login,
+
       };
     }
   };

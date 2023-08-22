@@ -59,7 +59,13 @@ export default {
     },
     methods:{
         logout(){
-            console.log("logout")
+            const userinfo = JSON.parse(localStorage.getItem('user'));
+            this.$store.dispatch("notice",{
+              title: '退出成功！',
+              message: "再见！" + userinfo.username,
+              type: 'success',
+            })
+            // console.log("logout")
             localStorage.removeItem('user');
             this.$store.commit('updateLoginState',false)
         },

@@ -54,7 +54,6 @@ export default {
       .then(() => {
       // 处理成功的情况
         console.log('Action was successful');
-        router.push({name:"home"})
       })
       .catch(error => {
         // 处理失败的情况
