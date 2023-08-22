@@ -47,6 +47,10 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 export default {
     name:"BaseComponentView",
+    created(){
+        this.$store.commit('updateLoginState',
+        JSON.parse(localStorage.getItem('user')))
+    }
 }
 </script>
 

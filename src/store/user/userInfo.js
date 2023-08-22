@@ -21,7 +21,7 @@ const ModuleUserInfo = ({
     updateForLogin(state,userinfo){
       state.userinfo = userinfo.userid;
       state.username = userinfo.username;
-      state.userloginstate = true;
+      state.userloginstate = userinfo.userloginstate;
     }
   },
   actions: {
@@ -44,14 +44,23 @@ const ModuleUserInfo = ({
           if(response.data > 0) {
             alert("欢迎回来！" + userinfo.username)
             userinfo.userid = response.data;
-            context.commit('updateForLogin',userinfo)
+            localStorage.setItem('user',JSON.stringify({
+              ...userinfo,
+              userloginstate:true
+            } ))
+            // let user = JSON.parse(localStorage.getItem('user'));
+            // console.log(user)
+            context.commit('updateForLogin',{
+              ...userinfo,
+              userloginstate:true
+            })
             router.push({name:'home'})
           }else if(response.data === 0){
             alert("抱歉，您输入的密码有误！" )
           }else if(response.data === -1){
             alert("服务器异常，请稍后再试")
           }else{
-            alert("抱歉，您输入的密码不正确")
+            alert("抱歉，您的用户名不存在！")
           }
         })
         .catch(error => {
