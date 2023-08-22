@@ -6,3 +6,10 @@ npm install vue-router@4
 npm install vuetify
 npm install axios
 npm install clipboard --save
+npm install markdown-it
+npm install markdown-it-mathjax
+npm install mathjax
+npm install katex
+npm install markdown-it-texmath
+npm install markdown-it-katex
+npm install vue-katex --save

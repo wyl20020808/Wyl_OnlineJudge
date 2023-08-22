@@ -1,17 +1,17 @@
 <template>
     <el-card class="card" v-if="problem">
       <div class="main-info">
-        <span class="id">P1111</span>
-        <span class="title">曾神</span>
+        <span class="id">P{{problem.problemid}}</span>
+        <span class="title">{{problem.title}}</span>
       </div>
       <div class="sub-info">
-        <p class="property">来源：123123</p>
-        <p class="property">时间限制：1000ms</p>
-        <p class="property">空间限制：128MB</p>
-        <p class="property">提交数量：100</p>
-        <p class="property">通过数量：27</p>
-        <p class="property">难度：简单</p>
-        <p class="property">算法标签：模拟</p>
+        <p class="property">来源：{{problem.source}}</p>
+        <p class="property">时间限制：{{ problem.timelimit }}</p>
+        <p class="property">空间限制：{{problem.memorylimit}}</p>
+        <p class="property">提交数量：{{problem.submitcount}}</p>
+        <p class="property">通过数量：{{problem.aceptedcount}}</p>
+        <p class="property">难度：{{problem.difficulty}}</p>
+        <p class="property">算法标签：{{problem.algorithm}}</p>
       </div>
     </el-card>
   </template>

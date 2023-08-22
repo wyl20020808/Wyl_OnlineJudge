@@ -1,11 +1,11 @@
 <template>
 
-    <ProblemCardView />
+    <ProblemCardView :problem="problem" />
     <div class="problem-operator">
       <ProblemOperateView :problem="problem"/>
     </div>
     <div class="problem-content">
-     <PrombleContentView v-bind:problem="problem"/> 
+     <PrombleContentView :problem="problem"/> 
     </div>
     
   </template>

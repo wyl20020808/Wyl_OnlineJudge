@@ -1,14 +1,26 @@
 <template>
     <div>
       <el-card class="outer-card" v-if="problem">
-        <el-card class="inner-card"><strong>题目背景</strong></el-card>
+        <el-card class="inner-card"><strong>题目背景</strong>
+          <div class="content" v-html="parsedDescription(problem.backgorund)">
+         
+        </div>
+        </el-card>
         <el-card class="inner-card"><strong>题目描述</strong>
-            <div class="content">
-                {{problem.description }}
+            <div class="content" v-html="parsedDescription(problem.description)">
+         
             </div>
         </el-card>
-        <el-card class="inner-card"><strong>{{problem.hint }}</strong></el-card>
-        <el-card class="inner-card"><strong>输出格式</strong></el-card>
+        <el-card class="inner-card"><strong>输入格式</strong>
+          <div class="content" v-html="parsedDescription(problem.inputformat)">
+         
+        </div>
+        </el-card>
+        <el-card class="inner-card"><strong>输出格式</strong>
+          <div class="content" v-html="parsedDescription(problem.outputformat)">
+         
+        </div>
+        </el-card>
         <div class="example-cards">
           <el-card class="inner-card">
             <strong>输入样例</strong>
@@ -21,12 +33,21 @@
             <div id="outputExample" ref="outputExample">这里是输出样例</div>
           </el-card>
         </div>
-        <el-card class="inner-card"><strong>数据范围</strong></el-card>
+        <el-card class="inner-card"><strong>数据范围</strong>
+          <div class="content" v-html="parsedDescription(problem.hint)">
+         
+        </div>
+        </el-card>
       </el-card>
     </div>
   </template>
   
   <script>
+ import MarkdownIt from "markdown-it";
+
+ import 'markdown-it-texmath/css/texmath.css';
+  import mk from 'markdown-it-katex';
+  import 'katex/dist/katex.min.css';
   export default {
     name:"temp",
     props:{/*从父节点接受参数 */
@@ -38,7 +59,21 @@
     setup(){
   
     },
+    data(){
+      return {
+        // md: new MarkdownIt({html:true}).use(tm, { engine: require('katex'), delimiters:'dollars' })
+        md: new MarkdownIt({html:true}).use(mk),
+      }
+    },
+    computed:{
+      
+    },
     methods: {
+      parsedDescription(content) {
+        console.log(content)
+        return this.md.render(String(content));
+        return "temp";
+      },
       copyToClipboard(refName) {
         const textToCopy = this.$refs[refName].innerText;
         navigator.clipboard.writeText(textToCopy).then(() => {
@@ -84,3 +119,5 @@
     right: 0;
   }
   </style>
+
+  
