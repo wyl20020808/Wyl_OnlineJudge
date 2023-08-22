@@ -24,14 +24,14 @@
         <div class="example-cards" v-for="(input, index) in problemSample" :key="input.id" >
           <el-card class="inner-card">
             <strong>输入样例</strong>
-            <el-button class="copy-button" :type="buttonTypes[`copyButtonInput${index}`] || 'primary'" @click="copyToClipboard('inputExample', index, `copyButtonInput${index}`)">复制</el-button>
+            <el-button style="color:white" class="copy-button" :type="buttonTypes[`copyButtonInput${index}`] || 'primary'" @click="copyToClipboard('inputExample', index, `copyButtonInput${index}`)">复制</el-button>
             <div class="content" :id="'inputExample' + index" ref="inputExample">
               {{input.input}}
             </div>
           </el-card>
           <el-card class="inner-card">
             <strong>输出样例</strong>
-            <el-button class="copy-button" :type="buttonTypes[`copyButtonOutput${index}`] || 'primary'" @click="copyToClipboard('outputExample', index, `copyButtonOutput${index}`)">复制</el-button>
+            <el-button style="color:white" class="copy-button" :type="buttonTypes[`copyButtonOutput${index}`] || 'primary'" @click="copyToClipboard('outputExample', index, `copyButtonOutput${index}`)">复制</el-button>
             <div class="content" :id="'outputExample' + index" ref="outputExample">
               {{input.output}}
             </div>

@@ -27,7 +27,7 @@
         <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input>
       </el-form-item>
     </el-form>
-    <el-button type="primary" @click="save" class="save-button">保存</el-button>
+    <el-button style="color: aliceblue;" type="primary" @click="save" class="save-button">保存</el-button>
   </div>
 </template>
 
