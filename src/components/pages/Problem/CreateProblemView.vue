@@ -70,7 +70,6 @@ export default {
         "hint": this.hint,
         "problemsample": this.examples
       };
-      console.log(this.examples[0]);
       axios.post('http://localhost:8088/problem/insert', dataSend,)
         .then(response => {
           if(response.data === "success") {

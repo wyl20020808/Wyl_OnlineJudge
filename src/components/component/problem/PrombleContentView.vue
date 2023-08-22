@@ -2,7 +2,7 @@
     <div>
       <el-card class="outer-card" v-if="problem">
         <el-card class="inner-card"><strong>题目背景</strong>
-          <div class="content" v-html="parsedDescription(problem.problemid)">
+          <div class="content" v-html="parsedDescription(problem.background)">
          
         </div>
         </el-card>
@@ -21,19 +21,19 @@
          
         </div>
         </el-card>
-        <div class="example-cards" v-for="input in problemSample" :key="input.id" >
-          <el-card class="inner-card"  >
+        <div class="example-cards" v-for="(input, index) in problemSample" :key="input.id" >
+          <el-card class="inner-card">
             <strong>输入样例</strong>
-            <el-button class="copy-button" @click="copyToClipboard('inputExample')">复制</el-button>
-            <div id="inputExample" ref="inputExample">
-              <div>{{input.input}}</div>
+            <el-button class="copy-button" :type="buttonTypes[`copyButtonInput${index}`] || 'primary'" @click="copyToClipboard('inputExample', index, `copyButtonInput${index}`)">复制</el-button>
+            <div class="content" :id="'inputExample' + index" ref="inputExample">
+              {{input.input}}
             </div>
           </el-card>
-          <el-card class="inner-card" >
+          <el-card class="inner-card">
             <strong>输出样例</strong>
-            <el-button class="copy-button" @click="copyToClipboard('outputExample')">复制</el-button>
-            <div id="outputExample" ref="outputExample">
-              <div>{{input.output}}</div>
+            <el-button class="copy-button" :type="buttonTypes[`copyButtonOutput${index}`] || 'primary'" @click="copyToClipboard('outputExample', index, `copyButtonOutput${index}`)">复制</el-button>
+            <div class="content" :id="'outputExample' + index" ref="outputExample">
+              {{input.output}}
             </div>
           </el-card>
         </div>
@@ -88,6 +88,7 @@
       return {
         // md: new MarkdownIt({html:true}).use(tm, { engine: require('katex'), delimiters:'dollars' })
         md: new MarkdownIt({html:true}).use(mk),
+        buttonTypes: []
       }
     },
     computed:{
@@ -97,21 +98,27 @@
       parsedDescription(content) {
         return this.md.render(String(content));
       },
-      copyToClipboard(refName) {
-        const textToCopy = this.$refs[refName].innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          this.$message({
-            message: '复制成功',
-            type: 'success',
-            duration: 2000
-          });
-        }, () => {
-          this.$message({
-            message: '复制失败',
-            type: 'error'
-          });
+    
+      copyToClipboard(refName, index, buttonRefName) {
+      const textToCopy = this.$refs[refName][index].innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        this.$message({
+          message: '复制成功',
+          type: 'success',
+          duration: 500
         });
-      }
+        this.buttonTypes[buttonRefName] = 'info';
+        setTimeout(() => {
+          this.buttonTypes[buttonRefName] = 'primary';
+        }, 500);
+      }, () => {
+        this.$message({
+          message: '复制失败',
+          type: 'error'
+        });
+      });
+    }
+
     }
   }
   </script>
@@ -140,6 +147,10 @@
     position: absolute;
     top: 0;
     right: 0;
+  }
+  .content{
+    position: relative;
+    top:10px
   }
   </style>
 

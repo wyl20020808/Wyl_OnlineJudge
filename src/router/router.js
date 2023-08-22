@@ -7,7 +7,9 @@ import RankListView from "../components/pages/RankListView.vue"
 import TissueView from "../components/pages/TissueView.vue"
 import UserInfoView from "../components/pages/UserInfoView.vue"
 import CreateProblemView from "../components/pages/Problem/CreateProblemView.vue"
-import ProblemDetailView from "../components/pages/Problem/ProblemDetail/ProblemDetailView.vue"
+import ProblemDetailView from "../components/pages/Problem/ProblemDetailView.vue"
+import UserRegitserView from "../components/pages/User/UserRegisterView.vue"
+import UserLoginView from "../components/pages/User/UserLoginView.vue"
 const routes = [
   {
     path: '/',
@@ -54,6 +56,16 @@ const routes = [
     name: 'problemdetail',
     component: ProblemDetailView,
     props: "true"
+  }, 
+  {
+    path: '/userregitser/',
+    name: 'userregitser',
+    component: UserRegitserView,
+  },
+  {
+    path: '/userlogin/',
+    name: 'userlogin',
+    component: UserLoginView,
   },
 ]
 

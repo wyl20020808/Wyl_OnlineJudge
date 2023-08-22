@@ -25,17 +25,26 @@
                 <li class="nav-item">
                     <router-link class="nav-link" :to="{name:'evaluationqueue'}">评测队列</router-link>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" v-if="$store.state.userInfo.userloginstate">
                     <router-link  :to="{name:'userinfo'}">
                     <img  class="avatar" src="https://cdn.acwing.com/media/user/profile/photo/70660_lg_145a4eca09.jpg" alt="Avatar">
                     </router-link>
                 </li>
+                <li class="nav-item dropdown" v-else>
+                    <router-link class="nav-link " :to="{name:'userlogin'}" >
+                        登录
+                    </router-link>
+                    
+                </li>
+                
             </ul>
         </div>
     </nav>
 </template>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/js/bootstrap.js'
 export default {
     name:"BaseComponentView",
 }
@@ -60,7 +69,7 @@ export default {
         }
         .nav-item:last-child {
             border-right: none;
-            margin-right: 100px;
+            margin-right: 20px;
         }
         .navbar-brand {
             font-size: 2em;

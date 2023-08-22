@@ -13,3 +13,5 @@ npm install katex
 npm install markdown-it-texmath
 npm install markdown-it-katex
 npm install vue-katex --save
+npm install vuetify
+npm i jquery

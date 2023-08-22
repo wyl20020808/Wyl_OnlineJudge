@@ -6,8 +6,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.wyl.backend.classes.problem.controller")
-@MapperScan("com.wyl.backend.classes.problem.sql")
+@MapperScan({"com.wyl.backend.classes.problem.controller",
+        "com.wyl.backend.classes.problem.sql",
+        "com.wyl.backend.classes.user.sql",
+        "com.wyl.backend.classes.user.Controller",
+})
 public class BackendApplication {
 
     public static void main(String[] args) {

@@ -12,9 +12,9 @@
   <script>
   import { reactive,toRefs} from 'vue';
   import { useRoute } from 'vue-router';
-  import ProblemCardView from './ProblemCardView.vue';
-  import ProblemOperateView from './ProblemOperateView.vue';
-  import PrombleContentView from './PrombleContentView.vue';
+  import ProblemCardView from '../../component/problem/ProblemCardView.vue';
+  import ProblemOperateView from '../../component/problem/ProblemOperateView.vue';
+  import PrombleContentView from '../../component/problem/PrombleContentView.vue';
   import axios from 'axios';
   export default {
     name:"problemdetail",
