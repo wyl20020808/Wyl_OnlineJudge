@@ -18,7 +18,7 @@ const ModuleUserInfo = ({
     updateLoginState(state,loginState){
         state.userloginstate = loginState;
     },
-    updateForLogin(state,userinfo){
+    updateUserState(state,userinfo){
       state.userinfo = userinfo.userid;
       state.username = userinfo.username;
       state.userloginstate = userinfo.userloginstate;
@@ -50,7 +50,7 @@ const ModuleUserInfo = ({
             } ))
             // let user = JSON.parse(localStorage.getItem('user'));
             // console.log(user)
-            context.commit('updateForLogin',{
+            context.commit('updateUserState',{
               ...userinfo,
               userloginstate:true
             })

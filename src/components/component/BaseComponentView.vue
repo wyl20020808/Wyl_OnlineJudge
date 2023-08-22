@@ -25,16 +25,20 @@
                 <li class="nav-item">
                     <router-link class="nav-link" :to="{name:'evaluationqueue'}">评测队列</router-link>
                 </li>
-                <li class="nav-item" v-if="$store.state.userInfo.userloginstate">
-                    <router-link  :to="{name:'userinfo'}">
-                    <img  class="avatar" src="https://cdn.acwing.com/media/user/profile/photo/70660_lg_145a4eca09.jpg" alt="Avatar">
-                    </router-link>
+                <li class="nav-item dropdown" v-if="$store.state.userInfo.userloginstate">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="avatar" src="https://cdn.acwing.com/media/user/profile/photo/70660_lg_145a4eca09.jpg" alt="Avatar">
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><router-link :to="{name:'home'}" class="dropdown-item">个人资料</router-link></li>
+                        <li><router-link :to="{name:'home'}" class="dropdown-item">设置</router-link></li>
+                        <li><router-link :to="{name:'home'}" class="dropdown-item">消息</router-link></li>
+                        <li><router-link :to="{name:'home'}" class="dropdown-item">通知</router-link></li>
+                        <li><a @click="logout" class="dropdown-item">退出</a></li>
+                    </ul>
                 </li>
-                <li class="nav-item dropdown" v-else>
-                    <router-link class="nav-link " :to="{name:'userlogin'}" >
-                        登录
-                    </router-link>
-                    
+                <li class="nav-item" v-else>
+                    <router-link class="nav-link" :to="{name:'userlogin'}">登录</router-link>
                 </li>
                 
             </ul>
@@ -48,9 +52,18 @@ import 'bootstrap/dist/js/bootstrap.js'
 export default {
     name:"BaseComponentView",
     created(){
-        this.$store.commit('updateLoginState',
-        JSON.parse(localStorage.getItem('user')))
-    }
+        if(JSON.parse(localStorage.getItem('user') !== null)){
+            this.$store.commit('updateUserState',
+            JSON.parse(localStorage.getItem('user')))
+        }
+    },
+    methods:{
+        logout(){
+            console.log("logout")
+            localStorage.removeItem('user');
+            this.$store.commit('updateLoginState',false)
+        },
+    }   
 }
 </script>
 
