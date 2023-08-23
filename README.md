@@ -1,19 +1,7 @@
-# onlinejudge
+# 前言
+有一天汪佬告诉我：“我要做一个oj留给学校” ，于是项目就开始了。
 
-## Project setup
-```
-npm install
-```
+这个项目是为了留给江理工的学弟学妹。
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+让他们不羡慕别人，用江理自己的oj。
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
