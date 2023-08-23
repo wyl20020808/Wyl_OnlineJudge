@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import BaseComponentViewVue from "../component/BaseComponentView.vue";
+import BaseComponentViewVue from "../component/NavBar.vue";
 export default{
     name:"home",
     components: {

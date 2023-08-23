@@ -26,16 +26,24 @@
                     <router-link class="nav-link" :to="{name:'evaluationqueue'}">评测队列</router-link>
                 </li>
                 <li class="nav-item dropdown" v-if="$store.state.userInfo.userloginstate">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <el-dropdown>
+                        <span class="el-dropdown-link">
+
                         <img class="avatar" src="https://cdn.acwing.com/media/user/profile/photo/70660_lg_145a4eca09.jpg" alt="Avatar">
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><router-link :to="{name:'home'}" class="dropdown-item">个人资料</router-link></li>
-                        <li><router-link :to="{name:'home'}" class="dropdown-item">设置</router-link></li>
-                        <li><router-link :to="{name:'home'}" class="dropdown-item">消息</router-link></li>
-                        <li><router-link :to="{name:'home'}" class="dropdown-item">通知</router-link></li>
-                        <li><a @click="logout" class="dropdown-item">退出</a></li>
-                    </ul>
+                       
+                        <el-icon class="el-icon--right">
+                            <arrow-down />
+                        </el-icon>
+                        </span>
+                        <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item ><router-link :to="{name:'userhome'}" class="dropdown-item"><el-icon><UserFilled /></el-icon>&ensp;个人资料</router-link></el-dropdown-item>
+                            <el-dropdown-item ><router-link :to="{name:'home'}" class="dropdown-item"><el-icon><Setting /></el-icon> &ensp;设置</router-link></el-dropdown-item>
+                            <el-dropdown-item ><router-link :to="{name:'home'}" class="dropdown-item"><el-icon><Bell /></el-icon>&ensp;通知</router-link></el-dropdown-item>
+                            <el-dropdown-item ><a @click="logout" class="dropdown-item"><el-icon><SwitchButton /></el-icon>&ensp;退出</a></el-dropdown-item>
+                        </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                 </li>
                 <li class="nav-item" v-else>
                     <router-link class="nav-link" :to="{name:'userlogin'}">登录</router-link>
@@ -44,18 +52,34 @@
             </ul>
         </div>
     </nav>
+    <!-- <div>
+
+        <UserSelectComponent />
+    </div> -->
+    
+    
 </template>
 
-<script>
+<script >
+import { Setting,UserFilled,Bell,SwitchButton } from '@element-plus/icons-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 export default {
     name:"BaseComponentView",
+    components:{
+        Setting,
+        UserFilled,
+        Bell,
+        SwitchButton,
+    },
     created(){
         if(JSON.parse(localStorage.getItem('user') !== null)){
             this.$store.commit('updateUserState',
             JSON.parse(localStorage.getItem('user')))
         }
+    },
+    setup(){
+      
     },
     methods:{
         logout(){
@@ -74,6 +98,7 @@ export default {
 </script>
 
 <style scoped>
+
  .navbar {
             padding-left: 50px;
             border-bottom: 1px solid #ccc;
@@ -99,10 +124,13 @@ export default {
         }
         .nav-link {
             font-size: 1.2em;
+            outline: none;
         }
         .avatar {
             border-radius: 50%;
             width: 40px;
             height: 40px;
+            outline: none;
         }
+        
 </style>
