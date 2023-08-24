@@ -7,6 +7,36 @@ public class UserInfo {
     private String registertime;
     private String useremail;
     private String token;
+    private String usermotto;
+    private String nickname;
+
+    private String userpicture;
+
+    public String getUserpicture() {
+        return userpicture;
+    }
+
+    public void setUserpicture(String userpicture) {
+        this.userpicture = userpicture;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getUsermotto() {
+        return usermotto;
+    }
+
+    public void setUsermotto(String usermotto) {
+        this.usermotto = usermotto;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+
 
     public String getToken() {
         return token;

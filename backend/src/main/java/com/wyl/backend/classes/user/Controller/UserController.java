@@ -4,7 +4,11 @@ import com.wyl.backend.classes.user.sql.UserOperator;
 import com.wyl.backend.classes.user.userinfo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -16,7 +20,6 @@ import java.util.Objects;
 public class UserController {
     @Autowired //注入，一定要写
     private UserOperator userOperator;
-
     private Boolean exists(String username) {
         List<UserInfo> userinfo = userOperator.select();
         for (UserInfo userInfo : userinfo) {
@@ -26,6 +29,19 @@ public class UserController {
         }
         return false;
     }
+
+    @PostMapping("/query")
+    public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
+        List<UserInfo> userinfo = userOperator.select();
+//        System.out.println(userInfo.getUsername());
+        for (UserInfo info : userinfo) {
+            if (info.getUserid() == userInfo.getUserid() ) {
+                return info;
+            }
+        }
+        return null;
+    }
+
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
         LocalDateTime now = LocalDateTime.now();
@@ -60,5 +76,46 @@ public class UserController {
             return -1;
         }
         return -2;
+    }
+
+    @PostMapping("/update/cardinfo")
+    public int updateUsename(@RequestBody UserInfo userInfo) {
+//        System.out.println(userInfo.getNickname());
+        int cnt = userOperator.updateUsername(userInfo);
+        if(cnt > 0)
+            return 1;
+        return 0;
+    }
+    @PostMapping("/update/userpicture")
+    public int updateUserpicture(@RequestBody UserInfo userInfo) {
+        return updateUserpicture(userInfo);
+
+    }
+
+    @PostMapping("/image/upload")
+    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+        try {
+            // 获取文件名
+            String fileName = file.getOriginalFilename();
+
+            // 指定文件保存的位置。这里我们保存在项目的根目录下的一个 'uploads' 文件夹中
+            String folder = System.getProperty("user.dir") + "/uploads/";
+//            System.out.println(folder);
+            Path path = Paths.get(folder + fileName);
+
+            // 检查 'uploads' 文件夹是否存在，如果不存在则创建
+            if (!Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+
+            // 将文件保存到目标位置
+            Files.write(path, file.getBytes());
+            // 返回文件的 URL，这取决于你的应用的需求
+            System.out.println("http://localhost:8088/images/" + fileName);
+            return "http://localhost:8088/images/" + fileName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Upload failed";
+        }
     }
 }

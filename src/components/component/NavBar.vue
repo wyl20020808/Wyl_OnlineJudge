@@ -64,6 +64,7 @@
 import { Setting,UserFilled,Bell,SwitchButton } from '@element-plus/icons-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
+import router from "@/router/router";
 export default {
     name:"BaseComponentView",
     components:{
@@ -92,6 +93,7 @@ export default {
             // console.log("logout")
             localStorage.removeItem('user');
             this.$store.commit('updateLoginState',false)
+            router.push({name:'home'})
         },
     }   
 }

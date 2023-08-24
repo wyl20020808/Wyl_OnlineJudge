@@ -58,6 +58,25 @@ const ModuleUserInfo = ({
           }) 
         });
     },
+    saveInfo(context,userinfo){
+    
+      axios.post('http://localhost:8088/user/query', userinfo,)
+      .then(response => {
+        console.log(response.data.motto)
+          localStorage.setItem('user',JSON.stringify({
+            ...response.data,
+            userloginstate:true
+          } ))
+      })
+      .catch(error => {
+        context.dispatch("notice",{
+          title: 'Error',
+          message: "服务器异常！ " + error ,
+          type: 'error',
+        })
+      });
+      
+    },
     login(context,userinfo){
       axios.post('http://localhost:8088/user/login', userinfo,)//这里注意不能用get，get有别的用法
         .then(response => {
@@ -69,10 +88,10 @@ const ModuleUserInfo = ({
               type: 'success',
             })
             userinfo.userid = response.data;
-            localStorage.setItem('user',JSON.stringify({
-              ...userinfo,
-              userloginstate:true
-            } ))
+            // console.log(userinfo.username)
+            context.dispatch("saveInfo",userinfo
+              )
+            
             // let user = JSON.parse(localStorage.getItem('user'));
             // console.log(user)
             context.commit('updateUserState',{
