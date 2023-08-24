@@ -1,7 +1,8 @@
-package com.wyl.backend.classes.user.Controller;
+package com.wyl.backend.controller.user;
 
-import com.wyl.backend.classes.user.sql.UserOperator;
-import com.wyl.backend.classes.user.userinfo.UserInfo;
+import com.wyl.backend.entity.user.UserInfo;
+import com.wyl.backend.mapper.UserMapper;
+import com.wyl.backend.utils.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +16,15 @@ import java.util.Objects;
 @RestController
 public class UserController {
     @Autowired //注入，一定要写
-    private UserOperator userOperator;
+    private UserMapper userMapper;
 
+    /**
+     * 判断用户是否存在
+     * @param username
+     * @return
+     */
     private Boolean exists(String username) {
-        List<UserInfo> userinfo = userOperator.select();
+        List<UserInfo> userinfo = userMapper.select();
         for (UserInfo userInfo : userinfo) {
             if (Objects.equals(userInfo.getUsername(), username)) {
                 return true;
@@ -26,32 +32,42 @@ public class UserController {
         }
         return false;
     }
+
+    /**
+     * 用户注册
+     * @param userInfo
+     * @return
+     */
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = now.format(formatter);
+        String formattedNow = TimeUtil.getNewTime();
         userInfo.setRegistertime(formattedNow);
-        if(exists(userInfo.getUsername())){
+        if (exists(userInfo.getUsername())) {
             return "用户名已存在";
         }
 
-        int cnt = userOperator.insert(userInfo);
-        if(cnt > 0)
+        int cnt = userMapper.insert(userInfo);
+        if (cnt > 0)
             return "注册成功";
         return "error";
     }
 
+    /**
+     * 用户登录
+     *
+     * @param userInfo
+     * @return
+     */
     @PostMapping("/login")
     public int login(@RequestBody UserInfo userInfo) {
         try {
-            List<UserInfo>userinfo = userOperator.select();
-            for(UserInfo u:userinfo) {
+            List<UserInfo> userinfo = userMapper.select();
+            for (UserInfo u : userinfo) {
                 System.out.println(u.getUsername());
-                if(Objects.equals(u.getUsername(), userInfo.getUsername())){
-                    if(Objects.equals(u.getPassword(), userInfo.getPassword())){
+                if (Objects.equals(u.getUsername(), userInfo.getUsername())) {
+                    if (Objects.equals(u.getPassword(), userInfo.getPassword())) {
                         return u.getUserid();
-                    }else{
+                    } else {
                         return 0;
                     }
                 }
