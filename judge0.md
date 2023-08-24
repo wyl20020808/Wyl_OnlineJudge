@@ -6,9 +6,7 @@
 看教程就完事了，官方文档写得很好
 
 **参考**：
-
 [安装docker compose](https://docs.docker.com/compose/install/linux/#install-using-the-repository)
-
 [judge0自建版官方安装教程](https://github.com/judge0/judge0/blob/master/CHANGELOG.md#deployment-procedure)
 
 # judge0安装遇到的问题记录
@@ -29,7 +27,6 @@ See 'snap info docker' for additional versions.
 
 ```
 
-# judge0的API
 
 
 
