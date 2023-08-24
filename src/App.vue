@@ -6,7 +6,7 @@
 <script>
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
-import BaseComponentView from './components/component/BaseComponentView.vue'
+import BaseComponentView from './components/component/NavBar.vue'
 import MainView from './components/pages/MainView.vue'
 export default {
   name: 'App',

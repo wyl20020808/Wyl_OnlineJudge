@@ -20,7 +20,7 @@
       <div v-for="(example, index) in examples" :key="index" class="example">
         <el-input v-model="example.input" placeholder="请输入样例输入" class="example-input"></el-input>
         <el-input v-model="example.output" placeholder="请输入样例输出" class="example-input"></el-input>
-        <el-button type="danger"  @click="removeExample(index)" class="example-button">删除</el-button>
+        <el-button style="color: aliceblue;" type="danger"  @click="removeExample(index)" class="example-button">删除</el-button>
       </div>
       <el-button @click="addExample" class="add-button">添加样例</el-button>
       <el-form-item label="提示">

@@ -33,6 +33,7 @@
 <script>
 import { Plus } from '@element-plus/icons-vue'
 import router from '@/router/router'
+
 export default {
   components: {
     Plus
@@ -63,6 +64,7 @@ export default {
 </script>
 
 <style scoped>
+
 .first-button{
 }
 

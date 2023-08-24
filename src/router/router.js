@@ -10,6 +10,7 @@ import CreateProblemView from "../components/pages/Problem/CreateProblemView.vue
 import ProblemDetailView from "../components/pages/Problem/ProblemDetailView.vue"
 import UserRegitserView from "../components/pages/User/UserRegisterView.vue"
 import UserLoginView from "../components/pages/User/UserLoginView.vue"
+import UserHomeView from '@/components/pages/User/UserHome/UserHomeView.vue'
 const routes = [
   {
     path: '/',
@@ -66,6 +67,11 @@ const routes = [
     path: '/userlogin/',
     name: 'userlogin',
     component: UserLoginView,
+  },
+  {
+    path: '/userhome/',
+    name: 'userhome',
+    component: UserHomeView,
   },
 ]
 
