@@ -1,6 +1,32 @@
+oj:
+  jwt:
+    secret-key: jxlg-oj
+    ttl: 7200000
+    token-name: token
+
 server:
   port: 8088
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.wyl.backend.entity
+  #开启驼峰命名
+  map-underscore-to-camel-case: true
+
 
 spring:
   profiles:
     active: dev
+  datasource:
+    url: ${dev.datasource.url}
+    username: ${dev.datasource.username}
+    password: ${dev.datasource.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    database: ${dev.redis.database}
+    url: ${dev.redis.url}
+    timeout: 1000

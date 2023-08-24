@@ -1,11 +1,9 @@
-spring:
+dev:
   datasource:
     url: jdbc:mysql://124.222.52.246:7945/online_judge?useSSL=false&serverTimezone=UTC
     username: root
     password: 2a002b41b9c8162f
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
-
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  redis:
+    database: 3
+    url: redis://RedisdsbZytdsb666@124.222.52.246:3721
+    timeout: 1000
