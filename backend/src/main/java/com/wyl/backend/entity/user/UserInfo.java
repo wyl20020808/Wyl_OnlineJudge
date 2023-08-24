@@ -6,18 +6,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
-import java.io.Serializable;
-
-import static com.baomidou.mybatisplus.annotation.IdType.ASSIGN_UUID;
-
 /**
  * 用户实体类
  */
 @TableName("userinfo")
 @Data
 @Builder
-public class UserInfo implements Serializable {
-    @TableId(type = ASSIGN_UUID)
+public class UserInfo {
+    @TableId
     private Long userid;
     private String username;
     private String password;

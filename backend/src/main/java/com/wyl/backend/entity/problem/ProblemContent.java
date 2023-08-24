@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Data
 @TableName("problemcontent")
-public class ProblemContent implements Serializable {
+public class ProblemContent {
     @TableId
     private int problemid;//题目id
     private String title;//标题
