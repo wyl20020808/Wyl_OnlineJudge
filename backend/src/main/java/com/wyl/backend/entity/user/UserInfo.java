@@ -1,5 +1,6 @@
 package com.wyl.backend.entity.user;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,6 +10,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 import static com.baomidou.mybatisplus.annotation.IdType.ASSIGN_UUID;
+import static com.baomidou.mybatisplus.annotation.IdType.AUTO;
 
 /**
  * 用户实体类

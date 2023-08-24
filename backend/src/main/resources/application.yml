@@ -16,7 +16,6 @@ mybatis-plus:
   #开启驼峰命名
   map-underscore-to-camel-case: true
 
-
 spring:
   profiles:
     active: dev

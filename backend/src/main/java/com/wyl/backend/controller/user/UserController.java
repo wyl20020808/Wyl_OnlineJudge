@@ -59,7 +59,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
-    public int login(@RequestBody UserInfo userInfo) {
+    public long login(@RequestBody UserInfo userInfo) {
         try {
             List<UserInfo> userinfo = userMapper.select();
             for (UserInfo u : userinfo) {
