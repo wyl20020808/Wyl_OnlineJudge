@@ -15,7 +15,6 @@ public class UserTest {
     @Autowired
     UserMapper userMapper;
     @Test
-    @Transient
     void testSign(){
         UserInfo userInfo = UserInfo.builder()
                 .username("fff")
