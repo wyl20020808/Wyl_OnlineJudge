@@ -49,7 +49,7 @@ judge0 有很多API，我在：[judge0API阅读测试](https://console-docs.apip
 | use-1  | source_code                                | text                    |          | Program’s source code.                                                                                                                                                                                                                                                                                                                                                                                          | No default. This attribute is required for [single-file programs](https://ce.judge0.com/#header-single-file-programs-and-multi-file-programs). |
 | use-2  | language_id                                | integer                 |          | [Language](https://ce.judge0.com/#statuses-and-languages-language) ID.                                                                                                                                                                                                                                                                                                                                          | No default. This attribute is required.                                                                                                        |
 | 3      | compiler_options                           | string (max. 512 chars) |          | Options for the compiler (i.e. compiler flags).（编译器的选项(即编译器标志)。）                                                                                                                                                                                                                                                                                                                                                | null                                                                                                                                           |
-| 4      | command_line_arguments                     | string (max. 512 chars) |          | Command line arguments for the program.（程序的命令行参数。）                                                                                                                                                                                                                                                                                                                                                              | null                                                                                                                                           |
+| 4      | command_line_arguments                     | string (max. 512 chars) |          | Command line arguments for the program.（程序的命令行参数）                                                                                                                                                                                                                                                                                                                                                               | null                                                                                                                                           |
 | use-5  | stdin                                      | text                    |          | Input for program.（程序输入）                                                                                                                                                                                                                                                                                                                                                                                        | null. Program won’t receive anything to standard input.                                                                                        |
 | use-6  | expected_output                            | text                    |          | Expected output of program. Used when you want to compare with stdout.（程序的预期输出）                                                                                                                                                                                                                                                                                                                                 | null. Program’s stdout won’t be compared with expected_output.                                                                                 |
 | use-7  | cpu_time_limit                             | float                   | second   | Default runtime limit for every program. Time in which the OS assigns the processor to different tasks is not counted.（每个程序的默认运行时限制。根据服务器配置，暂时设置为5）                                                                                                                                                                                                                                                             | Depends on [configuration](https://ce.judge0.com/#system-and-configuration-configuration-info).                                                |
@@ -80,7 +80,7 @@ judge0 有很多API，我在：[judge0API阅读测试](https://console-docs.apip
 | 32     | wall_time                                  | float                   | second   | Program’s wall time. Will be greater or equal to time.                                                                                                                                                                                                                                                                                                                                                          |                                                                                                                                                |
 | 33     | memory                                     | float                   | kilobyte | Memory used by the program after execution.                                                                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                |
 
-### 项目中需要用到的API
+## 项目中需要用到的API
 
 经过一番探索后发现： `/submissions/batch`这个接口非常好用，而且虽然有很多的参数，但是使用到的并不多。草率了。
 
@@ -161,50 +161,81 @@ Body
 
 ```
 {
-	"submissions": [
-		{
-			"stdout": "hello from Bash\n",
-			"time": "0.006",
-			"memory": 2792,
-			"stderr": null,
-			"token": "cdb3b5fe-22ac-476e-8720-679978f084f1",
-			"compile_output": null,
-			"message": null,
-			"status": {
-				"id": 3,
-				"description": "Accepted"
-			}
-		},
-		{
-			"stdout": "hello from Python\n",
-			"time": "0.024",
-			"memory": 8300,
-			"stderr": null,
-			"token": "b3fe594f-6dce-4adf-9954-6c2220ef249c",
-			"compile_output": null,
-			"message": null,
-			"status": {
-				"id": 3,
-				"description": "Accepted"
-			}
-		},
-		{
-			"stdout": "hello from Ruby\n",
-			"time": "0.059",
-			"memory": 10824,
-			"stderr": null,
-			"token": "93d49b15-2d79-40bd-8ef5-ed3a4b1b99fe",
-			"compile_output": null,
-			"message": null,
-			"status": {
-				"id": 3,
-				"description": "Accepted"
-			}
-		}
-	]
+    "submissions": [
+        {
+            "stdout": "hello from Bash\n",
+            "time": "0.006",
+            "memory": 2792,
+            "stderr": null,
+            "token": "cdb3b5fe-22ac-476e-8720-679978f084f1",
+            "compile_output": null,
+            "message": null,
+            "status": {
+                "id": 3,
+                "description": "Accepted"
+            }
+        },
+        {
+            "stdout": "hello from Python\n",
+            "time": "0.024",
+            "memory": 8300,
+            "stderr": null,
+            "token": "b3fe594f-6dce-4adf-9954-6c2220ef249c",
+            "compile_output": null,
+            "message": null,
+            "status": {
+                "id": 3,
+                "description": "Accepted"
+            }
+        },
+        {
+            "stdout": "hello from Ruby\n",
+            "time": "0.059",
+            "memory": 10824,
+            "stderr": null,
+            "token": "93d49b15-2d79-40bd-8ef5-ed3a4b1b99fe",
+            "compile_output": null,
+            "message": null,
+            "status": {
+                "id": 3,
+                "description": "Accepted"
+            }
+        }
+    ]
 }
 ```
 
 **返回的参数说明：**
 
 ![](assets/2023-08-25-14-57-38-image.png)
+
+
+
+# 关于Judge0自带的IDE
+
+Judge0-IDE开源地址：[judge0/ide](https://github.com/judge0/ide)
+
+了解了Judge0的API之后，我对Judge0有了一个大致的了解，但是我并不清楚Judge0的标准API输入输出格式是什么样的，于是我对Judge0的IDE研究了一下。
+
+
+
+Judge0的IDE访问的接口是：submissions?base64_encoded=true&wait=true，
+
+请求负载为：command_line_arguments（程序的命令行参数，一般用不上）、compiler_options（编译器标志）、language_id、redirect_stderr_to_stdout（将标准错误重定向至标准输出）、source_code、stdin
+
+![](assets/2023-08-25-15-20-51-image.png)
+
+
+
+了解了Judge0自带的IDE后，我决定把提交题目的接口发送参数设置为：
+
+```java
+{
+	"source_code": "cHVibGljIGNsYXNzIE1haW4gewogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiaGVsbG8sIHdvcmxkIik7CiAgICB9Cn0K",
+	"language_id": 62,
+	"redirect_stderr_to_stdout": true,
+	"stdin": "",
+	"command_line_arguments": "",
+	"compiler_options": ""
+}
+```
