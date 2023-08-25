@@ -179,6 +179,7 @@ export default {
       this.$refs.fileInput.click();
     },
     saveUserpicture(userPicture){
+        if(userPicture === 'Upload failed')return;
         const userinfo = JSON.parse(localStorage.getItem('user'));
         userinfo.userpicture = userPicture;
         axios.post('http://localhost:8088/user/update/userpicture', userinfo,)
@@ -200,7 +201,8 @@ export default {
       if (file) {
         const formData = new FormData();
         formData.append('file', file);
-
+        const userinfo = JSON.parse(localStorage.getItem('user'));
+        formData.append('userinfo', JSON.stringify(userinfo));
         axios.post('http://localhost:8088/user/image/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -208,21 +210,21 @@ export default {
         })
         .then(response => {
           // 服务器应该返回图片的 URL
+          this.saveUserpicture(response.data);
           this.$store.dispatch("notice",{
                     title: '头像上传成功！',
                     message: "",
                     type: 'success',
                 })
-          this.userPicture = response.data;
-          saveUserpicture(this.userPicture);
+          if(response.data !== "Upload failed")this.userPicture = response.data;
         })
         .catch(error => {
-            console.log("here")
             this.$store.dispatch("notice",{
                     title: '上传失败！',
                     message:"服务器异常" + error,
                     type: 'error',
                 })
+            this.userPicture = JSON.parse(localStorage.getItem('user').userpicture);
         });
       }
     },

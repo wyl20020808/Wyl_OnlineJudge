@@ -1,5 +1,8 @@
 package com.wyl.backend.classes.user.userinfo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
     private int userid;
     private String username;

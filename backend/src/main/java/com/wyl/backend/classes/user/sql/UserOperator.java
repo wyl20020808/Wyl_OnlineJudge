@@ -17,6 +17,6 @@ public interface UserOperator {
     @Update("UPDATE userinfo SET nickname=#{userinfo.nickname},usermotto=#{userinfo.usermotto} where userid =  #{userinfo.userid}")
     int updateUsername(@Param("userinfo") UserInfo userinfo);
 
-    @Update("UPDATE userpictrue SET userpictrue=#{userinfo.userpictrue} where userid =  #{userinfo.userid}")
+    @Update("UPDATE userinfo SET userpicture=#{userinfo.userpicture} where userid =  #{userinfo.userid}")
     int updateUserPictrue(@Param("userinfo") UserInfo userinfo);
 }

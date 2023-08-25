@@ -1,5 +1,7 @@
 package com.wyl.backend.classes.user.Controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wyl.backend.classes.user.sql.UserOperator;
 import com.wyl.backend.classes.user.userinfo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @CrossOrigin
 @RequestMapping("/user")
 @RestController
@@ -88,12 +90,14 @@ public class UserController {
     }
     @PostMapping("/update/userpicture")
     public int updateUserpicture(@RequestBody UserInfo userInfo) {
-        return updateUserpicture(userInfo);
-
+        System.out.println(userInfo.getUserpicture() +"yes");
+        return userOperator.updateUserPictrue(userInfo);
     }
 
     @PostMapping("/image/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public String handleFileUpload(@RequestParam("file") MultipartFile file,
+                                   @RequestParam("userinfo") String userinfo) {
         try {
             // 获取文件名
             String fileName = file.getOriginalFilename();
@@ -101,7 +105,14 @@ public class UserController {
             // 指定文件保存的位置。这里我们保存在项目的根目录下的一个 'uploads' 文件夹中
             String folder = System.getProperty("user.dir") + "/uploads/";
 //            System.out.println(folder);
-            Path path = Paths.get(folder + fileName);
+            // 获取文件的后缀名
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // 使用 ObjectMapper 将 JSON 字符串转换为 User 对象
+            UserInfo user = objectMapper.readValue(userinfo, UserInfo.class);
+            String newFileName = new String(String.valueOf(user.getUserid())) + fileName.substring(fileName.lastIndexOf("."));
+//            System.out.println(newFileName);
+            Path path = Paths.get(folder + newFileName);
 
             // 检查 'uploads' 文件夹是否存在，如果不存在则创建
             if (!Files.exists(path.getParent())) {
@@ -111,8 +122,8 @@ public class UserController {
             // 将文件保存到目标位置
             Files.write(path, file.getBytes());
             // 返回文件的 URL，这取决于你的应用的需求
-            System.out.println("http://localhost:8088/images/" + fileName);
-            return "http://localhost:8088/images/" + fileName;
+//            System.out.println("http://localhost:8088/images/" + fileName);
+            return "http://localhost:8088/images/" + newFileName;
         } catch (Exception e) {
             e.printStackTrace();
             return "Upload failed";
