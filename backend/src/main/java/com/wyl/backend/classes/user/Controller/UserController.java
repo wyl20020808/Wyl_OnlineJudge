@@ -44,6 +44,15 @@ public class UserController {
         return null;
     }
 
+    @PostMapping("/synchronize/userinfo")
+    public String synchronizeUserInfo(@RequestBody UserInfo userInfo) {
+        try{
+            userOperator.updateById(userInfo);
+            return "success";
+        }catch (Exception e){
+            return "error";
+        }
+    }
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
         LocalDateTime now = LocalDateTime.now();

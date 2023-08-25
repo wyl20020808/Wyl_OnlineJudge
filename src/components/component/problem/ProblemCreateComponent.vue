@@ -45,7 +45,7 @@ export default {
   },
   methods:{
     validateLogon(){
-        if(this.$store.state.userInfo.userloginstate === false){
+        if(this.$store.state.userInfo.userloginstate === 'false'){
             this.centerDialogVisible = true
             return
         }

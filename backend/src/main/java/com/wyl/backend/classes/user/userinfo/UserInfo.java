@@ -1,11 +1,14 @@
 package com.wyl.backend.classes.user.userinfo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
+    @TableId(value = "userid")
     private int userid;
     private String username;
+    private String userloginstate;
     private String password;
     private String registertime;
     private String useremail;
@@ -14,6 +17,14 @@ public class UserInfo {
     private String nickname;
 
     private String userpicture;
+
+    public String getUserloginstate() {
+        return userloginstate;
+    }
+
+    public void setUserloginstate(String userloginstate) {
+        this.userloginstate = userloginstate;
+    }
 
     public String getUserpicture() {
         return userpicture;

@@ -43,13 +43,13 @@
         </li>
         <li
           class="nav-item dropdown"
-          v-if="$store.state.userInfo.userloginstate"
+          v-if="$store.state.userInfo.userloginstate === 'true'"
         >
           <el-dropdown>
             <span class="el-dropdown-link">
               <img
                 class="avatar"
-                src="https://cdn.acwing.com/media/user/profile/photo/70660_lg_145a4eca09.jpg"
+                :src="$store.state.userInfo.userpicture"
                 alt="Avatar"
               />
 
@@ -119,31 +119,23 @@ export default {
     Bell,
     SwitchButton,
   },
-  created() {
-    if (JSON.parse(localStorage.getItem("user") !== null)) {
-      this.$store.commit(
-        "updateUserState",
-        JSON.parse(localStorage.getItem("user"))
-      );
-    }
+  computed:{
+    userloginstate: function() {
+      // return "false";
+    return JSON.parse(localStorage.getItem('user')).userloginstate;
+  }
   },
   created() {
     window.onbeforeunload = () => {
-      // 这里是你的回调函数
       const userinfo = JSON.parse(localStorage.getItem("user"));
-      axios
-        .post("http://localhost:8088/user/query", userinfo)
-        .then((response) => {
-          // 服务器应该返回图片的 URL
-          localStorage.setItem("user", JSON.stringify(response.data));
-        })
-        .catch((error) => {
-          this.$store.dispatch("notice", {
-            title: "刷新失败！",
-            message: "服务器异常" + error,
-            type: "error",
-          });
-        });
+      console.log(userinfo.userloginstate)
+      this.$store.dispatch("SynchronizeInfo",{
+          userinfo,
+          loginState:userinfo.userloginstate
+      }
+      )
+      
+      
     };
   },
   setup() {},
@@ -155,9 +147,10 @@ export default {
         message: "再见！" + userinfo.username,
         type: "success",
       });
-      // console.log("logout")
-      localStorage.removeItem("user");
-      this.$store.commit("updateLoginState", false);
+      this.$store.dispatch("SynchronizeInfo",{
+          userinfo,
+          loginState:false
+      })
       router.push({ name: "home" });
     },
   },

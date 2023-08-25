@@ -9,21 +9,18 @@ const ModuleUserInfo = ({
     userpassword:"",
     userphone:"",
     useraddress:"",
-    userloginstate:false,
-    userisadmin:false,
+    userloginstate:"false",
+    userisadmin:"false",
+    userpicture:"",
   },
   getters: {
 
   },
   mutations: {
-    updateLoginState(state,loginState){
-        state.userloginstate = loginState;
+    updateState(state,State){//把本地数据同步到这里是为了让vue来动态监听
+      state.userloginstate = State.userloginstate;
+      state.userpicture = State.userpicture;
     },
-    updateUserState(state,userinfo){
-      state.userinfo = userinfo.userid;
-      state.username = userinfo.username;
-      state.userloginstate = userinfo.userloginstate;
-    }
   },
   actions: {
     notice(context,noticeInfo)  {
@@ -58,24 +55,25 @@ const ModuleUserInfo = ({
           }) 
         });
     },
-    saveInfo(context,userinfo){
-    
-      axios.post('http://localhost:8088/user/query', userinfo,)
-      .then(response => {
-        console.log(response.data.motto)
-          localStorage.setItem('user',JSON.stringify({
-            ...response.data,
-            userloginstate:true
-          } ))
-      })
-      .catch(error => {
-        context.dispatch("notice",{
+    async SynchronizeInfo(context, info) {
+      try {
+        const response = await axios.post('http://localhost:8088/user/query', info.userinfo);
+        response.data.userloginstate = info.loginState;
+        context.commit("updateState", response.data);//更新到store，为了全局渲染同步
+        localStorage.setItem('user', JSON.stringify(response.data));//同步本地数据
+        await axios.post('http://localhost:8088/user/synchronize/userinfo', response.data);
+        context.dispatch("notice", {
+          title: 'Success',
+          message: "数据同步成功！ ",
+          type: 'success',
+        });
+      } catch (error) {
+        context.dispatch("notice", {
           title: 'Error',
-          message: "服务器异常！ " + error ,
+          message: "服务器异常！ " + error,
           type: 'error',
-        })
-      });
-      
+        });
+      }
     },
     login(context,userinfo){
       axios.post('http://localhost:8088/user/login', userinfo,)//这里注意不能用get，get有别的用法
@@ -89,15 +87,14 @@ const ModuleUserInfo = ({
             })
             userinfo.userid = response.data;
             // console.log(userinfo.username)
-            context.dispatch("saveInfo",userinfo
-              )
+            context.dispatch("SynchronizeInfo",{
+              userinfo,
+              loginState:"true"
+            }
+             )
             
             // let user = JSON.parse(localStorage.getItem('user'));
             // console.log(user)
-            context.commit('updateUserState',{
-              ...userinfo,
-              userloginstate:true
-            })
             router.push({name:'home'})
           }else if(response.data === 0){
             // alert("抱歉，您输入的密码有误！" )
