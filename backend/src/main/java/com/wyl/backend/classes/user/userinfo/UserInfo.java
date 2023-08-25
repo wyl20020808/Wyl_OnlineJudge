@@ -1,8 +1,10 @@
 package com.wyl.backend.classes.user.userinfo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@TableName("userinfo")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
     @TableId(value = "userid")

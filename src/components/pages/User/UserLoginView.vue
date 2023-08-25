@@ -56,11 +56,13 @@
         .then(() => {
         // 处理成功的情况
           console.log('登录部分成功');
+          
         })
         .catch(error => {
           // 处理失败的情况
           console.error('Action failed:', error);
         });
+        
       };
       
   

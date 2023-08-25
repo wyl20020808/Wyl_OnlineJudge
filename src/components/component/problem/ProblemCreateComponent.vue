@@ -45,7 +45,7 @@ export default {
   },
   methods:{
     validateLogon(){
-        if(this.$store.state.userInfo.userloginstate === 'false'){
+        if(JSON.parse(localStorage.getItem('user')).userloginstate !== 'true'){
             this.centerDialogVisible = true
             return
         }

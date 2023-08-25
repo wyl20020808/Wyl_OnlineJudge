@@ -43,13 +43,13 @@
         </li>
         <li
           class="nav-item dropdown"
-          v-if="$store.state.userInfo.userloginstate === 'true'"
+          v-if="userloginstate === 'true'"
         >
           <el-dropdown>
             <span class="el-dropdown-link">
               <img
                 class="avatar"
-                :src="$store.state.userInfo.userpicture"
+                :src="userpicture"
                 alt="Avatar"
               />
 
@@ -107,7 +107,7 @@ import {
 } from "@element-plus/icons-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
-
+import {sleep} from "@/js/functions/TimeAbout.js"
 import router from "@/router/router";
 import axios from "axios";
 
@@ -123,19 +123,16 @@ export default {
     userloginstate: function() {
       // return "false";
     return JSON.parse(localStorage.getItem('user')).userloginstate;
-  }
+  },
+  userpicture: function() {
+      return JSON.parse(localStorage.getItem('user')).userpicture;
+    }
   },
   created() {
     window.onbeforeunload = () => {
-      const userinfo = JSON.parse(localStorage.getItem("user"));
-      console.log(userinfo.userloginstate)
-      this.$store.dispatch("SynchronizeInfo",{
-          userinfo,
-          loginState:userinfo.userloginstate
-      }
-      )
-      
-      
+
+      // console.log(userinfo.userloginstate)
+
     };
   },
   setup() {},
@@ -146,12 +143,17 @@ export default {
         title: "退出成功！",
         message: "再见！" + userinfo.username,
         type: "success",
+        
       });
       this.$store.dispatch("SynchronizeInfo",{
           userinfo,
           loginState:false
       })
-      router.push({ name: "home" });
+      sleep(500).then(()=>{
+        window.location = "http://localhost:8080/";
+      })
+      // router.push({ name: "home" });
+      
     },
   },
 };

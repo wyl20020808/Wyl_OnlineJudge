@@ -182,10 +182,10 @@ export default {
         if(userPicture === 'Upload failed')return;
         const userinfo = JSON.parse(localStorage.getItem('user'));
         userinfo.userpicture = userPicture;
+        // this.userPicture = userPicture;
         axios.post('http://localhost:8088/user/update/userpicture', userinfo,)
         .then(response => {
           // 服务器应该返回图片的 URL
-                console.log(userPicture)
                 localStorage.setItem('user', JSON.stringify(userinfo));
         })
         .catch(error => {
@@ -195,6 +195,7 @@ export default {
                     type: 'error',
                 })
         });
+        
     },
     handleFileChange(event) {
       const file = event.target.files[0];
@@ -217,6 +218,7 @@ export default {
                     type: 'success',
                 })
           if(response.data !== "Upload failed")this.userPicture = response.data;
+          window.location.reload();
         })
         .catch(error => {
             this.$store.dispatch("notice",{
