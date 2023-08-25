@@ -30,15 +30,19 @@ See 'snap info docker' for additional versions.
 
 # judge0的API
 
-judge0 有很多API，在：[judge0API阅读测试](https://console-docs.apipost.cn/preview/3e3232a9746a65b8/533a4321aaab9848)中进行了简单的测试。
+参考：[Judge0 CE - API Docs](https://ce.judge0.com/)
+
+judge0 有很多API，我在：[judge0API阅读测试](https://console-docs.apipost.cn/preview/3e3232a9746a65b8/533a4321aaab9848)中进行了简单的测试。
 
 其中非常有用的API就是：submissions和workers
+
+可以通过访问Judge0的官方网站[Judge0 IDE](https://ide.judge0.com/)来体验官方的API，没有访问官方IDE之前，我无法理解这个接口的运转模式。
 
 ## api-submission
 
 这个接口可以用于提交在指定运行时约束的可用编程语言之一中运行任意源代码。Submission有33个属性。属性1-20用于创建新的提交，而属性21-33给出提交执行后的详细信息。
 
-### api-submission属性参考表
+### api属性参考表
 
 | #      | Name                                       | Type                    | Unit     | Description                                                                                                                                                                                                                                                                                                                                                                                                     | Default Value                                                                                                                                  |
 | ------ | ------------------------------------------ | ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -76,7 +80,7 @@ judge0 有很多API，在：[judge0API阅读测试](https://console-docs.apipost
 | 32     | wall_time                                  | float                   | second   | Program’s wall time. Will be greater or equal to time.                                                                                                                                                                                                                                                                                                                                                          |                                                                                                                                                |
 | 33     | memory                                     | float                   | kilobyte | Memory used by the program after execution.                                                                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                |
 
-### 项目中用到的API
+### 项目中需要用到的API
 
 经过一番探索后发现： `/submissions/batch`这个接口非常好用，而且虽然有很多的参数，但是使用到的并不多。草率了。
 
@@ -200,3 +204,7 @@ Body
 	]
 }
 ```
+
+**返回的参数说明：**
+
+![](assets/2023-08-25-14-57-38-image.png)
