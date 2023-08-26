@@ -1,8 +1,15 @@
 package com.wyl.backend.classes.problem;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@TableName("problemsample")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemSample {
     private String input;
     private String output;
+    @TableId(value = "problemid")
     private int problemid;
     public int getProblemid() {
         return problemid;

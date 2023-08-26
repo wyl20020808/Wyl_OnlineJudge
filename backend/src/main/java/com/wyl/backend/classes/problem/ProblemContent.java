@@ -3,12 +3,14 @@ package com.wyl.backend.classes.problem;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 @TableName("problemcontent")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemContent {
     private String title;//标题
-    @TableId
+    @TableId(value = "problemid")
     private int problemid;//题目id
     private String description;//题目描述
     private String background;//题目背景

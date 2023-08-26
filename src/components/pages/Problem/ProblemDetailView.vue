@@ -32,7 +32,6 @@ export default {
   axios.get(`http://localhost:8088/problem/query/${state.problemid}`)
     .then(response => {
       state.problem = response.data;
-      console.log(state.problem.pro,"weyuw");
     })
     .catch(error => {
       console.log(error);

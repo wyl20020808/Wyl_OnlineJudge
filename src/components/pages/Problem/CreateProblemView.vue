@@ -33,6 +33,8 @@
 
 <script>
 import axios from 'axios';
+
+import { sleep } from '@/js/functions/TimeAbout';
 export default {
   data() {
     return {
@@ -73,15 +75,32 @@ export default {
       axios.post('http://localhost:8088/problem/insert', dataSend,)
         .then(response => {
           if(response.data === "success") {
-            alert("保存成功！")
+            this.$store.dispatch("notice", {
+            title: "保存成功！",
+            message: "",
+            type: "success",
+      
+          });
+            sleep(500)
             this.$router.push({ path: '/problems' })
           }else{
-            alert("保存失败！" + response.data)
+            // alert("保存失败！" + response.data)
+            this.$store.dispatch("notice", {
+            title: "保存失败！",
+            message: response.data,
+            type: "error",
+      
+          });
             this.rollBackInfo(dataSend);
           }          
         })
         .catch(error => {
-          alert("保存失败！" + error.data)
+          this.$store.dispatch("notice", {
+            title: "保存失败！",
+            message: error,
+            type: "error",
+      
+          });
           this.rollBackInfo(dataSend);
         });
     }

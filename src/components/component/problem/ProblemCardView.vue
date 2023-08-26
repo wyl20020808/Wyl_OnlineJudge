@@ -6,8 +6,8 @@
       </div>
       <div class="sub-info">
         <p class="property">来源：{{problem.source}}</p>
-        <p class="property">时间限制：{{ problem.timelimit }}</p>
-        <p class="property">空间限制：{{problem.memorylimit}}</p>
+        <p class="property">时间限制：{{ problem.timelimit }}ms</p>
+        <p class="property">空间限制：{{problem.memorylimit}}MB</p>
         <p class="property">提交数量：{{problem.submitcount}}</p>
         <p class="property">通过数量：{{problem.aceptedcount}}</p>
         <p class="property">难度：{{problem.difficulty}}</p>
