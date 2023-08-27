@@ -13,6 +13,8 @@
 
 # judge0安装遇到的问题记录
 
+下载缓慢问题:[docker安装，以及docker源修改，docker-compose安装一条龙_docker-compose 镜像源___WHOAMI的博客-CSDN博客](https://blog.csdn.net/qq_28597013/article/details/121864092)
+
 执行docker-compose up -d命令时报错。
 
 **解决方法**：按提示的来（没啥困难的）
@@ -209,15 +211,11 @@ Body
 
 ![](assets/2023-08-25-14-57-38-image.png)
 
-
-
 # 关于Judge0自带的IDE
 
 Judge0-IDE开源地址：[judge0/ide](https://github.com/judge0/ide)
 
 了解了Judge0的API之后，我对Judge0有了一个大致的了解，但是我并不清楚Judge0的标准API输入输出格式是什么样的，于是我对Judge0的IDE研究了一下。
-
-
 
 Judge0的IDE访问的接口是：submissions?base64_encoded=true&wait=true，
 
@@ -225,17 +223,19 @@ Judge0的IDE访问的接口是：submissions?base64_encoded=true&wait=true，
 
 ![](assets/2023-08-25-15-20-51-image.png)
 
-
-
 了解了Judge0自带的IDE后，我决定把提交题目的接口发送参数设置为：
 
 ```java
 {
-	"source_code": "cHVibGljIGNsYXNzIE1haW4gewogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiaGVsbG8sIHdvcmxkIik7CiAgICB9Cn0K",
-	"language_id": 62,
-	"redirect_stderr_to_stdout": true,
-	"stdin": "",
-	"command_line_arguments": "",
-	"compiler_options": ""
+    "source_code": "cHVibGljIGNsYXNzIE1haW4gewogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiaGVsbG8sIHdvcmxkIik7CiAgICB9Cn0K",
+    "language_id": 62,
+    "redirect_stderr_to_stdout": true,
+    "stdin": "",
+    "command_line_arguments": "",
+    "compiler_options": ""
 }
 ```
+
+# 关于Judge0可以使用的语言
+
+62是java，26,27都不行，，，
