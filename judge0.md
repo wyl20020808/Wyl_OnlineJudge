@@ -239,3 +239,9 @@ Judge0的IDE访问的接口是：submissions?base64_encoded=true&wait=true，
 # 关于Judge0可以使用的语言
 
 62是java，26,27都不行，，，
+
+## 判题逻辑设计
+
+本来想画成时序图的，以后再更新好了
+
+![](assets/2023-08-28-19-20-29-image.png)
