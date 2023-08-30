@@ -30,10 +30,6 @@ ps:Http接口本来在上午就应该调试完，但是因为我在发送http请
 
 #### 2023-8-27
 
-
-
 今天遇到一个很奇怪的错：# [org.apache.ibatis.type.TypeException：别名“Criterion”已映射到值“com.xxx.domain.def.GameListExample$Criterion”](https://stackoverflow.com/questions/55902991/org-apache-ibatis-type-typeexception-the-alias-criterion-is-already-mapped-to)
-
-
 
 原因是因为两个entity取名太类似了，容易映射错误。我把ProblemSample改名为Sample就没问题了。
