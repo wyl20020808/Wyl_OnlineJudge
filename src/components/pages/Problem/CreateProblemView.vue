@@ -33,7 +33,7 @@
 
 <script>
 import axios from 'axios';
-
+import {SERVER_URL} from "../../../js/functions/config"
 import { sleep } from '@/js/functions/TimeAbout';
 export default {
   data() {
@@ -72,7 +72,7 @@ export default {
         "hint": this.hint,
         "problemsample": this.examples
       };
-      axios.post('http://localhost:8088/problem/insert', dataSend,)
+      axios.post(`${SERVER_URL}/problem/insert`, dataSend,)
         .then(response => {
           if(response.data === "success") {
             this.$store.dispatch("notice", {

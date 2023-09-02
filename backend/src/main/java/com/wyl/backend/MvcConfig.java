@@ -9,7 +9,9 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String projectPath = System.getProperty("user.dir");
+        String absolutePath = "file:" + projectPath + "/uploads/";
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:/E:\\Desktop\\test\\Wyl_OnlineJudge\\backend\\uploads/");
+                .addResourceLocations(absolutePath);
     }
 }

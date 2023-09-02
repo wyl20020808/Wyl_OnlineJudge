@@ -29,6 +29,7 @@
   </template>
   
   <script>
+  import {SERVER_URL} from "../../../js/functions/config"
   import {
     Search,
   } from '@element-plus/icons-vue'
@@ -62,7 +63,7 @@
       };
     },
     created(){
-      axios.get('http://localhost:8088/problem/query')
+      axios.get(`${SERVER_URL}/problem/query`)
       .then(response => {
         this.questions = response.data;
       })

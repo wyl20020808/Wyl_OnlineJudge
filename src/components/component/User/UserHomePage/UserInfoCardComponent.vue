@@ -92,6 +92,7 @@
 </template>
 
 <script>
+import {SERVER_URL} from "../../../../js/functions/config"
 import axios from 'axios';
 export default {
   data() {
@@ -154,7 +155,7 @@ export default {
             const userinfo = JSON.parse(localStorage.getItem('user'));
             userinfo.nickname = this.nickName;
             userinfo.usermotto = this.userMotto;
-            axios.post(`http://localhost:8088/user/update/cardinfo`,userinfo)
+            axios.post(`${SERVER_URL}/user/update/cardinfo`,userinfo)
             .then(response => {
                 this.$store.dispatch("notice",{
                     title: '修改成功！',
@@ -183,7 +184,7 @@ export default {
         const userinfo = JSON.parse(localStorage.getItem('user'));
         userinfo.userpicture = userPicture;
         // this.userPicture = userPicture;
-        axios.post('http://localhost:8088/user/update/userpicture', userinfo,)
+        axios.post(`${SERVER_URL}/user/update/userpicture`, userinfo,)
         .then(response => {
           // 服务器应该返回图片的 URL
                 localStorage.setItem('user', JSON.stringify(userinfo));
@@ -204,7 +205,7 @@ export default {
         formData.append('file', file);
         const userinfo = JSON.parse(localStorage.getItem('user'));
         formData.append('userinfo', JSON.stringify(userinfo));
-        axios.post('http://localhost:8088/user/image/upload', formData, {
+        axios.post(`${SERVER_URL}/user/image/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

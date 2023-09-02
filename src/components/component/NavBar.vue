@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import {SERVER} from "../../js/functions/config"
 import {
   Setting,
   UserFilled,
@@ -121,13 +122,22 @@ export default {
   },
   computed:{
     userloginstate: function() {
-      // return "false";
-    return JSON.parse(localStorage.getItem('user')).userloginstate;
-  },
-  userpicture: function() {
-      return JSON.parse(localStorage.getItem('user')).userpicture;
+    let user = localStorage.getItem('user');
+    if(user) {
+      return JSON.parse(user).userloginstate;
+    } else {
+      return "false";
     }
   },
+  userpicture: function() {
+    let user = localStorage.getItem('user');
+    if(user) {
+      return JSON.parse(user).userpicture;
+    } else {
+      return ""; // 返回一个默认的图片URL或者空字符串
+    }
+  }
+},
   created() {
     window.onbeforeunload = () => {
 
@@ -138,6 +148,7 @@ export default {
   setup() {},
   methods: {
     logout() {
+      console.log("logout")
       const userinfo = JSON.parse(localStorage.getItem("user"));
       this.$store.dispatch("notice", {
         title: "退出成功！",
@@ -150,13 +161,14 @@ export default {
           loginState:false
       })
       sleep(500).then(()=>{
-        window.location = "http://localhost:8080/";
+        window.location = `${SERVER}`;
       })
       // router.push({ name: "home" });
       
     },
   },
-};
+
+}
 </script>
 
 <style scoped>

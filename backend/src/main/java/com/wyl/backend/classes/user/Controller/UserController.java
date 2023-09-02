@@ -131,8 +131,18 @@ public class UserController {
             // 将文件保存到目标位置
             Files.write(path, file.getBytes());
             // 返回文件的 URL，这取决于你的应用的需求
-//            System.out.println("http://localhost:8088/images/" + fileName);
+            String env = System.getProperty("env");
+
+            if ("production".equals(env)) {
+                return "http://8.134.48.157:8088/images/" + newFileName;
+                // 生产环境
+            }
+                // 开发环境
             return "http://localhost:8088/images/" + newFileName;
+
+
+//            System.out.println("http://localhost:8088/images/" + fileName);
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Upload failed";

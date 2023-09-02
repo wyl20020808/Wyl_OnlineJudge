@@ -136,6 +136,7 @@
 </template>
 
 <script>
+import {SERVER_URL} from "../../../js/functions/config"
 import router from "@/router/router";
 import { ref } from "vue";
 import axios from "axios";
@@ -145,7 +146,7 @@ export default {
   methods: {
     deleteQuestion(){
         axios
-        .post(`http://localhost:8088/problem/delete/problem`,{problemid: this.problemid} )
+        .post(`${SERVER_URL}/problem/delete/problem`,{problemid: this.problemid} )
         .then((response) => {
           this.$store.dispatch("notice", {
             title: "删除成功！",
@@ -196,7 +197,7 @@ export default {
         problemsample: problemsample,
       };
       axios
-        .post(`http://localhost:8088/problem/update/problem`, problem)
+        .post(`${SERVER_URL}/problem/update/problem`, problem)
         .then((response) => {
           this.$store.dispatch("notice", {
             title: "保存成功！",
@@ -328,7 +329,7 @@ export default {
   },
   created() {
     axios
-      .get(`http://localhost:8088/problem/query/probleminfo/${this.problemid}`)
+      .get(`${SERVER_URL}/problem/query/probleminfo/${this.problemid}`)
       .then((response) => {
         this.probleminfo = response.data;
         this.fields.forEach((field) => {

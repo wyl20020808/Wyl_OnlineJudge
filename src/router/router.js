@@ -12,6 +12,7 @@ import UserRegitserView from "../components/pages/User/UserRegisterView.vue"
 import UserLoginView from "../components/pages/User/UserLoginView.vue"
 import UserHomeView from '@/components/pages/User/UserHome/UserHomeView.vue'
 import ProblemEditView from '@/components/pages/Problem/ProblemEditView.vue'
+import SubmitCodeView from "../components/pages/Problem/SubmitCodeView.vue"
 const routes = [
   {
     path: '/',
@@ -78,6 +79,12 @@ const routes = [
     path: '/problemedit/:problemid',
     name: 'problemedit',
     component: ProblemEditView,
+    props:true,
+  },
+  {
+    path: '/problem/submit/:problemid',
+    name: 'submitCodeview',
+    component: SubmitCodeView,
     props:true,
   },
 ]

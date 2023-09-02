@@ -82,6 +82,7 @@
 </template>
 
 <script>
+import {SERVER_URL} from "../../../js/functions/config"
 import MarkdownIt from "markdown-it";
 import { watchEffect, toRefs, reactive } from "vue";
 import "markdown-it-texmath/css/texmath.css";
@@ -108,7 +109,7 @@ export default {
       if (state.problemid) {
         axios
           .get(
-            `http://localhost:8088/problem/query/problemsample/${state.problemid}`
+            `${SERVER_URL}/problem/query/problemsample/${state.problemid}`
           )
           .then((response) => {
             state.problemSample = response.data;

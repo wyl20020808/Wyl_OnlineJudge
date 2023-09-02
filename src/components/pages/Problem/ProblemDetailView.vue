@@ -10,6 +10,7 @@
 
 </template>
 <script>
+import {SERVER_URL} from "../../../js/functions/config"
 import { reactive,toRefs} from 'vue';
 import { useRoute } from 'vue-router';
 import ProblemCardView from '../../component/problem/ProblemCardView.vue';
@@ -29,7 +30,7 @@ export default {
     problemid: route.query.problemid,
     problem: {}
   });
-  axios.get(`http://localhost:8088/problem/query/${state.problemid}`)
+  axios.get(`${SERVER_URL}/problem/query/${state.problemid}`)
     .then(response => {
       state.problem = response.data;
     })
