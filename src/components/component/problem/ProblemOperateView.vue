@@ -1,7 +1,7 @@
 <template>
   <div class="button-container">
     <el-button @click="editProblem" class="button editProblem">编辑题目</el-button>
-    <el-button class="button">提交代码</el-button>
+    <el-button @click="submitProblem" class="button">提交代码</el-button>
     <el-button class="button">题解</el-button>
     <el-button class="button">讨论</el-button>
     <el-button class="button">收藏</el-button>
@@ -23,6 +23,9 @@ export default {
   methods: {
     editProblem() {
       router.push({name:"problemedit",params:{ problemid : this.problem.problemid}})
+    },
+    submitProblem(){
+      router.push({name:"submitcode",params:{ problemid : this.problem.problemid}})
     }
 
   }

@@ -13,6 +13,7 @@ import UserLoginView from "../components/pages/User/UserLoginView.vue"
 import UserHomeView from '@/components/pages/User/UserHome/UserHomeView.vue'
 import ProblemEditView from '@/components/pages/Problem/ProblemEditView.vue'
 import SubmitCodeView from "../components/pages/Problem/SubmitCodeView.vue"
+import JudgeContentView from "@/components/pages/judge/JudgeContentView.vue"
 const routes = [
   {
     path: '/',
@@ -83,8 +84,14 @@ const routes = [
   },
   {
     path: '/problem/submit/:problemid',
-    name: 'submitCodeview',
+    name: 'submitcode',
     component: SubmitCodeView,
+    props:true,
+  },
+  {
+    path: '/judge/judgecontent/:judgeid',
+    name: 'judgecontent',
+    component: JudgeContentView,
     props:true,
   },
 ]

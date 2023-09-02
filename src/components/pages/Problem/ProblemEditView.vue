@@ -26,6 +26,22 @@
       @click="deleteQuestion"
       >删除题目</el-button
     >
+    <div style="position: relative;left: 850px;bottom: 40px;">
+      <input  type="file" accept=".zip" @change="handleFileUpload($event)">
+    <el-button
+      type="primary"
+      style="
+        color: white;
+        width: 100px;
+        position: relative;
+        left: -90px;
+        bottom: 2px;
+      "
+      @click="upload"
+      >上传数据</el-button
+    >
+    </div>
+    
   </div>
   <div class="card card1">
     <div class="input-field" v-for="(field, index) in fields" :key="index">
@@ -214,6 +230,24 @@ export default {
           });
         });
     },
+    handleFileUpload(event) {
+      this.file = event.target.files[0];
+    },
+    upload() {
+      let formData = new FormData();
+      formData.append('zipFile', this.file);
+      formData.append('problemId', parseInt(this.problemid));
+      console.log(this.file,this.problemid)
+      axios.post('https://784y2154s6.zicp.fun/sample/upload', formData)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      // 然后你可以使用你的HTTP库（例如axios）来发送这个formData到服务器
+      // axios.post('/upload', formData)
+    }
   },
   data() {
     const timeoptions = [];
@@ -312,6 +346,7 @@ export default {
     ]);
     let samples = ref([]);
     return {
+      file: null,
       memoryoptions,
       timeoptions,
       isModified: false,
@@ -393,8 +428,8 @@ export default {
   width: 80%;
   position: relative;
   left: 150px;
-  min-height: 100px; /* 设置最小高度 */
-  height: auto; /* 自动调整大小以适应内容 */
+  /* min-height: 100px; 设置最小高度 */
+  height: 120px; /* 自动调整大小以适应内容 */
   margin-bottom: 30px;
   margin-top: 20px;
 }
