@@ -238,7 +238,7 @@ export default {
       formData.append('zipFile', this.file);
       formData.append('problemId', parseInt(this.problemid));
       console.log(this.file,this.problemid)
-      axios.post('https://784y2154s6.zicp.fun/sample/upload', formData)
+      axios.post(`${SERVER_URL}/sample/upload`, formData)
         .then(response => {
           console.log(response);
         })

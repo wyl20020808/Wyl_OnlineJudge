@@ -1,5 +1,6 @@
 package com.wyl.backend.classes.judge.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wyl.backend.classes.judge.Judge;
 import com.wyl.backend.classes.judge.JudgeContent;
 import com.wyl.backend.classes.judge.sql.JudgeContentSQL;
@@ -24,7 +25,7 @@ public class JudgeController {
             List<Judge> query = judgeSql.selectList(null);
             return query.get(query.size()-1).getJudgeid();
         }catch (Exception e){
-            //System.out.println(e);
+            System.out.println(e);
             System.out.println("yes yes wrong  wrong wrong wrong");
             return -1;
         }
@@ -41,5 +42,23 @@ public class JudgeController {
             System.out.println();
             return -1;
         }
+    }
+
+    @GetMapping("/query/judge")
+    public Judge queryJudge(@RequestParam int judgeid){
+        QueryWrapper<Judge> query = new QueryWrapper<>();
+        query.eq("judgeid",judgeid);
+        return judgeSql.selectOne(query);
+    }
+
+    @GetMapping("/query/judgecontent")
+    public List<JudgeContent> queryJudgeContent(@RequestParam int judgeid){
+        QueryWrapper<JudgeContent> query = new QueryWrapper<>();
+        query.eq("judgeid",judgeid);
+        return judgeContentSql.selectList(query);
+    }
+    @GetMapping("/query/judgeid")
+    public List<Judge> queryJudgeid(){
+        return judgeSql.selectList(null);
     }
 }

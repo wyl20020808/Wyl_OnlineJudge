@@ -17,8 +17,57 @@ public class Judge {
     public String language;
     public String submittime;
 
+    public String username;
+
+    public String code;
+    public String compileoutput;
+
+    public int totaltime;
+
+    public int score;
+
     public int getJudgeid() {
         return judgeid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getCompileoutput() {
+        return compileoutput;
+    }
+
+    public void setCompileoutput(String compileoutput) {
+        this.compileoutput = compileoutput;
+    }
+
+    public int getTotaltime() {
+        return totaltime;
+    }
+
+    public void setTotaltime(int totaltime) {
+        this.totaltime = totaltime;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public void setJudgeid(int judgeid) {

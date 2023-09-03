@@ -89,10 +89,9 @@ const routes = [
     props:true,
   },
   {
-    path: '/judge/judgecontent/:judgeid',
+    path: '/judge/judgecontent',
     name: 'judgecontent',
     component: JudgeContentView,
-    props:true,
   },
 ]
 
