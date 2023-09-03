@@ -18,13 +18,24 @@
           ></span>
           <!-- 显示 "×" -->
           {{ judgestate }} {{ score }}
+          <div class="compileoutput">
+            <span
+              >编译器输出：{{
+                decodeBase64(judgeinfo.judge.compileoutput)
+              }}</span
+            >
+          </div>
+          <div class="state" v-if="tableData.length > 0">
+            <el-table class="table1" :data="tableData" :row-class-name="tableRowClassName">
+              <el-table-column prop="judgeid" label="编号"></el-table-column>
+              <el-table-column prop="judgestate" label="状态"></el-table-column>
+              <el-table-column prop="runtime" label="耗时"></el-table-column>
+              <el-table-column prop="memory" label="空间"></el-table-column>
+            </el-table>
+          </div>
         </div>
-        <div
-          v-for="judgecontent in judgeinfo.judgecontent"
-          :key="judgecontent.judgecontentid"
-        >
-      
-      </div>
+
+        
       </div>
     </div>
   </div>
@@ -32,6 +43,7 @@
 
 <script>
 import { Check, Close } from "@element-plus/icons";
+import { ElTable, ElTableColumn } from "element-plus";
 export default {
   props: {
     judgeinfo: {
@@ -42,17 +54,24 @@ export default {
   components: {
     Check,
     Close,
+    ElTable,
+    ElTableColumn,
   },
 
   data() {
     return {
-      score: 0,
+      score: null,
       judgestate: "Wrong Answer",
       loading: true,
       startTime: Date.now(),
       elapsedTime: 0,
       fast: false,
       randomTime: Math.floor(Math.random() * 5) + 1, // 生成1到5之间的随机数
+      tableData: [
+        // { judgeid: "1", judgestate: "状态1", runtime: "耗时1", memory: "空间1" },
+        // { judgeid: "2", judgestate: "状态2", runtime: "耗时2", memory: "空间2" },
+        // ...其他行数据...
+      ],
     };
   },
   computed: {
@@ -67,18 +86,44 @@ export default {
       return this.fast ? "Running Code...." : "Compile Code....";
     },
   },
-  methods: {},
+  methods: {
+    decodeBase64(input) {
+      return atob(input);
+    },
+    tableRowClassName({ row, rowIndex }) {
+      // 根据行数据和行索引返回类名
+      return rowIndex % 2 === 0 ? "odd-row" : "even-row";
+    },
+    updateInfo(){
+      this.loading = false;
+      this.score = this.judgeinfo.judge.score;
+      this.judgestate = this.judgeinfo.judge.judgestate;
+      if(this.judgeinfo.judgecontent.length !== undefined){
+        for(let i = 0 ;i < this.judgeinfo.judgecontent.length;i++){
+          this.tableData.push({
+            judgeid:i + 1,
+            judgestate:this.judgeinfo.judgecontent[i].judgestate,
+            runtime:this.judgeinfo.judgecontent[i].runtime,
+            memory:this.judgeinfo.judgecontent[i].memory
+          })
+      }
+      }
+      
+    }
+  },
   watch: {
     judgeinfo: {
       handler(newJudgeInfo, oldJudgeInfo) {
-        this.loading = false;
-        this.score = this.judgeinfo.judge.score;
-        this.judgestate = this.judgeinfo.judge.judgestate;
+        this.updateInfo();
       },
       deep: true,
     },
   },
   created() {
+    if (this.judgeinfo.judge.score !== undefined) {
+      //组件重新加载的时候
+      this.updateInfo();
+    }
     this.interval = setInterval(() => {
       this.elapsedTime = ((Date.now() - this.startTime) / 1000).toFixed(2);
       if (this.elapsedTime > this.randomTime) {
@@ -93,6 +138,35 @@ export default {
 </script>
 
 <style scoped>
+.odd-row {
+  background-color: #f2f2f2;
+}
+.even-row {
+  background-color: #ffffff;
+}
+.span1 {
+  margin-right: 150px;
+  font-size: 20px;
+  position: relative;
+  top: 20px;
+}
+.state {
+  position: relative;
+  color: gray;
+  top: 50px;
+  right: 10px;
+}
+.compileoutput {
+  color: gray;
+  position: relative;
+  left: 0px;
+  top: 30px;
+  font-size: 18px;
+}
+.table1{
+  width: 780px;
+  font-size: 16px;
+}
 .icon-check {
   color: green;
 }

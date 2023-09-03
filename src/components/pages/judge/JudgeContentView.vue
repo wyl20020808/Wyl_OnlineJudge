@@ -154,25 +154,24 @@ export default {
   async created() {
     this.judgeid = this.$route.query.judgeid;//首先给我们的judgeid赋值
     await this.getData();
-    console.log(this.hadinfo)
     if(this.hadinfo === false){
       let formData = new FormData();
       formData.append("source_code", this.$route.query.source_code);
       formData.append("problemId", this.$route.query.problemid);
       formData.append("languageId", this.$route.query.languageId);
       await axios //提交代码给后端
-        .post(`http://8.134.48.157:8088/judge/judgeForm`, formData, {
+        .post(`http://8.134.100.87:8088/judge/judgeForm`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         })
-        .then((response) => {
+        .then(async (response) => {
           this.$store.dispatch("notice", {
             title: "提交成功！",
             message: "",
             type: "success",
           });
-          this.saveJudgeInfo(response.data, this.$route.query.submittime);
+          await this.saveJudgeInfo(response.data, this.$route.query.submittime);
         })
         .catch((error) => {
           console.error(error);
