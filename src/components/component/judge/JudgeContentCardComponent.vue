@@ -26,7 +26,11 @@
             >
           </div>
           <div class="state" v-if="tableData.length > 0">
-            <el-table class="table1" :data="tableData" :row-class-name="tableRowClassName">
+            <el-table
+              class="table1"
+              :data="tableData"
+              :row-class-name="tableRowClassName"
+            >
               <el-table-column prop="judgeid" label="编号"></el-table-column>
               <el-table-column prop="judgestate" label="状态"></el-table-column>
               <el-table-column prop="runtime" label="耗时"></el-table-column>
@@ -34,8 +38,6 @@
             </el-table>
           </div>
         </div>
-
-        
       </div>
     </div>
   </div>
@@ -88,28 +90,37 @@ export default {
   },
   methods: {
     decodeBase64(input) {
+      const state = [
+        "Accepted",
+        "Time Limit Exceeded",
+        "Wrong Answer",
+        "Runtime Error",
+        "Memory Limit Exceeded",
+      ];
+      if(state.includes(input)) {
+        return input;
+      }
       return atob(input);
     },
     tableRowClassName({ row, rowIndex }) {
       // 根据行数据和行索引返回类名
       return rowIndex % 2 === 0 ? "odd-row" : "even-row";
     },
-    updateInfo(){
+    updateInfo() {
       this.loading = false;
       this.score = this.judgeinfo.judge.score;
       this.judgestate = this.judgeinfo.judge.judgestate;
-      if(this.judgeinfo.judgecontent.length !== undefined){
-        for(let i = 0 ;i < this.judgeinfo.judgecontent.length;i++){
+      if (this.judgeinfo.judgecontent.length !== undefined) {
+        for (let i = 0; i < this.judgeinfo.judgecontent.length; i++) {
           this.tableData.push({
-            judgeid:i + 1,
-            judgestate:this.judgeinfo.judgecontent[i].judgestate,
-            runtime:this.judgeinfo.judgecontent[i].runtime,
-            memory:this.judgeinfo.judgecontent[i].memory
-          })
+            judgeid: i + 1,
+            judgestate: this.judgeinfo.judgecontent[i].judgestate,
+            runtime: this.judgeinfo.judgecontent[i].runtime,
+            memory: this.judgeinfo.judgecontent[i].memory,
+          });
+        }
       }
-      }
-      
-    }
+    },
   },
   watch: {
     judgeinfo: {
@@ -163,7 +174,7 @@ export default {
   top: 30px;
   font-size: 18px;
 }
-.table1{
+.table1 {
   width: 780px;
   font-size: 16px;
 }

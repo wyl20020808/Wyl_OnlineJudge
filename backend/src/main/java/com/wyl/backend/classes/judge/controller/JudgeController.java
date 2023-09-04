@@ -44,7 +44,7 @@ public class JudgeController {
         }
     }
 
-    @GetMapping("/query/judge")
+    @GetMapping("/query/judgebyid")
     public Judge queryJudge(@RequestParam int judgeid){
         QueryWrapper<Judge> query = new QueryWrapper<>();
         query.eq("judgeid",judgeid);
@@ -57,7 +57,7 @@ public class JudgeController {
         query.eq("judgeid",judgeid);
         return judgeContentSql.selectList(query);
     }
-    @GetMapping("/query/judgeid")
+    @GetMapping("/query/alljudge")
     public List<Judge> queryJudgeid(){
         return judgeSql.selectList(null);
     }

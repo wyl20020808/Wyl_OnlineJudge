@@ -32,6 +32,7 @@ export default {
   });
   axios.get(`${SERVER_URL}/problem/query/${state.problemid}`)
     .then(response => {
+      // console.log(response.data.title)
       state.problem = response.data;
     })
     .catch(error => {

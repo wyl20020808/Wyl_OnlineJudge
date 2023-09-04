@@ -25,7 +25,8 @@ export default {
       router.push({name:"problemedit",params:{ problemid : this.problem.problemid}})
     },
     submitProblem(){
-      router.push({name:"submitcode",params:{ problemid : this.problem.problemid}})
+      // console.log(this.problem.title)
+      router.push({name:"submitcode",query:{ problemid : this.problem.problemid,problemname:this.problem.title}})
     }
 
   }

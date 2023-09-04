@@ -16,7 +16,7 @@ public class Judge {
     public String memory;
     public String language;
     public String submittime;
-
+    public String problemname;
     public String username;
 
     public String code;
@@ -25,6 +25,14 @@ public class Judge {
     public int totaltime;
 
     public int score;
+
+    public String getProblemname() {
+        return problemname;
+    }
+
+    public void setProblemname(String problemname) {
+        this.problemname = problemname;
+    }
 
     public int getJudgeid() {
         return judgeid;

@@ -2,7 +2,7 @@
   <div>
     <div class="card out2">
       <div class="title1">
-        <h2>提交代码 - P{{ problemid }}</h2>
+        <h2>提交代码 - P{{ problemid }} {{ problemname }}</h2>
       </div>
       <div class="buttons">
         <el-button @click="backToProblem" class="button2" type="primary"
@@ -18,7 +18,7 @@
           size="large"
         >
           <el-option
-            v-for="item in options"
+            v-for="item in languages"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -52,10 +52,9 @@ import router from "@/router/router";
 import axios from "axios";
 import { getNowTime } from "../../../js/functions/TimeAbout";
 export default {
-  props: ["problemid"],
   data() {
     let value = ref("54");
-    const options = [
+    const languages = [
       { value: 45, label: "Assembly (NASM 2.14.02)", is_archived: false },
       { value: 46, label: "Bash (5.0.0)", is_archived: false },
       { value: 47, label: "Basic (FBC 1.07.1)", is_archived: false },
@@ -122,109 +121,36 @@ export default {
       },
     ];
     return {
-      options,
+      languages,
       value,
       codes: "",
       judgeid:0,
+      problemid:this.$route.query.problemid,
+      problemname:this.$route.query.problemname,
     };
   },
   methods: {
     backToProblem() {
       router.go(-1);
     },
-    // async saveJudgeInfo(judgedata, submittime) {
-    //   let judgeinfo = {
-    //     problemid: this.problemid,
-    //     userid: JSON.parse(localStorage.getItem("user")).userid,
-    //     submittime,
-    //     code: this.codes,
-    //     username:JSON.parse(localStorage.getItem("user")).username,
-    //   };
-    //   const results = judgedata.data.results;
-    //   let runtime = 0;
-    //   let memory = 0;
-    //   let score = 0;
-    //   let compileoutput = "";
-    //   let language = "";
-    //   let judgestate = "Accepted";
-    //   for(let i = 0; i < this.options.length; i++) {
-    //       if(this.value.toString() === this.options[i].value.toString()){
-    //           language = this.options[i].label;
-    //           break;
-    //       }
-    //   }
-
-    //   judgeinfo.language = language;
-    //   for (let i = 0; i < results.length; i++) {
-    //     runtime = runtime + parseFloat(results[i].time) * 1000;
-    //     memory = Math.max(memory, parseFloat(results[i].memory));
-    //     if (results[i].status.description == "Accepted")
-    //       score = score + 100 / results.length;
-    //     else judgestate = results[i].status.description;
-    //     compileoutput =
-    //       results[i].compile_output === null
-    //         ? results[i].status.description
-    //         : results[i].compile_output;
-    //   }
-    //   judgeinfo.judgestate = judgestate;
-    //   judgeinfo.compileoutput = compileoutput;
-    //   judgeinfo.runtime = runtime;
-    //   judgeinfo.memory = memory;
-    //   judgeinfo.score = score === 99 ? 100:score;
-    //   judgeinfo.totaltime = runtime;
-    //   await axios
-    //     .post(`${SERVER_URL}/judge/insert/judge`, judgeinfo)
-    //     .then((response) => {
-    //       this.judgeid = response.data;
-    //     })
-    //     .catch((error) => {
-    //       this.$store.dispatch("notice", {
-    //         title: "数据保存失败！",
-    //         message: "服务器异常" + error,
-    //         type: "error",
-    //       });
-    //     });
-    //   let infolist = [];
-    //   for (let i = 0; i < results.length; i++) {
-    //     infolist.push({
-    //       judgeid: this.judgeid,
-    //       runtime: results[i].time,
-    //       memory: results[i].memory,
-    //       judgestate: results[i].status.description,
-    //     });
-    //   }
-    //   axios
-    //     .post(`${SERVER_URL}/judge/insert/judgecontent`, infolist)
-    //     .then((response) => {})
-    //     .catch((error) => {
-    //       this.$store.dispatch("notice", {
-    //         title: "数据保存失败！",
-    //         message: "服务器异常" + error,
-    //         type: "error",
-    //       });
-    //     });
-    // },
 
     async submitCode() {
       let submittime = getNowTime();
-      // let formData = new FormData();
-      // formData.append("source_code", this.codes);
-      // formData.append("problemId", this.problemid);
-      // formData.append("languageId", this.value.toString());
       let language = "";
-      for(let i = 0; i < this.options.length; i++) {
-          if(this.value.toString() === this.options[i].value.toString()){
-              language = this.options[i].label;
+      for(let i = 0; i < this.languages.length; i++) {
+          if(this.value.toString() === this.languages[i].value.toString()){
+              language = this.languages[i].label;
               break;
           }
       }
-      await axios.get(`${SERVER_URL}/judge/query/judgeid`)
+      await axios.get(`${SERVER_URL}/judge/query/alljudge`)
       .then((response) =>{
           this.judgeid = response.data[response.data.length - 1].judgeid + 1;
       } )
       .catch((error)=>{
         console.log(error);
       })
+
       router.push({name:"judgecontent",query:{
         source_code: this.codes,
         problemid: this.problemid,
@@ -232,24 +158,9 @@ export default {
         submittime:submittime,
         language:language,
         judgeid:this.judgeid,
+        problemname:this.problemname,
       }})
-      // axios
-      //   .post(`http://8.134.48.157:8088/judge/judgeForm`, formData, {
-      //     headers: {
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   })
-      //   .then((response) => {
-      //     this.$store.dispatch("notice", {
-      //       title: "提交成功！",
-      //       message: "",
-      //       type: "success",
-      //     });
-      //     this.saveJudgeInfo(response.data, submittime);
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
+
     },
   },
 };

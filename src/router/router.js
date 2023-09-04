@@ -83,10 +83,9 @@ const routes = [
     props:true,
   },
   {
-    path: '/problem/submit/:problemid',
+    path: '/problem/submit',
     name: 'submitcode',
     component: SubmitCodeView,
-    props:true,
   },
   {
     path: '/judge/judgecontent',
@@ -97,7 +96,10 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  },
 })
 
 export default router

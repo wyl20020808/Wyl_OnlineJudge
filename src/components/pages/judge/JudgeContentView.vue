@@ -2,7 +2,7 @@
 <template>
   <div class="nav">
     <h1 style="position: relative; left: 15px; top: 10px">
-      测评详情 - U{{ judgeid }}
+      测评详情 - U{{ judgeid }} - P{{ problemid }} {{ problemname  }}
     </h1>
   </div>
   <div class="card nav2">
@@ -28,7 +28,14 @@
     <CodeComponent v-else />
   </div>
 </template>
+<!-- 
 
+数据格式：
+judgeinfo: {
+      judgecontent: [],
+      judge: {},
+},
+ -->
 <script>
 import JudgeContentCardComponent from "@/components/component/judge/JudgeContentCardComponent.vue";
 // Import your Code component
@@ -46,9 +53,15 @@ export default {
       },
       hadinfo:true,
       judgeid: 0,
+      problemid: this.$route.query.problemid,
+      problemname:this.$route.query.problemname,//注意这里有可能别的地方没传过来，所以就需要更新数据
     };
   },
   methods:{
+    updateInfo(){
+      this.problemid = this.judgeinfo.judge.problemid;
+      this.problemname = this.judgeinfo.judge.problemname;
+    },
     async saveJudgeInfo(judgedata, submittime) {
       let judgeinfo = {
         problemid: this.$route.query.problemid,
@@ -57,6 +70,7 @@ export default {
         code: this.$route.query.source_code,
         username:JSON.parse(localStorage.getItem("user")).username,
         language:this.$route.query.language,
+        problemname:this.$route.query.problemname,
       };
       const results = judgedata.data.results;
       let runtime = 0;
@@ -103,7 +117,7 @@ export default {
           judgestate: results[i].status.description,
         });
       }
-      axios
+      await axios
         .post(`${SERVER_URL}/judge/insert/judgecontent`, infolist)
         .then((response) => {})
         .catch((error) => {
@@ -115,19 +129,18 @@ export default {
         });
     },
     async getData(){
-     
       await axios//查询一下数据库里面有没有数据
-      .get( `${SERVER_URL}/judge/query/judge`, {
+      .get( `${SERVER_URL}/judge/query/judgebyid`, {
         params: {
           judgeid: this.judgeid,
         },
       })
       .then((response) => {
         this.hadinfo = response.data !== "";//如果查不到数据
-        console.log(response.data);
-        if(this.hadinfo === true)
-            this.judgeinfo.judge = response.data;
-            console.log(this.judgeinfo.judge.score);
+        if(this.hadinfo === true){
+          this.judgeinfo.judge = response.data;
+        }
+            
       })    
       .catch(function (error) {
         console.log(error);
@@ -140,13 +153,12 @@ export default {
         },
       })
       .then((response) => {
-        console.log(response.data);
         this.judgeinfo.judgecontent = response.data;//外面的if保证了这里肯定有数据，否则就是数据库有问题
       })    
       .catch(function (error) {
         console.log(error);
       });
-
+      this.updateInfo();
     }
 
   },
