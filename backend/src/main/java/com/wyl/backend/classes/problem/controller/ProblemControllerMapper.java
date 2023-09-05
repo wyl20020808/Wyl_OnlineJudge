@@ -10,42 +10,77 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @CrossOrigin
 @RequestMapping(value = "/problem")
 @RestController
 public class ProblemControllerMapper {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
     @Autowired //注入，一定要写
     private CreateProblemContent createProblemContent;
     @Autowired
     private ProblemContentSQL problemContentSQL;
     @Autowired
     private ProblemSampleSQL problemSampleSQL;
-//    @PostMapping("/update/problemcontent")
-    public String updateProblemContent(ProblemContent problemContent){
+
+    //    @PostMapping("/update/problemcontent")
+    public String updateProblemContent(ProblemContent problemContent) {//更新单个题目所有信息，根据id
         problemContentSQL.updateById(problemContent);
         return "yes";
     }
-//    @PostMapping("/update/problemcontent")
-    public String updateProblemSample(List<ProblemSample> problemSample){
+
+    //    @PostMapping("/update/problemcontent")
+    public String updateProblemSample(List<ProblemSample> problemSample) {
         problemSampleSQL.deleteById(problemSample.get(0).getProblemid());
-        for (ProblemSample problemSample1 : problemSample){
+        for (ProblemSample problemSample1 : problemSample) {
             problemSampleSQL.insert(problemSample1);
         }
+        return "yes";
+    }
 
+    @PostMapping("/update/problemcontent/special")
+    public void updateProblemContentSpecific(@RequestBody ProblemContent problemContent
+                                             ) {
+        System.out.println(ANSI_RED + "edkjahsdkjahskdhakjsdjahsd\nahjsdhjhahgsdj\njkjhk" + ANSI_RESET);
+        try {
+            if("submitcount".equals(problemContent.getSpecial()))
+                problemContentSQL.incrementSubmitCount(problemContent.getProblemid());
+            else if("aceptedcount".equals(problemContent.getSpecial()))
+                problemContentSQL.incrementAceptedcountCount(problemContent.getProblemid());
+        }catch(Exception e) {
+            System.out.println(ANSI_RED + "abcdefg" + ANSI_RESET);
+        }
+
+
+    }
+
+    @PostMapping("/update/problemcontent")
+    public String updateProblemContents(@RequestBody ProblemContent problemContent) {
+        //直接全部更新题目信息，懒得分段更新了
+        updateProblemContent(problemContent);
         return "yes";
     }
 
     @PostMapping("/update/problem")
-    public String updateProblem(@RequestBody Problem problem){
+    public String updateProblem(@RequestBody Problem problem) {//更新题目和样例，更新方式是直接全部更新和
+        // 先删除原来的样例，再插入新的样例，最后更新题目
         List<ProblemSample> problemSample = problem.getProblemsample();
-        ProblemContent  problemContent = problem.getProblemcontent();
+        ProblemContent problemContent = problem.getProblemcontent();
         updateProblemContent(problemContent);
         updateProblemSample(problemSample);
         return "yes";
     }
 
     @PostMapping("/delete/problem")
-    public String deleteProblem(@RequestBody ProblemSample problem){
+    public String deleteProblem(@RequestBody ProblemSample problem) {
         problemContentSQL.deleteById(problem.getProblemid());
         problemSampleSQL.deleteById(problem.getProblemid());
         return "yes";
@@ -53,47 +88,48 @@ public class ProblemControllerMapper {
 
     @GetMapping("/query")
     public List<ProblemContent> query() {
-         List<ProblemContent> queryResult = createProblemContent.selectAll();
-         return queryResult;
-    }
-    @GetMapping("/query/{id}")
-    public ProblemContent query2(@PathVariable int id) {
-        ProblemContent queryResult = createProblemContent.selectById(id);
-        System.out.println(queryResult.getTitle());
+        List<ProblemContent> queryResult = createProblemContent.selectAll();
         return queryResult;
     }
+
+    @GetMapping("/query/{id}")
+    public ProblemContent query2(@PathVariable int id) {
+        return createProblemContent.selectById(id);
+    }
+
     @GetMapping("/query/problemsample/{id}")
     public List<ProblemSample> query3(@PathVariable int id) {
-        List<ProblemSample>  queryResult = createProblemContent.selectSampleById(id);
+        List<ProblemSample> queryResult = createProblemContent.selectSampleById(id);
         return queryResult;
     }
 
     @GetMapping("/query/probleminfo/{id}")
-    public Problem query4(@PathVariable int id) {
+    public Problem query4(@PathVariable int id) {//查询题目和样例
         Problem queryResult = new Problem();
         queryResult.setProblemsample(createProblemContent.selectSampleById(id));
         queryResult.setProblemcontent(createProblemContent.selectById(id));
         return queryResult;
     }
+
     @PostMapping("/insert")
-    public String insertCommon(@RequestBody ProblemContent problemContent){
+    public String insertCommon(@RequestBody ProblemContent problemContent) {
         int cnt = 0;
-        if(problemContent.getTitle() == "")
+        if (problemContent.getTitle() == "")
             return "必须输入题目名称!";
         cnt += createProblemContent.insert(problemContent);
         List<ProblemContent> queryResult = createProblemContent.selectAll();
-        int problemid = queryResult.get(queryResult.size()-1).getProblemid() ;//计算一下当前要插入的problemid
+        int problemid = queryResult.get(queryResult.size() - 1).getProblemid();//计算一下当前要插入的problemid
         //找出来样例，单独存放，因为样例可能会很多
-        List<ProblemSample>problemsample = problemContent.getProblemsample();
-        for(int i = 0;i < problemsample.size();i++){
+        List<ProblemSample> problemsample = problemContent.getProblemsample();
+        for (int i = 0; i < problemsample.size(); i++) {
             problemsample.get(i).setProblemid(problemid);
         }
 
-        for(int i = 0;i < problemsample.size();i++){
+        for (int i = 0; i < problemsample.size(); i++) {
             cnt += createProblemContent.insertToSample(problemsample.get(i));
         }
 
-        if(cnt > problemsample.size())return "success";
+        if (cnt > problemsample.size()) return "success";
         else return "error";
     }
 }

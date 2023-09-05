@@ -1,11 +1,11 @@
 <template>
 
-  <ProblemCardView :problem="problem" />
+  <ProblemCardView :problem="problemcontent" />
   <div class="problem-operator">
-    <ProblemOperateView :problem="problem"/>
+    <ProblemOperateView :problem="problemcontent"/>
   </div>
   <div class="problem-content">
-    <PrombleContentView :problem="problem"/> 
+    <PrombleContentView :problem="problemcontent"/> 
   </div>
 
 </template>
@@ -28,12 +28,12 @@ export default {
   const route = useRoute();
   const state = reactive({
     problemid: route.query.problemid,
-    problem: {}
+    problemcontent: {}
   });
-  axios.get(`${SERVER_URL}/problem/query/${state.problemid}`)
+  axios.get(`${SERVER_URL}/problem/query/${state.problemid}`)//通过id查询题目的数据
     .then(response => {
       // console.log(response.data.title)
-      state.problem = response.data;
+      state.problemcontent = response.data;
     })
     .catch(error => {
       console.log(error);

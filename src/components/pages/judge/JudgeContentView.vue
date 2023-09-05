@@ -25,8 +25,14 @@
   <div>
     <JudgeContentCardComponent v-if="selectedTab === 'testInfo'" :judgeinfo="judgeinfo" />
     <!-- Replace with your Code component -->
-    <CodeComponent v-else />
+    <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
+
+    
   </div>
+  <div class="">
+    <JudgeContentInfoComponent :judgeinfo="judgeinfo" />
+  </div>
+ 
 </template>
 <!-- 
 
@@ -38,8 +44,8 @@ judgeinfo: {
  -->
 <script>
 import JudgeContentCardComponent from "@/components/component/judge/JudgeContentCardComponent.vue";
-// Import your Code component
-// import CodeComponent from "@/components/CodeComponent.vue"
+import JudgeContentCodesComponent from "@/components/component/judge/JudgeContentCodesComponent.vue";
+import JudgeContentInfoComponent from "@/components/component/judge/JudgeContentInfoComponent.vue";
 import { SERVER_URL } from "@/js/functions/config";
 import axios from "axios";
 export default {
@@ -62,8 +68,53 @@ export default {
       this.problemid = this.judgeinfo.judge.problemid;
       this.problemname = this.judgeinfo.judge.problemname;
     },
-    async saveJudgeInfo(judgedata, submittime) {
-      let judgeinfo = {
+    async addSubmitCount(problemid,userid){
+      axios.post(`${SERVER_URL}/problem/update/problemcontent/special`,{
+        problemid:problemid,
+        special:"submitcount",
+      })
+      .then((res) =>{
+
+      })
+      .catch((error) =>{
+        console.log(error);
+      })
+      axios.post(`${SERVER_URL}/userextra/update/special`,{
+        userid,
+        special:"submitcount",
+      })
+      .then((res) =>{
+
+      })
+      .catch((error) =>{
+        console.log(error);
+      })
+    },
+    async addAceptedCount(problemid,userid){
+     await axios.post(`${SERVER_URL}/problem/update/problemcontent/special`,{
+        problemid:problemid,
+        special:"aceptedcount",
+      })
+      .then((res) =>{
+
+      })
+      .catch((error) =>{
+        console.log(error);
+      })
+      await axios.post(`${SERVER_URL}/userextra/update/special`,{
+        userid:userid,
+        special:"aceptedcount",
+      })
+      .then((res) =>{
+
+      })
+      .catch((error) =>{
+        console.log(error);
+      })
+    },
+    async saveJudgeInfo(judgedata, submittime) {//保存评测信息到数据库
+      this.addSubmitCount(this.$route.query.problemid,JSON.parse(localStorage.getItem("user")).userid);
+      let judgeinfo = {//这里为什么能用$router，是因为到这里来的肯定是提交代码的
         problemid: this.$route.query.problemid,
         userid: JSON.parse(localStorage.getItem("user")).userid,
         submittime,
@@ -90,6 +141,10 @@ export default {
             : results[i].compile_output;
       }
       judgeinfo.judgestate = judgestate;
+      if(judgestate === "Accepted"){
+        this.addAceptedCount(this.$route.query.problemid,JSON.parse(localStorage.getItem("user")).userid)
+      }
+          
       judgeinfo.compileoutput = compileoutput;
       judgeinfo.runtime = runtime;
       judgeinfo.memory = memory;
@@ -108,6 +163,7 @@ export default {
             type: "error",
           });
         });
+        // 上面是保存单个信息，下面是保存每个测试点的信息
       let infolist = [];
       for (let i = 0; i < results.length; i++) {
         infolist.push({
@@ -127,6 +183,7 @@ export default {
             type: "error",
           });
         });
+        // 
     },
     async getData(){
       await axios//查询一下数据库里面有没有数据
@@ -172,7 +229,7 @@ export default {
       formData.append("problemId", this.$route.query.problemid);
       formData.append("languageId", this.$route.query.languageId);
       await axios //提交代码给后端
-        .post(`http://8.134.100.87:8088/judge/judgeForm`, formData, {
+        .post(`http://8.134.90.238:8088/judge/judgeForm`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -191,17 +248,12 @@ export default {
         await this.getData();
     }
 
-    //如果没有数据，说明是提交页面过来的，那就提交代码，天才
-      
-    
-    
-    
-
-    
   },
   components: {
     JudgeContentCardComponent,
     // CodeComponent
+    JudgeContentCodesComponent,
+    JudgeContentInfoComponent,
   },
 };
 </script>

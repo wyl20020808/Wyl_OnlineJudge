@@ -12,18 +12,27 @@
             :data="displayedQuestions"
             style="width: 100%"
           >
-            <el-table-column prop="problemid" label="ID"></el-table-column>
-            <el-table-column prop="title" label="标题"></el-table-column>
-            <el-table-column prop="difficulty" label="难度"></el-table-column>
-            <el-table-column prop="algorithm" label="知识点"></el-table-column>
-            <el-table-column prop="source" label="来源"></el-table-column>
+            <el-table-column align="center" width="80" prop="problemid" label="ID">  
+            </el-table-column>
+            <el-table-column align="center" width="400" prop="title" label="标题">
+              <template v-slot="{row}">
+    <div class="hoverable" @click="push_to_problemcontent(row.problemid)">{{ row.title }}</div>
+  </template>
+            </el-table-column>
+            <el-table-column align="center" width="70" prop="difficulty" label="难度"></el-table-column>
+            <el-table-column align="center" prop="algorithm" label="算法"></el-table-column>
+            <el-table-column align="center" width="70" prop="source" label="来源"></el-table-column>
             <el-table-column
               prop="aceptedcount"
               label="通过数"
+              width="70"
+              align="center"
             ></el-table-column>
             <el-table-column
               prop="submitcount"
               label="提交数"
+              width="70"
+              align="center"
             ></el-table-column>
           </el-table>
           <el-pagination class="pagination-container"
@@ -50,11 +59,11 @@ export default {
   },
   setup() {
     const router = useRouter();
-    const push_to_problemcontent = (problem) => {
+    const push_to_problemcontent = (problemid) => {
       router.push({
         path: "/problemdetail",
         query: {
-          problemid: problem.problemid,
+          problemid: problemid,
         },
       });
     };
@@ -131,5 +140,14 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.hoverable {
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  filter: brightness(1.3);
+  text-decoration: underline;
 }
 </style>

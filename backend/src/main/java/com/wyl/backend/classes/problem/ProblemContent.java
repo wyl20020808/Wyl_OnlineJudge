@@ -28,6 +28,25 @@ public class ProblemContent {
     private int submitcount;//提交次数
     private int aceptedcount;//通过次数
     private String difficulty;//难度
+    private String havedata = "false";//是否有数据
+    @TableField(select = false)
+    private String special;//更新单个数据，借助它来写
+
+    public String getSpecial() {
+        return special;
+    }
+
+    public void setSpecial(String special) {
+        this.special = special;
+    }
+
+    public String getHavedata() {
+        return havedata;
+    }
+
+    public void setHavedata(String havedata) {
+        this.havedata = havedata;
+    }
 
     public String getAlgorithm() {
         return algorithm;

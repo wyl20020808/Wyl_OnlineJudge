@@ -29,13 +29,15 @@ const ModuleUserInfo = ({
             type: noticeInfo.type,
         })
       },
-    signin(context,userinfo){
-        axios.post(`${SERVER_URL}/user/signin`, userinfo,)
-        .then(response => {
+    async signin(context,userinfo){
+       
+        await axios.post(`${SERVER_URL}/user/signin`, userinfo,)
+        .then(async response => {
           // alert("yes")
           let type = 'error';
           if(response.data === '注册成功'){
               type = "success";
+               await axios.post(`${SERVER_URL}/userextra/synchronizeinfo `,{})//注册完同步一下表的信息
           }
           context.dispatch("notice",{
             title:response.data,

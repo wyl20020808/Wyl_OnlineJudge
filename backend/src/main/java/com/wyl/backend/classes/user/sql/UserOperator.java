@@ -20,4 +20,6 @@ public interface UserOperator extends BaseMapper<UserInfo> {
 
     @Update("UPDATE userinfo SET userpicture=#{userinfo.userpicture} where userid =  #{userinfo.userid}")
     int updateUserPictrue(@Param("userinfo") UserInfo userinfo);
+
+
 }

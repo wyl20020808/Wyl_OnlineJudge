@@ -1,5 +1,6 @@
 <template>
   <div class="card card1">
+    <el-button type="primary" class="button1"  @click="resetFilters">重置所有筛选</el-button>
     <div class="select1">
       <el-select v-model="judgevalue" clearable placeholder="状态">
         <el-option
@@ -39,15 +40,13 @@
 
   <div class="card card2">
     
-    <el-table :data="tableData" style="width: 100%">
-      <el-table-column
+    <el-table ref="tableRef" :data="tableData" style="width: 100%" >
+      <el-table-column align="center"
+      @filter-change="handleFilterChange"
         prop="judgestate"
         label="状态"
         sortable
-        :filters="[
-          { text: '2016-05-01', value: '2016-05-01' },
-          { text: '2016-05-02', value: '2016-05-02' },
-        ]"
+        :filters=judgestatefilters
         :filter-method="filterHandler"
       >
       <template v-slot:default="{ row }">
@@ -56,7 +55,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="problemname" label="题目">
+      <el-table-column align="center" prop="problemname" label="题目">
         <!-- 这个row指的就是tableData里面存放的信息 -->
         <template  v-slot:default="{ row }">
           <div class="hoverable" @click="goToProblem(row.problemid)">
@@ -64,11 +63,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="提交者"> </el-table-column>
-      <el-table-column prop="runtime" label="运行时间"> </el-table-column>
-      <el-table-column prop="memory" label="占用内存"> </el-table-column>
-      <el-table-column prop="language" label="语言"> </el-table-column>
-      <el-table-column prop="submittime" label="提交时间"> </el-table-column>
+      <el-table-column align="center" prop="username" label="提交者"> </el-table-column>
+      <el-table-column align="center" prop="runtime" label="运行时间"> </el-table-column>
+      <el-table-column align="center" prop="memory" label="占用内存"> </el-table-column>
+      <el-table-column align="center" prop="language" label="语言"> </el-table-column>
+      <el-table-column align="center" prop="submittime" label="提交时间"> </el-table-column>
     </el-table>
     <div class="pagination-container">
     <el-pagination
@@ -193,38 +192,64 @@ export default {
       judge: [],
       currentPage: 1,
       pageSize: 15,
+      judgestatefilters:[
+        {text: "Compilation Error", value:"Compilation Error"},
+        {text: "Accepted", value:"Accepted"},
+        {text: "Time Limit Exceeded", value:"Time Limit Exceeded"},
+        {text: "Runtime Error", value:"Runtime Error"},
+        {text: "Wrong Answer", value:"Wrong Answer"},
+      ],
+      originalJudge: [],
+      
     };
   },
   methods: {
+    resetFilters() {
+    this.$refs.tableRef.clearFilter();
+    this.judge = [...this.originalJudge];
+    this.updateTableData();
+  },
     filterHandler(value, row, column) {
-      const property = column["property"];
-      return row[property] === value;
-    },
+
+    const property = column["property"];
+    
+    if (value) {
+      this.judge = this.originalJudge.filter(item => item[property] === value);
+      this.updateTableData();
+    }
+  },
+  handleFilterChange(filters) {
+    if (Object.keys(filters).every(key => filters[key] === undefined)) {  // 如果所有的筛选都被重置，恢复到原始的judge数组
+      this.judge = [...this.originalJudge];
+      this.updateTableData();
+    }
+  },
     updateTableData() {
-      this.tableData = [];
-      const start = (this.currentPage - 1) * this.pageSize;
-      const end = this.currentPage * this.pageSize;
-      for (let i = start; i < end && i < this.judge.length; i++) {
-        this.tableData.push({
-          judgestate: this.judge[i].judgestate,
-          problemname: this.judge[i].problemname,
-          username: this.judge[i].username,
-          runtime: this.judge[i].runtime,
-          memory: this.judge[i].memory,
-          language: this.judge[i].language,
-          submittime: this.judge[i].submittime,
-          problemid: this.judge[i].problemid,
-          judgeid:this.judge[i].judgeid,
-        });
-      }
-    },
+  this.tableData = [];
+  const start = (this.currentPage - 1) * this.pageSize;
+  const end = Math.min(this.currentPage * this.pageSize, this.judge.length);  // 添加了Math.min
+  for (let i = start; i < end; i++) {  // 修改了循环的条件
+    this.tableData.push({
+      judgestate: this.judge[i].judgestate,
+      problemname: this.judge[i].problemname,
+      username: this.judge[i].username,
+      runtime: this.judge[i].runtime + ` ms`,
+      memory: this.judge[i].memory + ` KB`,
+      language: this.judge[i].language,
+      submittime: this.judge[i].submittime,
+      problemid: this.judge[i].problemid,
+      judgeid:this.judge[i].judgeid,
+    });
+  }
+
+},
     handlePageChange(newPage) {
       this.currentPage = newPage;
       this.updateTableData();
     },
     getJudgeStateColor(judgestate){
       if(judgestate === "Accepted")
-        return "green";
+        return "#25ad40";
       else if(judgestate === "Compilation Error")
         return "orange";
       else 
@@ -245,17 +270,18 @@ export default {
     },
   },
   async created() {
-    await axios
-      .get(`${SERVER_URL}/judge/query/alljudge`)
-      .then((response) => {
-        console.log(response.data);
-        this.judge = response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    this.updateTableData();
-  },
+  await axios
+    .get(`${SERVER_URL}/judge/query/alljudge`)
+    .then((response) => {
+      console.log(response.data);
+      this.originalJudge = response.data.reverse();
+      this.judge = [...this.originalJudge];
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  this.updateTableData();
+},
 };
 </script>
 
@@ -271,7 +297,7 @@ export default {
 }
 .card2 {
   position: relative;
-  top: 180px;
+  top: 200px;
   width: 1300px;
   left: 100px;
 }
@@ -308,5 +334,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.button1{
+  width: 100px;
+  color: white;
+  position: relative;
+  left: 1130px;
+  top: 70px;
 }
 </style>

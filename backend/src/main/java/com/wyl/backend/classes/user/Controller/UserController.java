@@ -35,7 +35,6 @@ public class UserController {
     @PostMapping("/query")
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
         List<UserInfo> userinfo = userOperator.select();
-//        System.out.println(userInfo.getUsername());
         for (UserInfo info : userinfo) {
             if (info.getUserid() == userInfo.getUserid() ) {
                 return info;
@@ -99,7 +98,6 @@ public class UserController {
     }
     @PostMapping("/update/userpicture")
     public int updateUserpicture(@RequestBody UserInfo userInfo) {
-        System.out.println(userInfo.getUserpicture() +"yes");
         return userOperator.updateUserPictrue(userInfo);
     }
 

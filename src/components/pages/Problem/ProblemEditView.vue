@@ -26,22 +26,21 @@
       @click="deleteQuestion"
       >删除题目</el-button
     >
-    <div style="position: relative;left: 850px;bottom: 40px;">
-      <input  type="file" accept=".zip" @change="handleFileUpload($event)">
-    <el-button
-      type="primary"
-      style="
-        color: white;
-        width: 100px;
-        position: relative;
-        left: -90px;
-        bottom: 2px;
-      "
-      @click="upload"
-      >上传数据</el-button
-    >
+    <div style="position: relative; left: 850px; bottom: 40px">
+      <input type="file" accept=".zip" @change="handleFileUpload($event)" />
+      <el-button
+        type="primary"
+        style="
+          color: white;
+          width: 100px;
+          position: relative;
+          left: -90px;
+          bottom: 2px;
+        "
+        @click="upload"
+        >上传数据</el-button
+      >
     </div>
-    
   </div>
   <div class="card card1">
     <div class="input-field" v-for="(field, index) in fields" :key="index">
@@ -60,7 +59,7 @@
           :value="item.value"
         />
       </el-select>
-      <el-select 
+      <el-select
         v-else-if="field.valueName === 'memorylimit'"
         v-model="field.value"
         class="m-2 select1"
@@ -74,7 +73,8 @@
           :value="item.value"
         />
       </el-select>
-      <el-input v-else
+      <el-input
+        v-else
         class="input"
         v-model="field.value"
         :autosize="{ minRows: field.minRows, maxRows: field.maxRows }"
@@ -147,22 +147,26 @@
         >保存</el-button
       >
     </div>
- 
   </div>
 </template>
 
 <script>
-import {SERVER_URL} from "../../../js/functions/config"
+import { SERVER_URL } from "../../../js/functions/config";
 import router from "@/router/router";
 import { ref } from "vue";
 import axios from "axios";
 import { sleep } from "@/js/functions/TimeAbout";
 export default {
   props: ["problemid"],
+  data() {
+    return {};
+  },
   methods: {
-    deleteQuestion(){
-        axios
-        .post(`${SERVER_URL}/problem/delete/problem`,{problemid: this.problemid} )
+    deleteQuestion() {
+      axios
+        .post(`${SERVER_URL}/problem/delete/problem`, {
+          problemid: this.problemid,
+        })
         .then((response) => {
           this.$store.dispatch("notice", {
             title: "删除成功！",
@@ -170,9 +174,8 @@ export default {
             type: "success",
           });
           sleep(500);
-          router.push({name:"problems"})
-        }
-        )
+          router.push({ name: "problems" });
+        })
         .catch((error) => {
           this.$store.dispatch("notice", {
             title: "删除失败！",
@@ -233,21 +236,39 @@ export default {
     handleFileUpload(event) {
       this.file = event.target.files[0];
     },
-    upload() {
+    async upload() {
       let formData = new FormData();
-      formData.append('zipFile', this.file);
-      formData.append('problemId', parseInt(this.problemid));
-      console.log(this.file,this.problemid)
-      axios.post(`${SERVER_URL}/sample/upload`, formData)
-        .then(response => {
-          console.log(response);
+      formData.append("zipFile", this.file);
+      formData.append("problemId", parseInt(this.problemid));
+      console.log(this.file, this.problemid);
+      await axios
+        .post(`http://8.134.90.238:8088/sample/upload`, formData)
+        .then(async (response) => {
+          //上传完之后，还要更新一下数据库题目的题目信息
+          await axios.post(`${SERVER_URL}/problem/update/problemcontent/specific`,{
+            problemid:this.problemid,
+            havedata:"true",
+          })
+          .then((response)=>{
+            this.$store.dispatch("notice", {
+            title: "数据上传成功！",
+            message: "",
+            type: "success",
+          });
+          })
+          .catch((error) => {
+          });
         })
-        .catch(error => {
-          console.error(error);
+        .catch((error) => {
+          this.$store.dispatch("notice", {
+            title: "数据上传失败！",
+            message: error,
+            type: "error",
+          });
         });
       // 然后你可以使用你的HTTP库（例如axios）来发送这个formData到服务器
       // axios.post('/upload', formData)
-    }
+    },
   },
   data() {
     const timeoptions = [];
@@ -404,7 +425,7 @@ export default {
   left: 30px;
   margin-top: 30px; /* 添加间隔 */
 }
-.select1{
+.select1 {
   width: 70%;
   font-size: 18px;
   position: relative;

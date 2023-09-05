@@ -20,23 +20,59 @@
           {{ judgestate }} {{ score }}
           <div class="compileoutput">
             <span
-              >编译器输出：{{
+              >编译器输出：<br />{{
                 decodeBase64(judgeinfo.judge.compileoutput)
               }}</span
             >
           </div>
-          <div class="state" v-if="tableData.length > 0">
-            <el-table
-              class="table1"
-              :data="tableData"
-              :row-class-name="tableRowClassName"
+        </div>
+        <div class="state" v-if="tableData.length > 0">
+          <el-table
+            class="table1"
+            :data="tableData"
+            :row-class-name="tableRowClassName"
+          >
+            <el-table-column
+              align="center"
+              width="60"
+              class="column1"
+              prop="judgeid"
+              label="编号"
             >
-              <el-table-column prop="judgeid" label="编号"></el-table-column>
-              <el-table-column prop="judgestate" label="状态"></el-table-column>
-              <el-table-column prop="runtime" label="耗时"></el-table-column>
-              <el-table-column prop="memory" label="空间"></el-table-column>
-            </el-table>
-          </div>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              width="500"
+              prop="judgestate"
+              label="状态"
+            >
+              <template v-slot:default="{ row }">
+                <div
+                  :style="{ color: getJudgeStateColor(row.judgestate) }"
+                >
+                  <span v-if="row.judgestate === 'Accepted'"
+                    ><el-icon><Check /></el-icon
+                  ></span>
+                  <!-- 显示 "√" -->
+                  <span v-else
+                    ><el-icon><Close /></el-icon
+                  ></span>
+                  {{ row.judgestate }}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              width="70"
+              prop="runtime"
+              label="耗时"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              prop="memory"
+              label="空间"
+            ></el-table-column>
+          </el-table>
         </div>
       </div>
     </div>
@@ -81,7 +117,7 @@ export default {
       if (this.loading) {
         return "orange";
       } else {
-        return this.score === 100 ? "green" : "red";
+        return this.score === 100 ? "#25ad40" : "red";
       }
     },
     statusText() {
@@ -89,6 +125,11 @@ export default {
     },
   },
   methods: {
+    getJudgeStateColor(judgestate) {
+      if (judgestate === "Accepted") return "#25ad40";
+      else if (judgestate === "Compilation Error") return "orange";
+      else return "red";
+    },
     decodeBase64(input) {
       const state = [
         "Accepted",
@@ -97,7 +138,7 @@ export default {
         "Runtime Error",
         "Memory Limit Exceeded",
       ];
-      if(state.includes(input)) {
+      if (state.includes(input)) {
         return input;
       }
       return atob(input);
@@ -115,8 +156,8 @@ export default {
           this.tableData.push({
             judgeid: i + 1,
             judgestate: this.judgeinfo.judgecontent[i].judgestate,
-            runtime: this.judgeinfo.judgecontent[i].runtime,
-            memory: this.judgeinfo.judgecontent[i].memory,
+            runtime: this.judgeinfo.judgecontent[i].runtime + "ms",
+            memory: this.judgeinfo.judgecontent[i].memory + "KB",
           });
         }
       }
@@ -164,8 +205,7 @@ export default {
 .state {
   position: relative;
   color: gray;
-  top: 50px;
-  right: 10px;
+  margin-top: 90px;
 }
 .compileoutput {
   color: gray;
@@ -179,7 +219,7 @@ export default {
   font-size: 16px;
 }
 .icon-check {
-  color: green;
+  color: #25ad40;
 }
 
 .icon-times {
@@ -221,6 +261,9 @@ export default {
   left: 20px;
   top: 20px;
 }
+.column1 {
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

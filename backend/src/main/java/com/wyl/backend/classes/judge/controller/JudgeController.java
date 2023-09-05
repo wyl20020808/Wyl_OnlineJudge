@@ -25,8 +25,6 @@ public class JudgeController {
             List<Judge> query = judgeSql.selectList(null);
             return query.get(query.size()-1).getJudgeid();
         }catch (Exception e){
-            System.out.println(e);
-            System.out.println("yes yes wrong  wrong wrong wrong");
             return -1;
         }
     }

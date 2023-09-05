@@ -14,7 +14,6 @@ public class UserInfo {
     private String password;
     private String registertime;
     private String useremail;
-    private String token;
     private String usermotto;
     private String nickname;
 
@@ -54,13 +53,6 @@ public class UserInfo {
 
 
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
 
     public String getUseremail() {
         return useremail;
