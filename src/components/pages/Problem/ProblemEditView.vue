@@ -242,19 +242,21 @@ export default {
       formData.append("problemId", parseInt(this.problemid));
       console.log(this.file, this.problemid);
       await axios
-        .post(`http://8.134.90.238:8088/sample/upload`, formData)
+        .post(`https://8.134.90.238/sample/upload
+`, formData)
         .then(async (response) => {
+          this.$store.dispatch("notice", {
+            title: "数据上传成功！",
+            message: "",
+            type: "success",
+          });
           //上传完之后，还要更新一下数据库题目的题目信息
           await axios.post(`${SERVER_URL}/problem/update/problemcontent/specific`,{
             problemid:this.problemid,
             havedata:"true",
           })
           .then((response)=>{
-            this.$store.dispatch("notice", {
-            title: "数据上传成功！",
-            message: "",
-            type: "success",
-          });
+            
           })
           .catch((error) => {
           });

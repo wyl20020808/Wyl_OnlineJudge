@@ -142,6 +142,7 @@ export default {
   align-items: center;
 }
 .hoverable {
+  color: #3498db;
   transition: color 0.3s ease, text-decoration 0.3s ease;
   cursor: pointer;
 }

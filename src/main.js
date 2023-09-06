@@ -8,6 +8,8 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import { nextTick } from 'vue'
+import Antd from 'ant-design-vue'
+// import 'ant-design-vue/dist/antd.less'
 const app = createApp(App)
 // 自动获取焦点
 app.directive('focus', { 
@@ -17,4 +19,4 @@ app.directive('focus', {
       })
     }
   })
-app.use(router).use(ElementPlus).use(store).use(Vuetify).mount('#app')
+app.use(router).use(ElementPlus).use(store).use(Vuetify).use(Antd).mount('#app')
