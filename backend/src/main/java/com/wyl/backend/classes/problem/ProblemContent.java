@@ -23,7 +23,7 @@ public class ProblemContent {
 
     private int timelimit;//时间限制
     private int memorylimit;//内存限制
-
+    @TableField(select = false)
     private List<ProblemSample> problemsample;//样例输入输出
     private int submitcount;//提交次数
     private int aceptedcount;//通过次数

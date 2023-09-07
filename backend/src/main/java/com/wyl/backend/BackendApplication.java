@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
         "com.wyl.backend.classes.user.Controller",
         "com.wyl.backend.classes.judge.controller",
         "com.wyl.backend.classes.judge.sql",
+        "com.wyl.backend.classes.contest.SQL",
+        "com.wyl.backend.classes.contest.controller",
 })
 public class BackendApplication {
 

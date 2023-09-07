@@ -1,5 +1,6 @@
 package com.wyl.backend.classes.user.userinfo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,6 +19,18 @@ public class UserInfo {
     private String nickname;
 
     private String userpicture;
+    @TableField(select = false)
+    private String special;//更新单个数据，借助它来写
+
+
+    public String getSpecial() {
+        return special;
+    }
+
+    public void setSpecial(String special) {
+        this.special = special;
+    }
+
 
     public String getUserloginstate() {
         return userloginstate;
