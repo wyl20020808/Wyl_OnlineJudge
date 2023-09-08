@@ -87,11 +87,11 @@ public class ContestController {
 
     @PostMapping("/create")//这里还处理了前端传过来的数据，获取了contestid和各自的名字
     public void createContest(@RequestBody Contest info){
-        info.getContenstcontent().setUsername(String.valueOf(userOperator.selectById(info.getContenstcontent().getUserid()).getUsername()));
-        contestContentSQL.insert(info.getContenstcontent());
+        info.getContestcontent().setUsername(String.valueOf(userOperator.selectById(info.getContestcontent().getUserid()).getUsername()));
+        contestContentSQL.insert(info.getContestcontent());
         List<ContestContent> contenstcontent = contestContentSQL.selectList(null);
         int id = contenstcontent.get(contenstcontent.size() - 1).getContestid();
-        for(ContestAdmin admin: info.getContenstadmin()){
+        for(ContestAdmin admin: info.getContestadmin()){
             admin.setContestid(id);;
             admin.setUsername(String.valueOf(userOperator.selectById(admin.getUserid()).getUsername()));
             contestAdminSQL.insert(admin);
@@ -144,6 +144,15 @@ public class ContestController {
         QueryWrapper<Contestant> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("userid", userid);
         return contestantSQL.selectList(queryWrapper);
+    }
+
+    @GetMapping("/query/contest")
+    public Contest queryContest(@RequestParam int contestid){
+        Contest result = new Contest();
+        result.setContestcontent(contestContentSQL.selectById(contestid));
+        result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
+        result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
+        return result;
     }
 
 }

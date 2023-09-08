@@ -3,25 +3,25 @@ package com.wyl.backend.classes.contest;
 import java.util.List;
 
 public class Contest {
-    private ContestContent contenstcontent;
-    private List<ContestAdmin> contenstadmin;
+    private ContestContent contestcontent;
+    private List<ContestAdmin> contestadmin;
 
     private List<ContestProblem> contestproblem;
 
-    public ContestContent getContenstcontent() {
-        return contenstcontent;
+    public ContestContent getContestcontent() {
+        return contestcontent;
     }
 
-    public void setContenstcontent(ContestContent contenstcontent) {
-        this.contenstcontent = contenstcontent;
+    public void setContestcontent(ContestContent contestcontent) {
+        this.contestcontent = contestcontent;
     }
 
-    public List<ContestAdmin> getContenstadmin() {
-        return contenstadmin;
+    public List<ContestAdmin> getContestadmin() {
+        return contestadmin;
     }
 
-    public void setContenstadmin(List<ContestAdmin> contenstadmin) {
-        this.contenstadmin = contenstadmin;
+    public void setContestadmin(List<ContestAdmin> contestadmin) {
+        this.contestadmin = contestadmin;
     }
 
     public List<ContestProblem> getContestproblem() {

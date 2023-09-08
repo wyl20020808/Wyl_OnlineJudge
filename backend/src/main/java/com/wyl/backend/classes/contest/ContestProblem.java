@@ -14,6 +14,25 @@ public class ContestProblem {
 
     private String problemname;
 
+    private int submitcount;
+    private int acceptedcount;
+
+    public int getSubmitcount() {
+        return submitcount;
+    }
+
+    public void setSubmitcount(int submitcount) {
+        this.submitcount = submitcount;
+    }
+
+    public int getAcceptedcount() {
+        return acceptedcount;
+    }
+
+    public void setAcceptedcount(int acceptedcount) {
+        this.acceptedcount = acceptedcount;
+    }
+
     public int getId() {
         return id;
     }

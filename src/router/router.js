@@ -15,6 +15,8 @@ import ProblemEditView from '@/components/pages/Problem/ProblemEditView.vue'
 import SubmitCodeView from "../components/pages/Problem/SubmitCodeView.vue"
 import JudgeContentView from "@/components/pages/judge/JudgeContentView.vue"
 import CreateContestView from "@/components/pages/contest/CreateContestView.vue"
+import ContestView from "@/components/pages/contest/ContestView.vue"
+import ProblemContentView2 from "@/components/component/problem/ProblemContentView2.vue"
 const routes = [
   {
     path: '/',
@@ -97,6 +99,16 @@ const routes = [
     path: '/contest/create',
     name: 'createcontest',
     component: CreateContestView,
+  },
+  {
+    path: '/contest/content',
+    name: 'contestcontest',
+    component: ContestView,
+  },
+  {
+    path: '/problem/test',
+    name: 'test',
+    component: ProblemContentView2,
   },
 ]
 

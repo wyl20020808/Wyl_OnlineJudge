@@ -6,7 +6,7 @@
         getContestStatus(contestList[index - 1]) !== getContestStatus(contest)
       "
     >
-      <h2>{{ getContestStatusText(contest) }}</h2>
+      <h2 >{{ getContestStatusText(contest) }}</h2>
     </div>
     <div class="card mb-3 card1" style="max-width: 1000px; max-height: 400px">
       <div class="row g-0">
@@ -15,7 +15,7 @@
         </div>
         <div class="col-md-7">
           <div class="card-body">
-            <h2 class="card-title">{{ contest.contestname }}</h2>
+            <h2 @click="viewContest(contest.contestid)"  class="card-title hoverable">{{ contest.contestname }}</h2>
             <div class="contesttime1 d-flex align-items-center">
               <NotificationTwoTone style="fontsize: 24px" />
               <span style="font-size: 16px; margin-left: 5px">
@@ -106,6 +106,7 @@
                 background-color: rgb(166, 164, 164);
               "
               type="primary"
+              @click="viewContest(contest.contestid)"
               v-else
               >回顾比赛</a-button
             >
@@ -187,7 +188,14 @@ export default {
           console.log(err);
         });
     },
-    viewContest(contestid) {},
+    viewContest(contestid) {
+      this.$router.push({
+        name:"contestcontest",
+        query:{
+          contestid:contestid,
+        }
+      });
+    },
     async joinContest(contestid, contestlimit, contestpassword) {
       if (contestlimit === "私密(需要密码)") {
         // 如果比赛需要密码，显示对话框
@@ -276,8 +284,7 @@ export default {
     async checkJoinState() {
       this.joinSet.clear(); //清空一下
       //查询一下用户的报名信息
-      await axios
-        .get(`${SERVER_URL}/contest/query/join/personal`, {
+      await axios.get(`${SERVER_URL}/contest/query/join/personal`, {
           params: {
             userid: JSON.parse(localStorage.getItem("user")).userid,
           },
@@ -367,5 +374,15 @@ export default {
 
 .countdown {
   margin-top: 5px;
+}
+.hoverable {
+
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  filter: brightness(1.3);
+  text-decoration: underline;
 }
 </style>
