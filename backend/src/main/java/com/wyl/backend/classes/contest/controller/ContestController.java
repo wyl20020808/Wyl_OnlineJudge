@@ -1,12 +1,12 @@
 package com.wyl.backend.classes.contest.controller;
 
-import com.wyl.backend.classes.contest.ContestContent;
-import com.wyl.backend.classes.contest.Contest;
-import com.wyl.backend.classes.contest.ContestAdmin;
-import com.wyl.backend.classes.contest.ContestProblem;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.wyl.backend.classes.contest.*;
 import com.wyl.backend.classes.contest.SQL.ContestAdminSQL;
 import com.wyl.backend.classes.contest.SQL.ContestContentSQL;
 import com.wyl.backend.classes.contest.SQL.ContestProblemSQL;
+import com.wyl.backend.classes.contest.SQL.ContestantSQL;
 import com.wyl.backend.classes.contest.auxiliaryclass.Trie;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
@@ -29,12 +29,14 @@ public class ContestController {
     @Autowired
     private ProblemContentSQL problemContentSQL;
     @Autowired
-    private ContestContentSQL contestCreateSQL;
+    private ContestContentSQL contestContentSQL;
 
     @Autowired
     private ContestAdminSQL  contestAdminSQL;
     @Autowired
     private ContestProblemSQL   contestProblemSQL;
+    @Autowired
+    private ContestantSQL  contestantSQL;
     // 获取用户信息
     @PostMapping("/query/user")
     public Map<String, Integer> queryUser(@RequestBody UserInfo info) {
@@ -86,8 +88,8 @@ public class ContestController {
     @PostMapping("/create")//这里还处理了前端传过来的数据，获取了contestid和各自的名字
     public void createContest(@RequestBody Contest info){
         info.getContenstcontent().setUsername(String.valueOf(userOperator.selectById(info.getContenstcontent().getUserid()).getUsername()));
-        contestCreateSQL.insert(info.getContenstcontent());
-        List<ContestContent> contenstcontent = contestCreateSQL.selectList(null);
+        contestContentSQL.insert(info.getContenstcontent());
+        List<ContestContent> contenstcontent = contestContentSQL.selectList(null);
         int id = contenstcontent.get(contenstcontent.size() - 1).getContestid();
         for(ContestAdmin admin: info.getContenstadmin()){
             admin.setContestid(id);;
@@ -103,6 +105,45 @@ public class ContestController {
 
     @GetMapping("/query")
     public List<ContestContent> queryContestContent(){
-        return contestCreateSQL.selectList(null);
+        return contestContentSQL.selectList(null);
     }
+
+    @PostMapping("/join/personal")
+    public int joinContestPersonal(@RequestBody Contestant info){
+        try{
+            contestantSQL.insert(info);
+            UpdateWrapper<ContestContent> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.setSql("joinpeople = joinpeople + 1").eq("contestid", info.getContestid());
+            contestContentSQL.update(null, updateWrapper);
+            return 1;
+        }catch(Exception e){
+            System.out.println(e);
+            return 0;
+        }
+    }
+    @PostMapping("/join/personal/cancel")
+    public int joinContestPersonalCancel(@RequestBody Contestant info){
+        try{
+            //取消报名 -1
+            UpdateWrapper<ContestContent> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.setSql("joinpeople = joinpeople - 1").eq("contestid", info.getContestid());
+            contestContentSQL.update(null, updateWrapper);
+            //删除报名信息
+            QueryWrapper<Contestant> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userid", info.getUserid()).eq("contestid", info.getContestid());
+
+            return contestantSQL.delete(queryWrapper);
+        }catch(Exception e){
+            System.out.println(e);
+            return 0;
+        }
+    }
+
+    @GetMapping("/query/join/personal")
+    public List<Contestant> queryJoinPersonal(@RequestParam int userid){//返回其已经注册过的比赛
+        QueryWrapper<Contestant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid", userid);
+        return contestantSQL.selectList(queryWrapper);
+    }
+
 }
