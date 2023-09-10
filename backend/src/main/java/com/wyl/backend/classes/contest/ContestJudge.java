@@ -28,6 +28,16 @@ public class ContestJudge {
 
     public int contestid;
 
+    private String problemchar;
+
+    public String getProblemchar() {
+        return problemchar;
+    }
+
+    public void setProblemchar(String problemchar) {
+        this.problemchar = problemchar;
+    }
+
     public int getJudgeid() {
         return judgeid;
     }

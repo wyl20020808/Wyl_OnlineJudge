@@ -2,8 +2,8 @@
   <a-table :dataSource="datas" :pagination="false">
     <a-table-column
       title="题号"
-      dataIndex="id"
-      key="id"
+      dataIndex="problemchar"
+      key="problemchar"
       width="100px"
       align="center"
     />
@@ -15,7 +15,7 @@
       align="center"
     >
       <template v-slot="{ record }">
-        <div class="hoverable" @click="viewProblem(record.problemid)">
+        <div class="hoverable" @click="viewProblem(record.problemid,record.problemchar)">
           {{ record.problemname }}
         </div>
       </template>
@@ -53,20 +53,22 @@ export default defineComponent({
   data() {
     return {
       datas: [],
-      
     };
   },
-  methods:{
-    viewProblem(problemid){
-      router.push({path: '/contest/problem',query:{problemid,contestid:this.contest.contestcontent.contestid}})
-    }
+  methods: {
+    viewProblem(problemid,problemchar) {
+      router.push({
+        path: "/contest/problem",
+        query: { problemid, contestid: this.contest.contestcontent.contestid,problemchar:problemchar },
+      });
+    },
   },
   watch: {
     contest(newVal, oldVal) {
       let problems = newVal.contestproblem;
       for (let i = 0; i < problems.length; i++) {
         this.datas.push({
-          id: String.fromCharCode("A".charCodeAt(0) + i),
+          problemchar: String.fromCharCode("A".charCodeAt(0) + i), //这里后续可以改，因为数据库存了
           problemname: problems[i].problemname,
           problemid: problems[i].problemid,
           passrate: problems[i].acceptedcount + "/" + problems[i].submitcount,

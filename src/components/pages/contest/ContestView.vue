@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <a-row class="row1">
-      <a-col :offset="3" :span="24">
+      <a-col style="margin-left: 260px;" :span="24">
         <a-row style="margin-top: 20px; display: flex; align-items: center">
           <el-icon size="40" color="rgb(24, 144, 255)" style="margin-right: 8px"
             ><Trophy
@@ -36,12 +36,14 @@
           <el-icon style="" size="20" color="rgb(24, 144, 255)"
             ><User
           /></el-icon>
-          <a-col style="font-size: 18px">参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col>
+          <a-col style="font-size: 18px"
+            >参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col
+          >
         </a-row>
       </a-col>
     </a-row>
     <a-row style="margin-top: 40px">
-      <a-col :offset="3" :span="16">
+      <a-col style="margin-left: 260px;" :span="16">
         <a-tabs class="my-tabs" v-model:activeKey="activeKey">
           <a-tab-pane key="1" tab="比赛说明"
             ><ContestDescriptionComponent :contest="contest"
@@ -49,8 +51,11 @@
           <a-tab-pane key="2" tab="题目" force-render
             ><ContestProblemComponent :contest="contest"
           /></a-tab-pane>
-          <a-tab-pane key="3" tab="提交"><ContestSubmitComponent :contest="contest"/></a-tab-pane>
-          <a-tab-pane key="4" tab="排名">Content of Tab Pane 4</a-tab-pane>
+          <a-tab-pane key="3" tab="提交"
+            ><ContestSubmitComponent :contest="contest"
+          /></a-tab-pane>
+          <a-tab-pane key="4" tab="排名"><ContestRankComponent :contest="contest"
+          /></a-tab-pane>
         </a-tabs></a-col
       >
     </a-row>
@@ -63,6 +68,7 @@ import { User, Timer, Flag, Trophy } from "@element-plus/icons-vue";
 import ContestDescriptionComponent from "@/components/component/contest/ContestDescriptionComponent.vue";
 import ContestProblemComponent from "@/components/component/contest/ContestProblemComponent.vue";
 import ContestSubmitComponent from "@/components/component/contest/ContestSubmitComponent.vue";
+import ContestRankComponent from "@/components/component/contest/ContestRankComponent.vue";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
 export default {
@@ -71,6 +77,7 @@ export default {
     ContestDescriptionComponent,
     ContestProblemComponent,
     ContestSubmitComponent,
+    ContestRankComponent,
     User,
     Timer,
     Flag,
@@ -91,19 +98,19 @@ export default {
           contestid: this.$route.query.contestid,
         },
 
-    //  @GetMapping("/query/contest")
-    // public Contest queryContest(@RequestParam int contestid){
-    //     Contest result = new Contest();
-    //     result.setContestcontent(contestContentSQL.selectById(contestid));
-    //     result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
-    //     result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
-    //     return result;
-    // }
+        //  @GetMapping("/query/contest")
+        // public Contest queryContest(@RequestParam int contestid){
+        //     Contest result = new Contest();
+        //     result.setContestcontent(contestContentSQL.selectById(contestid));
+        //     result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
+        //     result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
+        //     return result;
+        // }
       })
       .then((res) => {
         this.contest = res.data;
 
-        console.log(this.contest, new Date());
+        // console.log(this.contest, new Date());
       })
       .catch((err) => {
         console.log(err);
@@ -118,18 +125,17 @@ export default {
       return beijingTime;
     },
     getTimeDifference(startdate, enddate) {
-    let start = new Date(startdate);
-    let end = new Date(enddate);
-    let diff = Math.abs(end - start); // 获取毫秒数的差值
-    let days = Math.floor(diff / (1000 * 60 * 60 * 24)); // 计算天数
-    diff -= days * (1000 * 60 * 60 * 24);
-    let hours = Math.floor(diff / (1000 * 60 * 60)); // 计算小时数
-    diff -= hours * (1000 * 60 * 60);
-    let minutes = Math.floor(diff / (1000 * 60)); // 计算分钟数
-    return `${days}天${hours}小时${minutes}分钟`;
+      let start = new Date(startdate);
+      let end = new Date(enddate);
+      let diff = Math.abs(end - start); // 获取毫秒数的差值
+      let days = Math.floor(diff / (1000 * 60 * 60 * 24)); // 计算天数
+      diff -= days * (1000 * 60 * 60 * 24);
+      let hours = Math.floor(diff / (1000 * 60 * 60)); // 计算小时数
+      diff -= hours * (1000 * 60 * 60);
+      let minutes = Math.floor(diff / (1000 * 60)); // 计算分钟数
+      return `${days}天${hours}小时${minutes}分钟`;
+    },
   },
-  },
-  
 };
 </script>
 

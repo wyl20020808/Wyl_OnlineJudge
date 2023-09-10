@@ -16,6 +16,15 @@ public class ContestProblem {
 
     private int submitcount;
     private int acceptedcount;
+   private String problemchar;
+
+    public String getProblemchar() {
+        return problemchar;
+    }
+
+    public void setProblemchar(String problemchar) {
+        this.problemchar = problemchar;
+    }
 
     public int getSubmitcount() {
         return submitcount;

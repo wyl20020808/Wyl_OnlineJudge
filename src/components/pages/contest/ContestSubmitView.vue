@@ -2,7 +2,7 @@
   <div>
     <div class="card out2">
       <div class="title1">
-        <h2>提交代码 - P{{ problemid }} {{ problemname }} 【比赛】{{ contestid }} </h2>
+        <h2>提交代码 - [{{ problemchar }}] {{ problemname }}   </h2>
       </div>
       <div class="buttons">
         <el-button @click="backToProblem" class="button2" type="primary"
@@ -39,7 +39,7 @@
         >提交代码</el-button
       >
     </div>
-    <div class="辅助" style="position: relative; top: 60px; width: 100px">
+    <div class="" style="position: relative; top: 60px; width: 100px">
       &ensp;
     </div>
   </div>
@@ -128,13 +128,13 @@ export default {
       problemid:this.$route.query.problemid,
       problemname:this.$route.query.problemname,
       contestid:this.$route.query.contestid,
+      problemchar:this.$route.query.problemchar,
     };
   },
   methods: {
     backToProblem() {
       router.go(-1);
     },
-
     async submitCode() {
       let submittime = getNowTime();
       let language = "";
@@ -144,7 +144,7 @@ export default {
               break;
           }
       }
-      await axios.get(`${SERVER_URL}/contest/query/alljudge`)
+      await axios.get(`${SERVER_URL}/contest/query/alljudge`)//这里可以优化
       .then((response) =>{
           this.judgeid = response.data[response.data.length - 1].judgeid + 1;
       } )
@@ -161,6 +161,7 @@ export default {
         judgeid:this.judgeid,
         problemname:this.problemname,
         contestid:this.$route.query.contestid,
+        problemchar:this.problemchar
       }})
 
     },

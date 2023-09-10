@@ -16,6 +16,16 @@ public class ContestJudgeContent {
 
     public int contestid;
 
+   public String problemchar;
+
+    public String getProblemchar() {
+        return problemchar;
+    }
+
+    public void setProblemchar(String problemchar) {
+        this.problemchar = problemchar;
+    }
+
     public int getId() {
         return id;
     }

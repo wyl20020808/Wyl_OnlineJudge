@@ -57,7 +57,7 @@ public class ContestJudgeController {
     @GetMapping("/query/alljudge")
     public List<ContestJudge> queryJudgeid(@RequestParam int contestid){
         QueryWrapper<ContestJudge> query = new QueryWrapper<>();
-        query.eq("judgeid",contestid);
+        query.eq("contestid",contestid);
         return judgeSql.selectList(query);
     }
 }

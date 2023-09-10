@@ -33,15 +33,22 @@
           font-weight: bold;
           margin-top: 10px;
         "
-        >P{{ problemcontent.problemid }} {{ problemcontent.title }}
+        >[{{ problemchar }}] {{ problemcontent.title }}
       </a-col>
     </a-row>
     <a-row class="nowrap-row" style="margin-top: 20px">
       <a-col :offset="3">
-        <a-button @click="submitProblem" style="color: white" type="primary">提交答案</a-button>
+        <a-button @click="submitProblem" style="color: white" type="primary"
+          >提交答案</a-button
+        >
       </a-col>
-      <a-col >
-        <a-button @click="editProblem" style="color: white;margin-left: 10px;" ghost >编辑题目</a-button>
+      <a-col>
+        <a-button
+          @click="editProblem"
+          style="color: white; margin-left: 10px"
+          ghost
+          >编辑题目</a-button
+        >
       </a-col>
       <a-col
         style="
@@ -364,15 +371,18 @@ export default {
       md: new MarkdownIt({ html: true }).use(mk),
       userinfo: {},
       algorithm: [],
-    
+      problemchar:this.$route.query.problemchar,
     };
   },
   methods: {
-    back(){
+    back() {
       router.go(-1);
     },
     editProblem() {
-      router.push({name:"problemedit",params:{ problemid : this.problemcontent.problemid}})
+      router.push({
+        name: "problemedit",
+        params: { problemid: this.problemcontent.problemid },
+      });
     },
     jump(path) {
       router.push({ path: path });
@@ -412,11 +422,18 @@ export default {
       }
       return text.replace(/\n/g, "<br>"); //为了体现间距，更加美观
     },
-    submitProblem(){
-      // console.log(this.problemcontent.title)
-      router.push({path:"/contest/submit",query:{ problemid : this.problemcontent.problemid,problemname:this.problemcontent.title,
-        contestid:this.$route.query.contestid}})
-    }
+    submitProblem() {
+       
+      router.push({
+        path: "/contest/submit",
+        query: {
+          problemid: this.problemcontent.problemid,
+          problemname: this.problemcontent.title,
+          contestid: this.$route.query.contestid,
+          problemchar: this.problemchar,
+        },
+      });
+    },
   },
   computed: {
     htmlText(text) {

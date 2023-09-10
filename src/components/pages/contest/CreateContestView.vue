@@ -179,9 +179,10 @@ export default {
         })
       }
       let contestproblem = [];
-      for(let problem in this.problems){
+      for(let i = 0 ;i < this.problems.length;i++){
         contestproblem.push({
-          problemid: this.problems[problem],
+          problemid: this.problems[i],
+          problemchar:String.fromCharCode("A".charCodeAt(0) + i),
         })
       }
       let contest = {
@@ -201,7 +202,6 @@ export default {
               type: "error",
             });
       } else {
-
         await axios
           .post(`${SERVER_URL}/contest/create`, contest)
           .then((res) => {

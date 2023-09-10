@@ -1,8 +1,11 @@
-<!-- 跳转到当前页面必须要judgeid -->
+<!-- 
+1、跳转到当前页面必须要judgeid
+2、如果是比赛则需要：[contestid,problemchar,problemname]
+ -->
 <template>
   <div class="nav">
     <h1 style="position: relative; left: 15px; top: 10px">
-      测评详情 - U{{ judgeid }} - P{{ problemid }} {{ problemname  }}
+      {{ titleinfo }}
     </h1>
   </div>
   <div class="card nav2">
@@ -22,16 +25,17 @@
     </div>
   </div>
 
-  <div >
-    <JudgeContentCardComponent v-if="selectedTab === 'testInfo'" :judgeinfo="judgeinfo" />
-    <!-- Replace with your Code component -->
-    <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
+  <div>
+    <JudgeContentCardComponent
+      v-if="selectedTab === 'testInfo'"
+      :judgeinfo="judgeinfo"
+    />
 
+    <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
   </div>
   <div class="">
     <JudgeContentInfoComponent :judgeinfo="judgeinfo" />
   </div>
- 
 </template>
 <!-- 
 
@@ -56,72 +60,84 @@ export default {
         judgecontent: [],
         judge: {},
       },
-      hadinfo:true,
+      hadinfo: true,
       judgeid: 0,
       problemid: this.$route.query.problemid,
-      problemname:this.$route.query.problemname,//注意这里有可能别的地方没传过来，所以就需要更新数据
+      problemname: this.$route.query.problemname, //注意这里有可能别的地方没传过来，所以就需要更新数据
+      titleinfo: "",
     };
   },
-  methods:{
-    updateInfo(){
+  methods: {
+    updateInfo() {
       this.problemid = this.judgeinfo.judge.problemid;
       this.problemname = this.judgeinfo.judge.problemname;
+
+      if(!this.$route.query.contestid){
+        this.titleinfo =
+        `测评详情 - U` +
+        this.judgeid +
+        ` - P` +
+        this.problemid +
+        `  ` +
+        this.problemname;
+      }
+      
     },
-    async addSubmitCount(problemid,userid){
-      axios.post(`${SERVER_URL}/problem/update/problemcontent/special`,{
-        problemid:problemid,
-        special:"submitcount",
-      })
-      .then((res) =>{
-
-      })
-      .catch((error) =>{
-        console.log(error);
-      })
-      axios.post(`${SERVER_URL}/userextra/update/special`,{
-        userid,
-        special:"submitcount",
-      })
-      .then((res) =>{
-
-      })
-      .catch((error) =>{
-        console.log(error);
-      })
+    async addSubmitCount(problemid, userid) {
+      axios
+        .post(`${SERVER_URL}/problem/update/problemcontent/special`, {
+          problemid: problemid,
+          special: "submitcount",
+        })
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
+      axios
+        .post(`${SERVER_URL}/userextra/update/special`, {
+          userid,
+          special: "submitcount",
+        })
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    async addAceptedCount(problemid,userid){
-     await axios.post(`${SERVER_URL}/problem/update/problemcontent/special`,{
-        problemid:problemid,
-        special:"aceptedcount",
-      })
-      .then((res) =>{
-
-      })
-      .catch((error) =>{
-        console.log(error);
-      })
-      await axios.post(`${SERVER_URL}/userextra/update/special`,{
-        userid:userid,
-        special:"aceptedcount",
-      })
-      .then((res) =>{
-
-      })
-      .catch((error) =>{
-        console.log(error);
-      })
+    async addAceptedCount(problemid, userid) {
+      await axios
+        .post(`${SERVER_URL}/problem/update/problemcontent/special`, {
+          problemid: problemid,
+          special: "aceptedcount",
+        })
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
+      await axios
+        .post(`${SERVER_URL}/userextra/update/special`, {
+          userid: userid,
+          special: "aceptedcount",
+        })
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    async saveJudgeInfo(judgedata, submittime) {//保存评测信息到数据库
-
-      this.addSubmitCount(this.$route.query.problemid,JSON.parse(localStorage.getItem("user")).userid);
-      let judgeinfo = {//这里为什么能用$router，是因为到这里来的肯定是提交代码的
+    async saveJudgeInfo(judgedata, submittime) {
+      //保存评测信息到数据库
+      this.addSubmitCount(
+        this.$route.query.problemid,
+        JSON.parse(localStorage.getItem("user")).userid
+      );
+      let judgeinfo = {
+        //这里为什么能用$router，是因为到这里来的肯定是提交代码的
         problemid: this.$route.query.problemid,
         userid: JSON.parse(localStorage.getItem("user")).userid,
         submittime,
         code: this.$route.query.source_code,
-        username:JSON.parse(localStorage.getItem("user")).username,
-        language:this.$route.query.language,
-        problemname:this.$route.query.problemname,
+        username: JSON.parse(localStorage.getItem("user")).username,
+        language: this.$route.query.language,
+        problemname: this.$route.query.problemname,
       };
       const results = judgedata.data.results;
       let runtime = 0;
@@ -141,19 +157,24 @@ export default {
             : results[i].compile_output;
       }
       judgeinfo.judgestate = judgestate;
-      if(judgestate === "Accepted"){
-        this.addAceptedCount(this.$route.query.problemid,JSON.parse(localStorage.getItem("user")).userid)
+      if (judgestate === "Accepted") {
+        this.addAceptedCount(
+          this.$route.query.problemid,
+          JSON.parse(localStorage.getItem("user")).userid
+        );
       }
-          
+
       judgeinfo.compileoutput = compileoutput;
       judgeinfo.runtime = runtime;
       judgeinfo.memory = memory;
-      judgeinfo.score = score > 99 ? 100:score;
+      judgeinfo.score = score >= 99 ? 100 : score;
       judgeinfo.totaltime = runtime;
-      let type = 'judge';
-      if(this.$route.query.contestid){//如果是比赛传过来的话
-        judgeinfo.contestid = this.$route.query.contestid;
-        type = 'contest';
+      let type = "judge";
+      if (this.$route.query.contestid) {
+        //如果是比赛传过来的话
+        judgeinfo.contestid = this.$route.query.contestid; //比赛id
+        judgeinfo.problemchar = this.$route.query.problemchar; //题目对应的字母
+        type = "contest";
       }
       await axios
         .post(`${SERVER_URL}/${type}/insert/judge`, judgeinfo)
@@ -168,7 +189,7 @@ export default {
             type: "error",
           });
         });
-        // 上面是保存单个信息，下面是保存每个测试点的信息
+      // 上面是保存单个信息，下面是保存每个测试点的信息
       let infolist = [];
       for (let i = 0; i < results.length; i++) {
         infolist.push({
@@ -178,9 +199,11 @@ export default {
           judgestate: results[i].status.description,
         });
       }
-      if(this.$route.query.contestid){//如果是比赛传过来的话
-        for(let i = 0;i < infolist.length;i++){
+      if (this.$route.query.contestid) {
+        //如果是比赛传过来的话
+        for (let i = 0; i < infolist.length; i++) {
           infolist[i].contestid = this.$route.query.contestid;
+          infolist[i].problemchar = this.$route.query.problemchar;
         }
       }
       await axios
@@ -193,51 +216,58 @@ export default {
             type: "error",
           });
         });
-        // 
+      //
     },
-    async getData(){
-      let type = 'judge';
-      if(this.$route.query.contestid){//如果是比赛传过来的话
+    async getData() {
+      let type = "judge";
+      if (this.$route.query.contestid) {
+        //如果是比赛传过来的话
         this.judgeinfo.contestid = this.$route.query.contestid;
-        type = 'contest';
+        type = "contest";
       }
-      await axios//查询一下数据库里面有没有数据
-      .get( `${SERVER_URL}/${type}/query/judgebyid`, {
-        params: {
-          judgeid: this.judgeid,
-        },
-      })
-      .then((response) => {
-        this.hadinfo = response.data !== "";//如果查不到数据
-        if(this.hadinfo === true){
-          this.judgeinfo.judge = response.data;
-        }
-      })    
-      .catch(function (error) {
-        console.log(error);
-      });
-    if(this.hadinfo){//如果有数据，就展示数据
+      await axios //查询一下数据库里面有没有数据
+        .get(`${SERVER_URL}/${type}/query/judgebyid`, {
+          params: {
+            judgeid: this.judgeid,
+          },
+        })
+        .then((response) => {
+          this.hadinfo = response.data !== ""; //如果查不到数据
+          if (this.hadinfo === true) {
+            this.judgeinfo.judge = response.data;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      if (this.hadinfo) {
+        //如果有数据，就展示数据
         await axios
-      .get( `${SERVER_URL}/${type}/query/judgecontent`, {
-        params: {
-          judgeid: this.judgeid,
-        },
-      })
-      .then((response) => {
-        this.judgeinfo.judgecontent = response.data;//外面的if保证了这里肯定有数据，否则就是数据库有问题
-      })    
-      .catch(function (error) {
-        console.log(error);
-      });
-      this.updateInfo();
-    }
-
+          .get(`${SERVER_URL}/${type}/query/judgecontent`, {
+            params: {
+              judgeid: this.judgeid,
+            },
+          })
+          .then((response) => {
+            this.judgeinfo.judgecontent = response.data; //外面的if保证了这里肯定有数据，否则就是数据库有问题
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        this.updateInfo();
+      }
+    },
   },
-},
   async created() {
-    this.judgeid = this.$route.query.judgeid;//首先给我们的judgeid赋值
+    
+    if (this.$route.query.contestid) {
+      //如果是比赛需要修改信息
+      this.titleinfo =
+        `[` + this.$route.query.problemchar + `]` + `  ` + this.problemname;
+    } 
+    this.judgeid = this.$route.query.judgeid; //首先给我们的judgeid赋值
     await this.getData();
-    if(this.hadinfo === false){
+    if (this.hadinfo === false) {
       let formData = new FormData();
       formData.append("source_code", this.$route.query.source_code);
       formData.append("problemId", this.$route.query.problemid);
@@ -259,9 +289,8 @@ export default {
         .catch((error) => {
           console.error(error);
         });
-        await this.getData();
+      await this.getData();
     }
-
   },
   components: {
     JudgeContentCardComponent,
