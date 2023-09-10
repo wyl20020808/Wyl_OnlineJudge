@@ -37,7 +37,7 @@ export default {
   methods: {
     push_to_problemcontent(problemid) {
       router.push({
-        path: "/problemdetail",
+        path: "/problem",
         query: {
           problemid: problemid,
         },

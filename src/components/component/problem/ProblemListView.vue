@@ -61,7 +61,7 @@ export default {
     const router = useRouter();
     const push_to_problemcontent = (problemid) => {
       router.push({
-        path: "/problemdetail",
+        path: "/problem",
         query: {
           problemid: problemid,
         },

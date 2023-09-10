@@ -1,9 +1,49 @@
 <template>
-  <a-table :dataSource="datas" :columns="columns" :pagination="false" />
+  <a-table :dataSource="datas" :pagination="false">
+    <a-table-column
+      title="题号"
+      dataIndex="id"
+      key="id"
+      width="100px"
+      align="center"
+    />
+    <a-table-column
+      title="题目名称"
+      dataIndex="problemname"
+      key="problemname"
+      width="600px"
+      align="center"
+    >
+      <template v-slot="{ record }">
+        <div class="hoverable" @click="viewProblem(record.problemid)">
+          {{ record.problemname }}
+        </div>
+      </template>
+    </a-table-column>
+    <a-table-column
+      title="通过率"
+      dataIndex="passrate"
+      key="passrate"
+      align="center"
+    />
+    <a-table-column
+      title="我的状态"
+      dataIndex="state"
+      key="state"
+      align="center"
+    />
+  </a-table>
 </template>
 
 <script>
-export default {
+import { defineComponent } from "vue";
+import { Table } from "ant-design-vue";
+import router from "@/router/router";
+export default defineComponent({
+  components: {
+    "a-table": Table,
+    "a-table-column": Table.Column,
+  },
   props: {
     contest: {
       type: Object,
@@ -13,56 +53,40 @@ export default {
   data() {
     return {
       datas: [],
-      columns: [
-        {
-          title: "题号",
-          dataIndex: "id",
-          key: "id",
-          width:"100px",
-          align: 'center',  // 设置列中的元素居中
-        },
-        {
-          title: "题目名称",
-          dataIndex: "problemname",
-          key: "problemname",
-          width:"600px",
-          align: 'center',  // 设置列中的元素居中
-        },
-        {
-          title: "通过率",
-          dataIndex: "passrate",
-          key: "passrate",
-          align: 'center',  // 设置列中的元素居中
-        },
-        {
-          title: "我的状态",
-          dataIndex: "state",
-          key: "state",
-          align: 'center',  // 设置列中的元素居中
-        },
-      ],
+      
     };
   },
-  watch:{
+  methods:{
+    viewProblem(problemid){
+      router.push({path: '/contest/problem',query:{problemid,contestid:this.contest.contestcontent.contestid}})
+    }
+  },
+  watch: {
     contest(newVal, oldVal) {
-      // 当contest的值改变时，这个函数会被调用
-      // newVal是新的值，oldVal是旧的值
       let problems = newVal.contestproblem;
       for (let i = 0; i < problems.length; i++) {
-      this.datas.push({
-        id: String.fromCharCode("A".charCodeAt(0) + i),
-        problemname: problems[i].problemname,
-        passrate:
-          problems[i].acceptedcount + "/" + problems[i].submitcount,
-        state: "未通过",
-      });
-    }
+        this.datas.push({
+          id: String.fromCharCode("A".charCodeAt(0) + i),
+          problemname: problems[i].problemname,
+          problemid: problems[i].problemid,
+          passrate: problems[i].acceptedcount + "/" + problems[i].submitcount,
+          state: "未通过",
+        });
+      }
     },
   },
-  created() {
-
-  },
-};
+});
 </script>
 
-<style scoped></style>
+<style scoped>
+.hoverable {
+  color: #3498db;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  filter: brightness(1.3);
+  text-decoration: underline;
+}
+</style>

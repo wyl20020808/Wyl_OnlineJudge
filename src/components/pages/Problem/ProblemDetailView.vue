@@ -32,7 +32,6 @@ export default {
   });
   axios.get(`${SERVER_URL}/problem/query/${state.problemid}`)//通过id查询题目的数据
     .then(response => {
-      // console.log(response.data.title)
       state.problemcontent = response.data;
     })
     .catch(error => {

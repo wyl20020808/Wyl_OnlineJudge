@@ -14,9 +14,9 @@
           >
           <a-breadcrumb-item
             class="hoverable"
-            @click="jump('/problems')"
+            @click="back"
             style="color: white"
-            >题库</a-breadcrumb-item
+            >比赛</a-breadcrumb-item
           >
           <a-breadcrumb-item style="color: white">{{
             problemcontent.title
@@ -364,9 +364,13 @@ export default {
       md: new MarkdownIt({ html: true }).use(mk),
       userinfo: {},
       algorithm: [],
+    
     };
   },
   methods: {
+    back(){
+      router.go(-1);
+    },
     editProblem() {
       router.push({name:"problemedit",params:{ problemid : this.problemcontent.problemid}})
     },
@@ -410,7 +414,8 @@ export default {
     },
     submitProblem(){
       // console.log(this.problemcontent.title)
-      router.push({name:"submitcode",query:{ problemid : this.problemcontent.problemid,problemname:this.problemcontent.title}})
+      router.push({path:"/contest/submit",query:{ problemid : this.problemcontent.problemid,problemname:this.problemcontent.title,
+        contestid:this.$route.query.contestid}})
     }
   },
   computed: {

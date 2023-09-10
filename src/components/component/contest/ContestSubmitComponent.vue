@@ -1,6 +1,8 @@
 <template>
   <div class="card card1">
-    <el-button type="primary" class="button1"  @click="resetFilters">重置所有筛选</el-button>
+    <el-button type="primary" class="button1" @click="resetFilters"
+      >重置所有筛选</el-button
+    >
     <div class="select1">
       <el-select v-model="judgevalue" clearable placeholder="状态">
         <el-option
@@ -39,53 +41,87 @@
   </div>
 
   <div class="card card2">
-    
-    <el-table ref="tableRef" :data="tableData" style="width: 100%" >
-      <el-table-column align="center"
-      @filter-change="handleFilterChange"
+    <el-table ref="tableRef" :data="tableData" style="width: 100%">
+      <el-table-column
+        align="center"
+        @filter-change="handleFilterChange"
         prop="judgestate"
         label="状态"
         sortable
-        :filters=judgestatefilters
+        :filters="judgestatefilters"
         :filter-method="filterHandler"
       >
-      <template v-slot:default="{ row }">
-          <div class="hoverable" @click="goToJudgeContent(row.judgeid)"  :style="{color:getJudgeStateColor(row.judgestate)}" >
+        <template v-slot:default="{ row }">
+          <div
+            class="hoverable"
+            @click="goToJudgeContent(row.judgeid)"
+            :style="{ color: getJudgeStateColor(row.judgestate) }"
+          >
             {{ row.judgestate }}
           </div>
         </template>
       </el-table-column>
       <el-table-column align="center" prop="problemname" label="题目">
         <!-- 这个row指的就是tableData里面存放的信息 -->
-        <template  v-slot:default="{ row }">
+        <template v-slot:default="{ row }">
           <div class="hoverable" @click="goToProblem(row.problemid)">
             {{ row.problemname }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" prop="username" label="提交者"> </el-table-column>
-      <el-table-column align="center" prop="runtime" label="运行时间"> </el-table-column>
-      <el-table-column align="center" prop="memory" label="占用内存"> </el-table-column>
-      <el-table-column align="center" prop="language" label="语言"> </el-table-column>
-      <el-table-column align="center" prop="submittime" label="提交时间"> </el-table-column>
+      <el-table-column align="center" prop="username" label="提交者">
+      </el-table-column>
+      <el-table-column align="center" prop="runtime" label="运行时间">
+      </el-table-column>
+      <el-table-column align="center" prop="memory" label="占用内存">
+      </el-table-column>
+      <el-table-column align="center" prop="language" label="语言">
+      </el-table-column>
+      <el-table-column align="center" prop="submittime" label="提交时间">
+      </el-table-column>
     </el-table>
     <div class="pagination-container">
-    <el-pagination
-      @current-change="handlePageChange"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      layout="prev, pager, next"
-      :total="judge.length"
-    ></el-pagination>
-  </div>
+      <el-pagination
+        @current-change="handlePageChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        layout="prev, pager, next"
+        :total="judge.length"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import { SERVER_URL } from "../../js/functions/config.js";
+import { SERVER_URL } from "../../../js/functions/config.js";
 import router from "@/router/router";
 export default {
+  props: {
+    contest: {
+      type: Object,
+      required: true,
+    },
+  },
+   watch:  {
+   async contest(newVal, oldVal) {
+      await axios
+      .get(`${SERVER_URL}/contest/query/alljudge`,{
+        params:{
+          contestid:newVal.contestid,
+        }
+      })
+      .then((response) => {
+        console.log(response.data);
+        this.originalJudge = response.data.reverse();
+        this.judge = [...this.originalJudge];
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    this.updateTableData();
+    },
+  },
   data() {
     const judgestates = [
       {
@@ -109,9 +145,9 @@ export default {
         label: "Wrong Answer",
       },
       {
-        value:"Compilation Error",
+        value: "Compilation Error",
         label: "Compilation Error",
-      }
+      },
     ];
     const languages = [
       { value: 45, label: "Assembly (NASM 2.14.02)", is_archived: false },
@@ -192,102 +228,93 @@ export default {
       judge: [],
       currentPage: 1,
       pageSize: 15,
-      judgestatefilters:[
-        {text: "Compilation Error", value:"Compilation Error"},
-        {text: "Accepted", value:"Accepted"},
-        {text: "Time Limit Exceeded", value:"Time Limit Exceeded"},
-        {text: "Runtime Error", value:"Runtime Error"},
-        {text: "Wrong Answer", value:"Wrong Answer"},
+      judgestatefilters: [
+        { text: "Compilation Error", value: "Compilation Error" },
+        { text: "Accepted", value: "Accepted" },
+        { text: "Time Limit Exceeded", value: "Time Limit Exceeded" },
+        { text: "Runtime Error", value: "Runtime Error" },
+        { text: "Wrong Answer", value: "Wrong Answer" },
       ],
       originalJudge: [],
-      
     };
   },
   methods: {
     resetFilters() {
-    this.$refs.tableRef.clearFilter();
-    this.judge = [...this.originalJudge];
-    this.updateTableData();
-  },
-    filterHandler(value, row, column) {
-
-    const property = column["property"];
-    
-    if (value) {
-      this.judge = this.originalJudge.filter(item => item[property] === value);
-      this.updateTableData();
-    }
-  },
-  handleFilterChange(filters) {
-    if (Object.keys(filters).every(key => filters[key] === undefined)) {  // 如果所有的筛选都被重置，恢复到原始的judge数组
+      this.$refs.tableRef.clearFilter();
       this.judge = [...this.originalJudge];
       this.updateTableData();
-    }
-  },
-    updateTableData() {
-  this.tableData = [];
-  const start = (this.currentPage - 1) * this.pageSize;
-  const end = Math.min(this.currentPage * this.pageSize, this.judge.length);  // 添加了Math.min
-  for (let i = start; i < end; i++) {  // 修改了循环的条件
-    this.tableData.push({
-      judgestate: this.judge[i].judgestate,
-      problemname: this.judge[i].problemname,
-      username: this.judge[i].username,
-      runtime: this.judge[i].runtime + ` ms`,
-      memory: this.judge[i].memory + ` KB`,
-      language: this.judge[i].language,
-      submittime: this.judge[i].submittime,
-      problemid: this.judge[i].problemid,
-      judgeid:this.judge[i].judgeid,
-    });
-  }
+    },
+    filterHandler(value, row, column) {
+      const property = column["property"];
 
-},
+      if (value) {
+        this.judge = this.originalJudge.filter(
+          (item) => item[property] === value
+        );
+        this.updateTableData();
+      }
+    },
+    handleFilterChange(filters) {
+      if (Object.keys(filters).every((key) => filters[key] === undefined)) {
+        // 如果所有的筛选都被重置，恢复到原始的judge数组
+        this.judge = [...this.originalJudge];
+        this.updateTableData();
+      }
+    },
+    updateTableData() {
+      this.tableData = [];
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = Math.min(this.currentPage * this.pageSize, this.judge.length); // 添加了Math.min
+      for (let i = start; i < end; i++) {
+        // 修改了循环的条件
+        this.tableData.push({
+          judgestate: this.judge[i].judgestate,
+          problemname: this.judge[i].problemname,
+          username: this.judge[i].username,
+          runtime: this.judge[i].runtime + ` ms`,
+          memory: this.judge[i].memory + ` KB`,
+          language: this.judge[i].language,
+          submittime: this.judge[i].submittime,
+          problemid: this.judge[i].problemid,
+          judgeid: this.judge[i].judgeid,
+        });
+      }
+    },
     handlePageChange(newPage) {
       this.currentPage = newPage;
       this.updateTableData();
     },
-    getJudgeStateColor(judgestate){
-      if(judgestate === "Accepted")
-        return "#25ad40";
-      else if(judgestate === "Compilation Error")
-        return "orange";
-      else 
-        return "red";
+    getJudgeStateColor(judgestate) {
+      if (judgestate === "Accepted") return "#25ad40";
+      else if (judgestate === "Compilation Error") return "orange";
+      else return "red";
     },
-    goToJudgeContent(judgeid){
-      router.push({name:"judgecontent",query:{
-        judgeid:judgeid,
-      }})
-    },
-    goToProblem(problemid){
+    goToJudgeContent(judgeid) {
       router.push({
-          path: '/problem',
-          query: {
-            problemid: problemid,
-          }
-        })
+        name: "judgecontent",
+        query: {
+          judgeid: judgeid,
+        },
+      });
+    },
+    goToProblem(problemid) {
+      router.push({
+        path: "/problem",
+        query: {
+          problemid: problemid,
+        },
+      });
     },
   },
   async created() {
-  await axios
-    .get(`${SERVER_URL}/judge/query/alljudge`)
-    .then((response) => {
-      console.log(response.data);
-      this.originalJudge = response.data.reverse();
-      this.judge = [...this.originalJudge];
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  this.updateTableData();
-},
+    
+  },
 };
 </script>
 
 <style scoped>
 .hoverable {
-  color:#3498db;
+  color: #3498db;
   transition: color 0.3s ease, text-decoration 0.3s ease;
   cursor: pointer;
 }
@@ -336,7 +363,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.button1{
+.button1 {
   width: 100px;
   color: white;
   position: relative;

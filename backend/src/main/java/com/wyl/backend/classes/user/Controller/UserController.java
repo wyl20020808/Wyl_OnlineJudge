@@ -34,13 +34,7 @@ public class UserController {
 
     @PostMapping("/query")
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
-        List<UserInfo> userinfo = userOperator.select();
-        for (UserInfo info : userinfo) {
-            if (info.getUserid() == userInfo.getUserid() ) {
-                return info;
-            }
-        }
-        return null;
+        return userOperator.selectById(userInfo.getUserid());
     }
 
     @PostMapping("/synchronize/userinfo")

@@ -1,7 +1,13 @@
 <template>
-  <div class="card card1">
-    <div class="code">{{ judgeinfo.judge.code }}</div>
-  </div>
+  <div style="width: 800px;">
+  <a-row>
+    <a-col style="margin-left: 200px;margin-top: 30px;" :span="24">
+        <a-typography-paragraph>
+          <pre>{{ judgeinfo.judge.code }}</pre>
+        </a-typography-paragraph>
+    </a-col>
+  </a-row>
+</div>
 </template>
 
 <script>
@@ -15,18 +21,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.card1 {
-  width: 800px;
-  position: relative;
-  min-height: 500px;
-  height: auto;
-  left: 200px;
-  top: 50px;
-}
-.code{
-    /* left:20px;
-    position: relative;
-    top:20px; */
-}
-</style>
+<style scoped></style>

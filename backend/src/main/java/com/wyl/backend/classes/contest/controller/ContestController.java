@@ -3,10 +3,7 @@ package com.wyl.backend.classes.contest.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.contest.*;
-import com.wyl.backend.classes.contest.SQL.ContestAdminSQL;
-import com.wyl.backend.classes.contest.SQL.ContestContentSQL;
-import com.wyl.backend.classes.contest.SQL.ContestProblemSQL;
-import com.wyl.backend.classes.contest.SQL.ContestantSQL;
+import com.wyl.backend.classes.contest.SQL.*;
 import com.wyl.backend.classes.contest.auxiliaryclass.Trie;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
@@ -37,6 +34,9 @@ public class ContestController {
     private ContestProblemSQL   contestProblemSQL;
     @Autowired
     private ContestantSQL  contestantSQL;
+
+    @Autowired
+    private ContestJudgeContentSQL contestJudgeSQL;
     // 获取用户信息
     @PostMapping("/query/user")
     public Map<String, Integer> queryUser(@RequestBody UserInfo info) {
@@ -87,6 +87,12 @@ public class ContestController {
 
     @PostMapping("/create")//这里还处理了前端传过来的数据，获取了contestid和各自的名字
     public void createContest(@RequestBody Contest info){
+        try{
+            System.out.println(info.getContestadmin());
+            System.out.println("info.getContestcontent()");
+        }catch(Exception e){
+            System.out.println(e);
+        }
         info.getContestcontent().setUsername(String.valueOf(userOperator.selectById(info.getContestcontent().getUserid()).getUsername()));
         contestContentSQL.insert(info.getContestcontent());
         List<ContestContent> contenstcontent = contestContentSQL.selectList(null);

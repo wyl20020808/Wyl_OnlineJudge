@@ -185,8 +185,8 @@ export default {
         })
       }
       let contest = {
-        contenstcontent:contestcontent,
-        contenstadmin:contestadmin,
+        contestcontent:contestcontent,
+        contestadmin:contestadmin,
         contestproblem:contestproblem,
       }
       //name和contestid在后端去计算
@@ -201,6 +201,7 @@ export default {
               type: "error",
             });
       } else {
+
         await axios
           .post(`${SERVER_URL}/contest/create`, contest)
           .then((res) => {

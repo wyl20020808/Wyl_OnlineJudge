@@ -49,7 +49,7 @@
           <a-tab-pane key="2" tab="题目" force-render
             ><ContestProblemComponent :contest="contest"
           /></a-tab-pane>
-          <a-tab-pane key="3" tab="提交">Content of Tab Pane 3</a-tab-pane>
+          <a-tab-pane key="3" tab="提交"><ContestSubmitComponent :contest="contest"/></a-tab-pane>
           <a-tab-pane key="4" tab="排名">Content of Tab Pane 4</a-tab-pane>
         </a-tabs></a-col
       >
@@ -62,6 +62,7 @@ import { NotificationTwoTone, HomeTwoTone } from "@ant-design/icons-vue";
 import { User, Timer, Flag, Trophy } from "@element-plus/icons-vue";
 import ContestDescriptionComponent from "@/components/component/contest/ContestDescriptionComponent.vue";
 import ContestProblemComponent from "@/components/component/contest/ContestProblemComponent.vue";
+import ContestSubmitComponent from "@/components/component/contest/ContestSubmitComponent.vue";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
 export default {
@@ -69,6 +70,7 @@ export default {
     NotificationTwoTone,
     ContestDescriptionComponent,
     ContestProblemComponent,
+    ContestSubmitComponent,
     User,
     Timer,
     Flag,
@@ -88,6 +90,15 @@ export default {
         params: {
           contestid: this.$route.query.contestid,
         },
+
+    //  @GetMapping("/query/contest")
+    // public Contest queryContest(@RequestParam int contestid){
+    //     Contest result = new Contest();
+    //     result.setContestcontent(contestContentSQL.selectById(contestid));
+    //     result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
+    //     result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
+    //     return result;
+    // }
       })
       .then((res) => {
         this.contest = res.data;

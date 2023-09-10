@@ -242,7 +242,7 @@ export default {
       formData.append("problemId", parseInt(this.problemid));
       console.log(this.file, this.problemid);
       await axios
-        .post(`https://8.134.90.238/sample/upload
+        .post(`https://8.134.73.246/sample/upload
 `, formData)
         .then(async (response) => {
           this.$store.dispatch("notice", {

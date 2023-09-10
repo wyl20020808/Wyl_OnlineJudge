@@ -22,12 +22,11 @@
     </div>
   </div>
 
-  <div>
+  <div >
     <JudgeContentCardComponent v-if="selectedTab === 'testInfo'" :judgeinfo="judgeinfo" />
     <!-- Replace with your Code component -->
     <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
 
-    
   </div>
   <div class="">
     <JudgeContentInfoComponent :judgeinfo="judgeinfo" />
@@ -113,6 +112,7 @@ export default {
       })
     },
     async saveJudgeInfo(judgedata, submittime) {//保存评测信息到数据库
+
       this.addSubmitCount(this.$route.query.problemid,JSON.parse(localStorage.getItem("user")).userid);
       let judgeinfo = {//这里为什么能用$router，是因为到这里来的肯定是提交代码的
         problemid: this.$route.query.problemid,
@@ -150,8 +150,13 @@ export default {
       judgeinfo.memory = memory;
       judgeinfo.score = score > 99 ? 100:score;
       judgeinfo.totaltime = runtime;
+      let type = 'judge';
+      if(this.$route.query.contestid){//如果是比赛传过来的话
+        judgeinfo.contestid = this.$route.query.contestid;
+        type = 'contest';
+      }
       await axios
-        .post(`${SERVER_URL}/judge/insert/judge`, judgeinfo)
+        .post(`${SERVER_URL}/${type}/insert/judge`, judgeinfo)
         .then((response) => {
           console.log(response.data);
           this.judgeid = response.data;
@@ -173,8 +178,13 @@ export default {
           judgestate: results[i].status.description,
         });
       }
+      if(this.$route.query.contestid){//如果是比赛传过来的话
+        for(let i = 0;i < infolist.length;i++){
+          infolist[i].contestid = this.$route.query.contestid;
+        }
+      }
       await axios
-        .post(`${SERVER_URL}/judge/insert/judgecontent`, infolist)
+        .post(`${SERVER_URL}/${type}/insert/judgecontent`, infolist)
         .then((response) => {})
         .catch((error) => {
           this.$store.dispatch("notice", {
@@ -186,8 +196,13 @@ export default {
         // 
     },
     async getData(){
+      let type = 'judge';
+      if(this.$route.query.contestid){//如果是比赛传过来的话
+        this.judgeinfo.contestid = this.$route.query.contestid;
+        type = 'contest';
+      }
       await axios//查询一下数据库里面有没有数据
-      .get( `${SERVER_URL}/judge/query/judgebyid`, {
+      .get( `${SERVER_URL}/${type}/query/judgebyid`, {
         params: {
           judgeid: this.judgeid,
         },
@@ -197,14 +212,13 @@ export default {
         if(this.hadinfo === true){
           this.judgeinfo.judge = response.data;
         }
-            
       })    
       .catch(function (error) {
         console.log(error);
       });
     if(this.hadinfo){//如果有数据，就展示数据
         await axios
-      .get( `${SERVER_URL}/judge/query/judgecontent`, {
+      .get( `${SERVER_URL}/${type}/query/judgecontent`, {
         params: {
           judgeid: this.judgeid,
         },
@@ -229,7 +243,7 @@ export default {
       formData.append("problemId", this.$route.query.problemid);
       formData.append("languageId", this.$route.query.languageId);
       await axios //提交代码给后端
-        .post(`http://8.134.90.238:8088/judge/judgeForm`, formData, {
+        .post(`http://8.134.73.246:8088/judge/judgeForm`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
