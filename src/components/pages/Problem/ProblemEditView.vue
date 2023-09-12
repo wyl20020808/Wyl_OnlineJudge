@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { SERVER_URL } from "../../../js/functions/config";
+import { SERVER_URL, JUDGE_URL } from "../../../js/functions/config";
 import router from "@/router/router";
 import { ref } from "vue";
 import axios from "axios";
@@ -242,8 +242,7 @@ export default {
       formData.append("problemId", parseInt(this.problemid));
       console.log(this.file, this.problemid);
       await axios
-        .post(`https://8.134.73.246/sample/upload
-`, formData)
+        .post(`${JUDGE_URL}/sample/upload`, formData)
         .then(async (response) => {
           this.$store.dispatch("notice", {
             title: "数据上传成功！",

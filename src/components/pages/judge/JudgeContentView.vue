@@ -49,7 +49,7 @@ judgeinfo: {
 import JudgeContentCardComponent from "@/components/component/judge/JudgeContentCardComponent.vue";
 import JudgeContentCodesComponent from "@/components/component/judge/JudgeContentCodesComponent.vue";
 import JudgeContentInfoComponent from "@/components/component/judge/JudgeContentInfoComponent.vue";
-import { SERVER_URL } from "@/js/functions/config";
+import { JUDGE_URL, SERVER_URL } from "@/js/functions/config";
 import axios from "axios";
 export default {
   props: ["judgeid"],
@@ -273,7 +273,7 @@ export default {
       formData.append("problemId", this.$route.query.problemid);
       formData.append("languageId", this.$route.query.languageId);
       await axios //提交代码给后端
-        .post(`http://8.134.73.246:8088/judge/judgeForm`, formData, {
+        .post(`${JUDGE_URL}/judge/judgeForm`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

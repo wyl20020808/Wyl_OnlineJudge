@@ -13,6 +13,7 @@ export function getNowTime(){
   // 如果月份、日期、分钟和秒小于10，前面补0
   month = month < 10 ? "0" + month : month;
   date = date < 10 ? "0" + date : date;
+  hours = hours < 10 ? "0" + hours : hours;
   minutes = minutes < 10 ? "0" + minutes : minutes;
   seconds = seconds < 10 ? "0" + seconds : seconds;
   return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;

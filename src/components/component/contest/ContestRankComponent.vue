@@ -1,19 +1,19 @@
 <template>
   <table>
-    <thead>
+    <thead style="background-color: #e8e8e8;">
       <tr>
         <th v-for="(column, index) in columns" :key="index" class="centered-header">
           {{ column.title }}
         </th>
       </tr>
     </thead>
-    <tbody>
-      <tr v-for="(row, rowIndex) in tableData" :key="rowIndex">
-        <td v-for="(column, columnIndex) in columns" :key="columnIndex" style="position: relative; padding: 0;">
+    <tbody style="background-color: #f4f4f4;">
+      <tr v-for="(row, rowIndex) in tableData" :key="rowIndex" style="">
+        <td v-for="(column, columnIndex) in columns" :key="columnIndex" :style="{width: column.width,height:'110px',position: 'relative', padding: '0'}">
           <div
             class="hoverable"
             :style="{...getStyle(columnIndex, row, column), border: '1px solid #ddd'}"
-            style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;"
+            style=""
           >
             {{ row[column.dataIndex] }}
             <div v-if="columnIndex > 3 && usersubmit.get(row.userid).get(column.title)">
@@ -25,31 +25,6 @@
     </tbody>
   </table>
 </template>
-<!-- <template>
-  <a-table class="my-table"  :dataSource="tableData" :pagination="false">
-    <a-table-column
-      v-for="(column, index) in columns"
-      :key="index"
-      :title="column.title"
-      :dataIndex="column.dataIndex"
-      :align="column.align"
-      :width="column.width"
-    >
-      <template v-slot="{ record }">
-        <div
-  class="hoverable"
-  :style="getStyle(index, record, column)"
-  style="width: 100%; height: 100%;"
->
-  {{ record[column.dataIndex] }}
-  <div v-if="index > 3 && usersubmit.get(record.userid).get(column.title)">
-    (-{{ usersubmit.get(record.userid).get(column.title) }})
-  </div>
-</div>
-      </template>
-    </a-table-column>
-  </a-table>
-</template> -->
 
 <script>
 import axios from "axios";
@@ -81,28 +56,28 @@ export default {
           dataIndex: "rank",
           key: "rank",
           align: "center",
-          width: 60,
+          width: "60px",
         },
         {
           title: "参赛者",
           dataIndex: "username",
           key: "username",
           align: "center",
-          width: 80,
+          width: "80px",
         },
         {
           title: "通过",
           dataIndex: "passedcountd",
           key: "passedcountd",
           align: "center",
-          width: 60,
+          width: "60px",
         },
         {
           title: "罚时",
           dataIndex: "punishtime",
           key: "punishtime",
           align: "center",
-          width: 60,
+          width: "60px",
         },
       ],
     };
@@ -115,17 +90,22 @@ export default {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '50px',
+      width:"100%",
+      height:"100%",
     };
 
     if (index > 3 && this.userActime.get(record.userid).get(column.title)) {
       // 添加额外的样式
-      baseStyle.backgroundColor = 'green';
+      baseStyle.backgroundColor = '#eff9f7';
+    }else if(index > 3 && this.usersubmit.get(record.userid).get(column.title)){
+      baseStyle.backgroundColor = '#ffecec';
     }
 
     return baseStyle;
   },
     updateTableData() {
       let data = []; //为了最后排序后计算rank
+      console.log(this.userActime);
       for (let userid of this.userlist) {
         let temp = {
           username: this.username.get(userid),
@@ -282,6 +262,7 @@ export default {
       // console.log(this.usersubmit, this.userActime, this.userinfo);
     },
     diffMinutes(dateStr1, dateStr2) {
+
       // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
       let isoDateStr1 = dateStr1.replace(" ", "T") + "+08:00";
 
@@ -290,7 +271,8 @@ export default {
 
       let diffMilliseconds = date1.getTime() - date2.getTime();
       let diffMinutes = diffMilliseconds / 1000 / 60;
-
+      // clearImmediateonsole.log(date1, diffMinutes);
+      console.log(dateStr1, dateStr2);
       return diffMinutes;
     },
   },
