@@ -400,6 +400,12 @@ export default {
       }
     },
     parsedDescription(content) {
+      const md = require('markdown-it')({ html: true })
+            .use(require('markdown-it-katex'))
+
+// 解析 Markdown 和 LaTeX
+      let result = md.render(content);
+      return result;
       return this.md.render(String(content));
     },
     formattedText(text) {

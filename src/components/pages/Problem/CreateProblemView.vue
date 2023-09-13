@@ -1,113 +1,265 @@
 <template>
   <div class="container">
-    <h1 class="title">新建题目</h1>
-    <el-form label-position="left" label-width="70px">
+    <h1 style="font-size: 36px" class="title">新建题目</h1>
+    <el-form label-position="left" label-width="100px">
       <el-form-item label="题目名称">
-        <el-input v-model="title" type="textarea" placeholder="请输入题目名称" class="input"></el-input>
+        <el-input
+          :autosize="{ minRows: 1, maxRows: 5 }"
+          v-model="title"
+          type="textarea"
+          placeholder="请输入题目名称"
+          class="input"
+        ></el-input>
       </el-form-item>
       <el-form-item label="题目背景">
-        <el-input v-model="background" type="textarea" placeholder="请输入题目背景" class="input"></el-input>
+        <v-md-editor
+          placeholder="题目背景"
+          v-model="background"
+          height="400px"
+        ></v-md-editor>
       </el-form-item>
       <el-form-item label="题目描述">
-        <el-input v-model="description" type="textarea" placeholder="请输入题目描述" class="input"></el-input>
+        <v-md-editor
+          placeholder="题目描述"
+          v-model="description"
+          height="300px"
+        ></v-md-editor>
+        <!-- <el-input v-model="description" type="textarea" placeholder="请输入题目描述" class="input"></el-input> -->
       </el-form-item>
       <el-form-item label="输入格式">
-        <el-input v-model="inputFormat" type="textarea" placeholder="请输入输入格式" class="input"></el-input>
+        <v-md-editor
+          placeholder="输入格式"
+          v-model="inputFormat"
+          height="300px"
+        ></v-md-editor>
+        <!-- <el-input v-model="inputFormat" type="textarea" placeholder="请输入输入格式" class="input"></el-input> -->
       </el-form-item>
       <el-form-item label="输出格式">
-        <el-input v-model="outputFormat" type="textarea" placeholder="请输入输出格式" class="input"></el-input>
+        <v-md-editor
+          placeholder="输出格式"
+          v-model="outputFormat"
+          height="300px"
+        ></v-md-editor>
+        <!-- <el-input v-model="outputFormat" type="textarea" placeholder="请输入输出格式" class="input"></el-input> -->
       </el-form-item>
-      <div v-for="(example, index) in examples" :key="index" class="example">
-        <el-input v-model="example.input" placeholder="请输入样例输入" class="example-input"></el-input>
-        <el-input v-model="example.output" placeholder="请输入样例输出" class="example-input"></el-input>
-        <el-button style="color: aliceblue;" type="danger"  @click="removeExample(index)" class="example-button">删除</el-button>
-      </div>
-      <el-button @click="addExample" class="add-button">添加样例</el-button>
-      <el-form-item label="提示">
-        <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input>
+      <el-form-item label="样例组">
+        <el-button @click="addExample" style="margin-left: 1090px"
+          >添加样例</el-button
+        >
       </el-form-item>
+      <a-row v-for="(example, index) in examples" :key="index" class="example">
+        <a-col
+          :span="2"
+          @mouseenter="handleMouseEnter(index)"
+          @mouseleave="handleMouseLeave(index)"
+          style="display: flex; align-items: center; margin-right: 0px"
+        >
+          样例 #{{ index + 1 }}
+          <CloseOutlined
+            style="margin-left: 5px; font-size: 12px"
+            v-if="mouseOnSample.get(index)"
+            class="hoverable"
+            @click="removeExample(index)"
+          />
+        </a-col>
+        <a-col :span="11" class="example-input-col">
+          <el-input
+            style="width: 580px"
+            type="textarea"
+            :autosize="{ minRows: 4, maxRows: 10 }"
+            v-model="example.input"
+            placeholder="样例输入"
+          ></el-input>
+        </a-col>
+        <a-col :span="11">
+          <el-input
+            style="width: 580px"
+            type="textarea"
+            :autosize="{ minRows: 4, maxRows: 10 }"
+            v-model="example.output"
+            placeholder="样例输出"
+          ></el-input>
+        </a-col>
+      </a-row>
+
+      <el-form-item label="数据范围">
+        <v-md-editor
+          placeholder="提示/数据范围"
+          v-model="hint"
+          height="300px"
+        ></v-md-editor>
+        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+      </el-form-item>
+      <el-form-item label="时间限制">
+        <el-select v-model="selectedTime" style="width:1200px;">
+          <el-option
+            v-for="item in timeoptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+      </el-form-item>
+      <el-form-item label="空间限制">
+        <el-select v-model="selectedMemory" style="width:1200px;">
+          <el-option
+            v-for="item in memoryoptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+      </el-form-item>
+      <el-form-item label="来源">
+        <el-input
+          :autosize="{ minRows: 1, maxRows: 5 }"
+          v-model="source"
+          type="textarea"
+          placeholder="来源"
+          class="input"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="难度">
+        <el-input
+          :autosize="{ minRows: 1, maxRows: 5 }"
+          v-model="difficulty"
+          type="textarea"
+          placeholder="难度"
+          class="input"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="算法">
+        <el-input
+          :autosize="{ minRows: 1, maxRows: 5 }"
+          v-model="algorithm"
+          type="textarea"
+          placeholder="算法"
+          class="input"
+        ></el-input>
+      </el-form-item>
+      
     </el-form>
-    <el-button style="color: aliceblue;" type="primary" @click="save" class="save-button">保存</el-button>
+    <el-button
+      style="color: aliceblue; width: 80px"
+      type="primary"
+      @click="save"
+      class="save-button"
+      >保存</el-button
+    >
+    
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import {SERVER_URL} from "../../../js/functions/config"
-import { sleep } from '@/js/functions/TimeAbout';
+import { CloseOutlined } from "@ant-design/icons-vue";
+import axios from "axios";
+import { SERVER_URL } from "../../../js/functions/config";
+import { sleep } from "@/js/functions/TimeAbout";
 export default {
+  components: {
+    CloseOutlined,
+  },
   data() {
+    const timeoptions = [];
+    for (let i = 1; i <= 50; i++) {
+      timeoptions.push({
+        value: i * 100,
+        label: `${i * 100}ms`,
+      });
+    }
+    const memoryoptions = [];
+    for (let i = 0; i < 10; i++) {
+      memoryoptions.push({
+        value: 2 ** i,
+        label: `${2 ** i}MB`,
+      });
+    }
     return {
-      title: '',
-      background: '',
-      description: '',
-      inputFormat: '',
-      outputFormat: '',
-      examples: [{ input: '', output: '' }],
-      hint: ''
+      difficulty:"",
+      algorithm:"",
+      source:"",
+      timeoptions,
+      memoryoptions,
+      title: "",
+      background: "",
+      description: "",
+      inputFormat: "",
+      outputFormat: "",
+      selectedTime:"",
+      selectedMemory:"",
+      examples: [{ input: "", output: "" }],
+      hint: "",
+      mouseOnSample: new Map(),
     };
   },
   methods: {
+    handleMouseEnter(index) {
+      // console.log("鼠标进入了元素");
+      this.mouseOnSample.set(index, true);
+    },
+    handleMouseLeave(index) {
+      // console.log("鼠标离开了元素");
+      this.mouseOnSample.set(index, false);
+    },
     addExample() {
-      this.examples.push({ input: '', output: '' });
+      this.examples.push({ input: "", output: "" });
     },
     removeExample(index) {
       this.examples.splice(index, 1);
     },
-    rollBackInfo (dataSend){
-        this.title = dataSend.title;
-        this.background = dataSend.background;
-        this.description = dataSend.description;
-        this.inputFormat = dataSend.inputformat;
-        this.outputFormat = dataSend.outputformat;
-        this.hint = dataSend.hint;
+    rollBackInfo(dataSend) {
+      this.title = dataSend.title;
+      this.background = dataSend.background;
+      this.description = dataSend.description;
+      this.inputFormat = dataSend.inputformat;
+      this.outputFormat = dataSend.outputformat;
+      this.hint = dataSend.hint;
     },
-    save() {//向后端传送基本的题目数据
+    save() {
+      //向后端传送基本的题目数据
       const dataSend = {
-        "title": this.title,
-        "background": this.background,
-        "description": this.description,
-        "inputformat": this.inputFormat,
-        "outputformat": this.outputFormat,
-        "hint": this.hint,
-        "problemsample": this.examples
+        title: this.title,
+        background: this.background,
+        description: this.description,
+        inputformat: this.inputFormat,
+        outputformat: this.outputFormat,
+        hint: this.hint,
+        problemsample: this.examples,
       };
-      axios.post(`${SERVER_URL}/problem/insert`, dataSend,)
-        .then(response => {
-          if(response.data === "success") {
+      axios
+        .post(`${SERVER_URL}/problem/insert`, dataSend)
+        .then((response) => {
+          if (response.data === "success") {
             this.$store.dispatch("notice", {
-            title: "保存成功！",
-            message: "",
-            type: "success",
-      
-          });
-            sleep(500)
-            this.$router.push({ path: '/problems' })
-          }else{
+              title: "保存成功！",
+              message: "",
+              type: "success",
+            });
+            sleep(500);
+            this.$router.push({ path: "/problems" });
+          } else {
             // alert("保存失败！" + response.data)
             this.$store.dispatch("notice", {
-            title: "保存失败！",
-            message: response.data,
-            type: "error",
-      
-          });
+              title: "保存失败！",
+              message: response.data,
+              type: "error",
+            });
             this.rollBackInfo(dataSend);
-          }          
+          }
         })
-        .catch(error => {
+        .catch((error) => {
           this.$store.dispatch("notice", {
             title: "保存失败！",
             message: error,
             type: "error",
-      
           });
           this.rollBackInfo(dataSend);
         });
-    }
+    },
   },
-  setup()  {
-    
-  }
+  setup() {},
 };
 </script>
 
@@ -152,5 +304,17 @@ export default {
 
 .save-button {
   width: 50%;
+}
+.hoverable {
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+  cursor: pointer;
+}
+
+.hoverable:hover {
+  filter: brightness(1.3);
+  text-decoration: underline;
+}
+.el-form-item__label {
+  font-weight: bold;
 }
 </style>

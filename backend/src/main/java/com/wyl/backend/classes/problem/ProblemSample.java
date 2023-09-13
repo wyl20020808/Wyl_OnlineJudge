@@ -3,7 +3,9 @@ package com.wyl.backend.classes.problem;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
+@Data
 @TableName("problemsample")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemSample {
@@ -11,6 +13,7 @@ public class ProblemSample {
     private String output;
     @TableId(value = "problemid")
     private int problemid;
+    private String path;
     public int getProblemid() {
         return problemid;
     }
