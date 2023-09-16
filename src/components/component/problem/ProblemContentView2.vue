@@ -38,10 +38,17 @@
     </a-row>
     <a-row class="nowrap-row" style="margin-top: 20px">
       <a-col :offset="3">
-        <a-button @click="submitProblem" style="color: white" type="primary">提交答案</a-button>
+        <a-button @click="submitProblem" style="color: white" type="primary"
+          >提交答案</a-button
+        >
       </a-col>
-      <a-col >
-        <a-button @click="editProblem" style="color: white;margin-left: 10px;" ghost >编辑题目</a-button>
+      <a-col>
+        <a-button
+          @click="editProblem"
+          style="color: white; margin-left: 10px"
+          ghost
+          >编辑题目</a-button
+        >
       </a-col>
       <a-col
         style="
@@ -262,6 +269,7 @@
                     type="flex"
                     align="middle"
                     justify="space-between"
+                    @click="jumpToUserInfo"
                   >
                     <a-col>
                       <img
@@ -368,10 +376,19 @@ export default {
   },
   methods: {
     editProblem() {
-      router.push({name:"problemedit",params:{ problemid : this.problemcontent.problemid}})
+      router.push({
+        name: "problemedit",
+        params: { problemid: this.problemcontent.problemid },
+      });
     },
     jump(path) {
       router.push({ path: path });
+    },
+    jumpToUserInfo() {
+      router.push({
+        name: "userhome",
+        query: { userid: this.userinfo.userid },
+      });
     },
     copyText(text) {
       if (navigator.clipboard) {
@@ -400,24 +417,26 @@ export default {
       }
     },
     parsedDescription(content) {
-      const md = require('markdown-it')({ html: true })
-            .use(require('markdown-it-katex'))
-
-// 解析 Markdown 和 LaTeX
-      let result = md.render(content);
-      return result;
       return this.md.render(String(content));
     },
     formattedText(text) {
+      return text;
       if (typeof text !== "string") {
         text = String(text);
       }
+      console.log(text.replace(/\n/g, "<br>"));
       return text.replace(/\n/g, "<br>"); //为了体现间距，更加美观
     },
-    submitProblem(){
+    submitProblem() {
       // console.log(this.problemcontent.title)
-      router.push({name:"submitcode",query:{ problemid : this.problemcontent.problemid,problemname:this.problemcontent.title}})
-    }
+      router.push({
+        name: "submitcode",
+        query: {
+          problemid: this.problemcontent.problemid,
+          problemname: this.problemcontent.title,
+        },
+      });
+    },
   },
   computed: {
     htmlText(text) {

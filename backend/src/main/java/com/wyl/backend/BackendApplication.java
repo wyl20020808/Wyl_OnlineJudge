@@ -4,10 +4,12 @@ package com.wyl.backend;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @CrossOrigin
 @SpringBootApplication
+@EnableTransactionManagement
 @MapperScan({"com.wyl.backend.classes.problem.controller",
         "com.wyl.backend.classes.problem.sql",
         "com.wyl.backend.classes.user.sql",

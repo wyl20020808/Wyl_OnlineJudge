@@ -6,7 +6,7 @@
         getContestStatus(contestList[index - 1]) !== getContestStatus(contest)
       "
     >
-      <h2 >{{ getContestStatusText(contest) }}</h2>
+      <h2>{{ getContestStatusText(contest) }}</h2>
     </div>
     <div class="card mb-3 card1" style="max-width: 1000px; max-height: 400px">
       <div class="row g-0">
@@ -15,7 +15,21 @@
         </div>
         <div class="col-md-7">
           <div class="card-body">
-            <h2 @click="viewContest(contest.contestid)"  class="card-title hoverable">{{ contest.contestname }}</h2>
+            <a-row style="display: flex; align-items: center">
+              <el-icon
+                size="40"
+                color="rgb(24, 144, 255)"
+                style="margin-right: 8px"
+                ><Trophy
+              /></el-icon>
+              <h2
+                @click="viewContest(contest.contestid)"
+                class="card-title hoverable"
+              >
+                {{ contest.contestname }}
+              </h2></a-row
+            >
+
             <div class="contesttime1 d-flex align-items-center">
               <NotificationTwoTone style="fontsize: 24px" />
               <span style="font-size: 16px; margin-left: 5px">
@@ -146,7 +160,7 @@
 <script>
 import { SERVER_URL } from "../../../js/functions/config";
 import { NotificationTwoTone, HomeTwoTone } from "@ant-design/icons-vue";
-import { User } from "@element-plus/icons-vue";
+import { User, Trophy } from "@element-plus/icons-vue";
 import axios from "axios";
 import { ElDialog, ElInput } from "element-plus";
 
@@ -156,6 +170,7 @@ export default {
   components: {
     NotificationTwoTone,
     HomeTwoTone,
+    Trophy,
     User,
     Countdown,
     ElDialog,
@@ -190,10 +205,10 @@ export default {
     },
     viewContest(contestid) {
       this.$router.push({
-        name:"contestcontest",
-        query:{
-          contestid:contestid,
-        }
+        name: "contestcontest",
+        query: {
+          contestid: contestid,
+        },
       });
     },
     async joinContest(contestid, contestlimit, contestpassword) {
@@ -284,7 +299,8 @@ export default {
     async checkJoinState() {
       this.joinSet.clear(); //清空一下
       //查询一下用户的报名信息
-      await axios.get(`${SERVER_URL}/contest/query/join/personal`, {
+      await axios
+        .get(`${SERVER_URL}/contest/query/join/personal`, {
           params: {
             userid: JSON.parse(localStorage.getItem("user")).userid,
           },
@@ -376,7 +392,6 @@ export default {
   margin-top: 5px;
 }
 .hoverable {
-
   transition: color 0.3s ease, text-decoration 0.3s ease;
   cursor: pointer;
 }

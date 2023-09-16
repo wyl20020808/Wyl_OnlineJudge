@@ -111,6 +111,7 @@ public class ContestController {
 
     @GetMapping("/query")
     public List<ContestContent> queryContestContent(){
+        System.out.println(System.getProperty("user.dir") + "ceshi");
         return contestContentSQL.selectList(null);
     }
 

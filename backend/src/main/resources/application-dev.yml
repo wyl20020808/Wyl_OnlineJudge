@@ -1,6 +1,6 @@
 dev:
   server:
-   port: 8080
+   port: 8088
   datasource:
     url: jdbc:mysql://localhost:3306/online_judge?useSSL=false&serverTimezone=UTC
     username: root

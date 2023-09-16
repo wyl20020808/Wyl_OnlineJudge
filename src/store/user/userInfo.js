@@ -67,6 +67,11 @@ const ModuleUserInfo = ({
           message: "数据同步成功！ ",
           type: 'success',
         });
+        context.dispatch("notice", {
+          title: "退出成功！",
+          message: "再见！" + userinfo.username,
+          type: "success",
+        });
       } catch (error) {
         context.dispatch("notice", {
           title: 'Error',

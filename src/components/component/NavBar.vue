@@ -41,17 +41,10 @@
             >评测队列</router-link
           >
         </li>
-        <li
-          class="nav-item dropdown"
-          v-if="userloginstate === 'true'"
-        >
+        <li class="nav-item dropdown" v-if="userloginstate === 'true'">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <img
-                class="avatar"
-                :src="userpicture"
-                alt="Avatar"
-              />
+              <img class="avatar" :src="userpicture" alt="Avatar" />
 
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -60,9 +53,9 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  ><router-link :to="{ name: 'userhome' }" class="dropdown-item"
+                  ><div @click="toUseInfo" class="dropdown-item"
                     ><el-icon><UserFilled /></el-icon
-                    >&ensp;个人资料</router-link
+                    >&ensp;个人资料</div
                   ></el-dropdown-item
                 >
                 <el-dropdown-item
@@ -99,7 +92,7 @@
 </template>
 
 <script>
-import {SERVER} from "../../js/functions/config"
+import { SERVER } from "../../js/functions/config";
 import {
   Setting,
   UserFilled,
@@ -108,7 +101,7 @@ import {
 } from "@element-plus/icons-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
-import {sleep} from "@/js/functions/TimeAbout.js"
+import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
 
@@ -120,55 +113,53 @@ export default {
     Bell,
     SwitchButton,
   },
-  computed:{
-    userloginstate: function() {
-    let user = localStorage.getItem('user');
-    if(user) {
-      return JSON.parse(user).userloginstate;
-    } else {
-      return "false";
-    }
+  computed: {
+    userloginstate: function () {
+      let user = localStorage.getItem("user");
+      if (user) {
+        return JSON.parse(user).userloginstate;
+      } else {
+        return "false";
+      }
+    },
+    userpicture: function () {
+      let user = localStorage.getItem("user");
+      if (user) {
+        return JSON.parse(user).userpicture;
+      } else {
+        return ""; // 返回一个默认的图片URL或者空字符串
+      }
+    },
   },
-  userpicture: function() {
-    let user = localStorage.getItem('user');
-    if(user) {
-      return JSON.parse(user).userpicture;
-    } else {
-      return ""; // 返回一个默认的图片URL或者空字符串
-    }
-  }
-},
   created() {
     window.onbeforeunload = () => {
-
       // console.log(userinfo.userloginstate)
-
     };
   },
   setup() {},
   methods: {
-    logout() {
-      console.log("logout")
-      const userinfo = JSON.parse(localStorage.getItem("user"));
-      this.$store.dispatch("notice", {
-        title: "退出成功！",
-        message: "再见！" + userinfo.username,
-        type: "success",
-        
+    toUseInfo() {
+      router.push({
+        name: "userhome",
+        query: { userid: JSON.parse(localStorage.getItem("user")).userid },
       });
-      this.$store.dispatch("SynchronizeInfo",{
-          userinfo,
-          loginState:false
-      })
-      sleep(500).then(()=>{
-        window.location = `${SERVER}`;
-      })
-      // router.push({ name: "home" });
+    },
+    logout() {
+      console.log("logout");
+      const userinfo = JSON.parse(localStorage.getItem("user"));
       
+      this.$store.dispatch("SynchronizeInfo", {
+        userinfo,
+        loginState: false,
+      });
+     
+      sleep(500).then(() => {
+        window.location = `${SERVER}`;
+      });
+      // router.push({ name: "home" });
     },
   },
-
-}
+};
 </script>
 
 <style scoped>

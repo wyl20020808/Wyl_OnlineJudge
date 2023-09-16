@@ -4,45 +4,79 @@
       <div class="search">
         <el-input v-model="searchText" placeholder="请输入搜索内容"></el-input>
         <el-button :icon="Search" circle @click="handleSearch"></el-button>
-        
       </div>
-      <div class="card card1">
-          <el-table
-            class="table1"
-            :data="displayedQuestions"
-            style="width: 100%"
+      <div class="card card1 " style="">
+        <el-pagination
+          class="pagination-container"
+          @current-change="handlePageChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          layout="prev, pager, next"
+          :total="questions.length"
+        ></el-pagination>
+        <el-table class="table1" :data="displayedQuestions" style="width: 100%;font-size: 16px;">
+          <el-table-column
+            align="center"
+            width="80"
+            prop="problemid"
+            label="ID"
           >
-            <el-table-column align="center" width="80" prop="problemid" label="ID">  
-            </el-table-column>
-            <el-table-column align="center" width="400" prop="title" label="标题">
-              <template v-slot="{row}">
-    <div class="hoverable" @click="push_to_problemcontent(row.problemid)">{{ row.title }}</div>
-  </template>
-            </el-table-column>
-            <el-table-column align="center" width="70" prop="difficulty" label="难度"></el-table-column>
-            <el-table-column align="center" prop="algorithm" label="算法"></el-table-column>
-            <el-table-column align="center" width="70" prop="source" label="来源"></el-table-column>
-            <el-table-column
-              prop="aceptedcount"
-              label="通过数"
-              width="70"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="submitcount"
-              label="提交数"
-              width="70"
-              align="center"
-            ></el-table-column>
-          </el-table>
-          <el-pagination class="pagination-container"
-            @current-change="handlePageChange"
-            :current-page="currentPage"
-            :page-size="pageSize"
-            layout="prev, pager, next"
-            :total="questions.length"
-          ></el-pagination>
-        </div>
+          </el-table-column>
+          <el-table-column align="center" width="400" prop="title" label="标题">
+            <template v-slot="{ row }">
+              <div
+                class="hoverable"
+                @click="push_to_problemcontent(row.problemid)"
+                
+              >
+                {{ row.title }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            align="center"
+            width="70"
+            prop="difficulty"
+            label="难度"
+          ></el-table-column>
+          <el-table-column align="center" prop="algorithm" label="算法">
+            <template v-slot="{ row }">
+              <div
+                class="hoverable"
+                @click="1"
+              >
+              <a-tag
+                    style="font-size: 14px"
+                    v-for="algorithm in row.algorithm"
+                    :key="algorithm"
+                    color="green"
+                    >{{ algorithm }}</a-tag
+                  >
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="aceptedcount"
+            label="通过数"
+            width="70"
+            align="center"
+          ></el-table-column>
+          <el-table-column
+            prop="submitcount"
+            label="提交数"
+            width="70"
+            align="center"
+          ></el-table-column>
+        </el-table>
+        <el-pagination
+          class="pagination-container"
+          @current-change="handlePageChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          layout="prev, pager, next"
+          :total="questions.length"
+        ></el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -111,8 +145,7 @@ export default {
           problem: question.problemid,
           title: question.title,
           difficulty: question.difficulty,
-          algorithm: question.algorithm,
-          source: question.source,
+          algorithm: question.algorithm.trimEnd().split(" "),
           aceptedcount: question.aceptedcount,
           submitcount: question.submitcount,
           problemid: question.problemid,
@@ -126,15 +159,14 @@ export default {
 .search {
   display: flex;
   position: relative;
-  width: 1000px;
-  left: 300px;
-  top: -100px;
+  width: 1200px;
+  left: 200px;
+  margin-bottom:20px ;
 }
-.card1{
+.card1 {
   position: relative;
-  width: 970px;
-  left: 300px;
-  top: -90px;
+  width: 1170px;
+  left: 200px;
 }
 .pagination-container {
   display: flex;

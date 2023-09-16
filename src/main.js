@@ -14,6 +14,9 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
+//css
+import './css/tailwind.css'
+
 
 // markdown
 import VueMarkdownEditor from '@kangc/v-md-editor';
@@ -49,6 +52,25 @@ import 'codemirror/addon/scroll/simplescrollbars';
 import 'codemirror/addon/scroll/simplescrollbars.css';
 // style
 import 'codemirror/lib/codemirror.css';
+
+// 2023年9月14日08:17:06
+//支持markdown和代码高亮？
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import Prism from 'prismjs';
+// 选择使用主题
+
+// 代码高亮
+import 'prismjs/components/prism-json';
+// 显示代码行数
+import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
+
+// 快速复制代码
+import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
+import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
+
+
+
 hljs.registerLanguage('json', json);
 hljs.registerLanguage('cpp', cpp);
 hljs.registerLanguage('cpp', javascript);
@@ -56,6 +78,10 @@ VMdEditor.Codemirror = Codemirror;
 VMdEditor.use(githubTheme, {
   Hljs: hljs,
 });
+VMdPreview.use(githubTheme, {
+  Hljs: hljs,
+});
+
 VueMarkdownEditor.use(githubTheme, {
   Hljs: hljs,
   extend(md) {
@@ -63,6 +89,9 @@ VueMarkdownEditor.use(githubTheme, {
     // md.set(option).use(plugin);
   },
 });
+
+VMdPreview.use(createLineNumbertPlugin());
+VMdPreview.use(createCopyCodePlugin());
 // 
 // import 'ant-design-vue/dist/antd.less'
 const app = createApp(App)
@@ -80,4 +109,4 @@ app.directive('focus', {
     }
   })
 app.use(router).use(ElementPlus).use(store).use(Vuetify).use(Antd).use(vuetify).mount('#app')
-app.use(VMdEditor)
+app.use(VMdEditor).use(VMdPreview)

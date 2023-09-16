@@ -1,5 +1,6 @@
 package com.wyl.backend.classes.user.Controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wyl.backend.classes.user.sql.UserExtraOperator;
@@ -32,7 +33,17 @@ public class UserExtraController {
              userExtraOperator.incrementSubmitCount(userExtra.getUserid());
          else if(userExtra.getSpecial().equals("aceptedcount"))
              userExtraOperator.incrementAceptedcountCount(userExtra.getUserid());
+
     }
+    @GetMapping("/query/id")
+    public UserExtra queryById(@RequestParam("userid") int userid){
+        QueryWrapper
+                <UserExtra> query = new QueryWrapper<>();
+        query.eq("userid",userid);
+        return
+                userExtraOperator.selectOne(query);
+    }
+
     @PostMapping("/synchronizeinfo")//用于同步两个表中id的信息
     public void insert(@RequestBody  UserExtra userextra){
         List<UserInfo> userInfoList = userOperator.selectList(null);

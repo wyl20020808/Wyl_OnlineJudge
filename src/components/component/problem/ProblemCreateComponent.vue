@@ -8,13 +8,7 @@
         style="width: 100%; height: 50%"
         ><el-icon><Plus /></el-icon> &ensp; 新建题目</el-button
       >
-      <el-button class="button-gp first-button" style="width: 100%; height: 50%"
-        >按钮2</el-button
-      >
-
-      <el-button class="button-gp third-button" style="width: 100%; height: 50%"
-        >按钮3</el-button
-      >
+     
     </el-button-group>
   </div>
 
