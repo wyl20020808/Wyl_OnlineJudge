@@ -10,5 +10,6 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
   ],
+  experimental: { scriptSetup: true }
 }
 

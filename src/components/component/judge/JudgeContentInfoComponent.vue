@@ -1,14 +1,14 @@
 <template>
   <div class="card card1">
-    <div class="user1">
+    <div @click="jumpToUserInfo(judgeinfo.judge.userid)" class="user1 hoverable">
       <img class="image1" :src="userinfo.userpicture" alt="Avatar" />
-      <div style="position: relative; left: 15px; font-size: 24px; top: 15px">
+      <div style="position: relative;color: #5f9fd6; left: 15px; font-size: 24px; top: 15px">
         {{ judgeinfo.judge.username }}
       </div>
     </div>
     <div class="problem1">
       题目：
-      <div @click="push_to_problemcontent(judgeinfo.judge.problemid)" class="hoverable">
+      <div style=" color: #5f9fd6;" @click="push_to_problemcontent(judgeinfo.judge.problemid)" class="hoverable">
         P{{ judgeinfo.judge.problemid }} - {{ judgeinfo.judge.problemname }}
       </div>
     </div>
@@ -35,6 +35,12 @@ export default {
     },
   },
   methods: {
+    jumpToUserInfo(userid) {
+      router.push({
+        name: "userhome",
+        query: { userid },
+      });
+    },
     push_to_problemcontent(problemid) {
       router.push({
         path: "/problem",
@@ -132,7 +138,7 @@ export default {
 .hoverable {
   transition: color 0.3s ease, text-decoration 0.3s ease;
   cursor: pointer;
-  color: #5f9fd6;
+
 }
 
 .hoverable:hover {

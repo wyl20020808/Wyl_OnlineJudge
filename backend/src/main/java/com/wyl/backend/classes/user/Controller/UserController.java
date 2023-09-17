@@ -31,7 +31,9 @@ public class UserController {
         }
         return false;
     }
-
+    public String getUsername(int userid) {
+        return userOperator.selectById(userid).getUsername();
+    }
     @PostMapping("/query")
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
         return userOperator.selectById(userInfo.getUserid());

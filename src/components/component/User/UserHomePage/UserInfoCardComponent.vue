@@ -60,11 +60,17 @@
             </div> </a-col
         ></a-row>
       </a-col>
-      <a-col style="margin-right: 40px">
+      <a-col
+        v-if="parseInt(userid) !== parseInt(myinfo.userid)"
+        style="margin-right: 40px"
+      >
         <a-row>
           <a-col style="z-index: 1000; margin-top: 60px">
             <a-tooltip title="私聊" color="rgb(52, 152, 219)">
-              <MessageTwoTone style="font-size: 38px; margin-right: 15px" />
+              <MessageTwoTone
+                @click="messageConnect"
+                style="font-size: 38px; margin-right: 15px"
+              />
             </a-tooltip>
             <a-button
               v-if="fansed === false"
@@ -258,6 +264,7 @@ import { SERVER_URL } from "../../../../js/functions/config";
 import axios from "axios";
 
 import { MessageTwoTone } from "@ant-design/icons-vue";
+import router from '@/router/router';
 export default {
   components: {
     MessageTwoTone,
@@ -269,8 +276,8 @@ export default {
       userinfo: {},
       userextra: {},
       fansed: false,
+      myinfo: JSON.parse(localStorage.getItem("user")),
       userid: this.$route.query.userid,
-      myid: JSON.parse(localStorage.getItem("user")).userid,
     };
   },
   async created() {
@@ -279,6 +286,38 @@ export default {
   },
 
   methods: {
+    async messageConnect() {
+      await axios.post(`${SERVER_URL}/message/add/connect`, {
+        belong: this.myinfo.userid,
+        target: this.userid,
+        belongname: this.myinfo.username,
+        targetname: this.userinfo.nickname,
+        connecttime:this.getBeijingTime(),
+        latestconnecttime:this.getBeijingTime(),
+        targetpicture:this.userinfo.userpicture,
+      });
+      router.push({ path: "/message"})
+    },
+    getBeijingTime() {
+      // 创建一个Date对象，表示当前的日期和时间
+      const now = new Date();
+
+      // 创建一个Intl.DateTimeFormat对象，用于格式化日期和时间
+      const formatter = new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai", // 设置时区为北京时间
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+
+      // 使用formatter来格式化当前的日期和时间
+      const beijingTime = formatter.format(now);
+
+      return beijingTime;
+    },
     async cancelFans() {
       await axios
         .get(`${SERVER_URL}/userfans/delete/fans`, {
@@ -307,7 +346,6 @@ export default {
         })
         .then((res) => {
           this.fansed = res.data;
-          
         })
         .catch((err) => {
           {
@@ -343,14 +381,14 @@ export default {
     async addFans() {
       let fansuserid = JSON.parse(localStorage.getItem("user")).userid;
       let userid = this.$route.query.userid;
-      if (parseInt(userid) === parseInt(fansuserid)) {
-        this.$store.dispatch("notice", {
-          title: "不可以关注自己哦~~",
-          message: "",
-          type: "success",
-        });
-        return;
-      }
+      // if (parseInt(userid) === parseInt(fansuserid)) {
+      //   this.$store.dispatch("notice", {
+      //     title: "不可以关注自己哦~~",
+      //     message: "",
+      //     type: "success",
+      //   });
+      //   return;
+      // }
       await axios
         .post(`${SERVER_URL}/userfans/add`, {
           userid,

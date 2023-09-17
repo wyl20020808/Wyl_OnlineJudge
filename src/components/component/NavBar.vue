@@ -64,8 +64,8 @@
                   ></el-dropdown-item
                 >
                 <el-dropdown-item
-                  ><router-link :to="{ name: 'home' }" class="dropdown-item"
-                    ><el-icon><Bell /></el-icon>&ensp;通知</router-link
+                  ><div @click="toMessage" class="dropdown-item"
+                    ><el-icon><Bell /></el-icon>&ensp;消息</div
                   ></el-dropdown-item
                 >
                 <el-dropdown-item
@@ -138,6 +138,9 @@ export default {
   },
   setup() {},
   methods: {
+    toMessage(){
+      router.push({path:'/message'});
+    },
     toUseInfo() {
       router.push({
         name: "userhome",

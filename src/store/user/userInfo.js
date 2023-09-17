@@ -75,7 +75,7 @@ const ModuleUserInfo = ({
       } catch (error) {
         context.dispatch("notice", {
           title: 'Error',
-          message: "服务器异常！ " + error,
+          message: "服务器后端有异常！ " + error,
           type: 'error',
         });
       }
