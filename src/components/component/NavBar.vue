@@ -45,7 +45,7 @@
           <el-dropdown>
             <span class="el-dropdown-link">
               <img class="avatar" :src="userpicture" alt="Avatar" />
-
+              <a-badge v-if="unRead > 0" dot></a-badge>
               <el-icon class="el-icon--right">
                 <arrow-down />
               </el-icon>
@@ -66,7 +66,10 @@
                 <el-dropdown-item
                   ><div @click="toMessage" class="dropdown-item"
                     ><el-icon><Bell /></el-icon>&ensp;消息</div
-                  ></el-dropdown-item
+                  > <a-badge :count="unRead" class="item">
+   
+  </a-badge>
+                  </el-dropdown-item
                 >
                 <el-dropdown-item
                   ><a @click="logout" class="dropdown-item"
@@ -92,7 +95,7 @@
 </template>
 
 <script>
-import { SERVER } from "../../js/functions/config";
+import { SERVER, SERVER_URL } from "../../js/functions/config";
 import {
   Setting,
   UserFilled,
@@ -113,6 +116,11 @@ export default {
     Bell,
     SwitchButton,
   },
+  data(){
+    return{
+      unRead:0,
+    }
+  },
   computed: {
     userloginstate: function () {
       let user = localStorage.getItem("user");
@@ -131,13 +139,36 @@ export default {
       }
     },
   },
-  created() {
+  async created() {
     window.onbeforeunload = () => {
       // console.log(userinfo.userloginstate)
     };
+    if(localStorage.getItem("user")){//如果登录了的话
+      
+      this.getUnreadMessage();
+    }
+    
+
   },
   setup() {},
   methods: {
+    async getUnreadMessage(){
+      //统计一下未读的消息
+      await axios.get(`${SERVER_URL}/message/query/unread`,{
+        params:{
+          receiver:JSON.parse(localStorage.getItem("user")).userid
+        }
+      })
+      .then(response => {
+        console.log(response.data.length)
+        if(response.data)
+          this.unRead += response.data.length;
+      })
+      .catch(err => {
+        console.log(err);
+      })
+      
+    },
     toMessage(){
       router.push({path:'/message'});
     },

@@ -298,6 +298,7 @@ export default {
     },
     async checkJoinState() {
       this.joinSet.clear(); //清空一下
+      if(!localStorage.getItem("user"))return;
       //查询一下用户的报名信息
       await axios
         .get(`${SERVER_URL}/contest/query/join/personal`, {

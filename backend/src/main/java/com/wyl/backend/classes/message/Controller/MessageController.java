@@ -67,22 +67,39 @@ public class MessageController {
 //        return emitter;
 //    }
     @GetMapping("/querychange")
-    public Message queryMessageChange(@RequestParam int receiver){//查找第一个未读的元素
+    public Message queryMessageChange(@RequestParam int receiver){//查找第一个没有加载的元素
         QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("receiver", receiver);
-        queryWrapper.eq("readed", "false");
-        if(messageSQL.selectList(queryWrapper).size() ==0){
+        queryWrapper.eq("loaded", "false");
+        if(messageSQL.selectList(queryWrapper).size() == 0){
             return null;
         }
         return messageSQL.selectList(queryWrapper).get(0);
     }
+    @GetMapping("/query/unread")
+    public List<Message> queryUnreadMessage(@RequestParam int receiver){
+        QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("receiver", receiver);
+        queryWrapper.eq("readed", "false");
+        return messageSQL.selectList(queryWrapper);
+    }
     @PostMapping("/haveread")
-    public void haveRead(@RequestBody Message message) {//更新消息状态
+    public void haveRead(@RequestBody Message message) {//更新消息状态，设置为已读
         UpdateWrapper<Message> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("sender", message.getSender())
                 .eq("receiver", message.getReceiver())
                 .eq("sendtime", message.getSendtime())
                 .set("readed", "true");
+        messageSQL.update(null,updateWrapper);
+    }
+
+    @PostMapping("/haveload")
+    public void haveLoad(@RequestBody Message message) {//更新消息状态，设置为已经加载
+        UpdateWrapper<Message> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("sender", message.getSender())
+                .eq("receiver", message.getReceiver())
+                .eq("sendtime", message.getSendtime())
+                .set("loaded", "true");
         messageSQL.update(null,updateWrapper);
     }
 
