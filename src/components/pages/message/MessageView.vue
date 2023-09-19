@@ -36,7 +36,9 @@
                     />
                   </template>
                 </a-list-item-meta>
-                <a-badge :count="item.unread" class="item"> </a-badge>
+                <a-badge :count="item.unread" class="item">
+                  </a-badge
+                >
               </a-list-item>
             </template>
           </a-list>
@@ -50,41 +52,46 @@
     <a-col>
       <a-row>
         <el-scrollbar ref="scrollbar" height="410px">
-    <el-card style="min-height: 410px; min-width: 850px">
-      <div style="text-align: center; font-size: 20px; width: 100%; top: 0">
-        {{ targetName }}
-      </div>
-      <div
-        v-for="(message, index) in messages"
-        :key="message.time"
-        class="message-container"
-      >
-        <div v-if="shouldShowTime(index)" class="message-time">
-          {{ formatTime(message.time) }}
-        </div>
-        <div
-          class="message-content"
-          :class="{
-            'message-right': message.name === userinfo.nickname,
-            'message-left': message.name !== userinfo.nickname,
-          }"
-        >
-          <a-comment :author="message.name" :avatar="message.avatar">
-            <template #content>
-              <el-card
-                style="
-                  max-width: 200px;
-                  word-wrap: break-word; /* 这会让长单词在达到最大宽度时换行 */
-                "
+          <el-card style="min-height: 410px; min-width: 850px">
+            <div
+              style="text-align: center; font-size: 20px; width: 100%; top: 0"
+            >
+              {{ targetName }}
+            </div>
+            <div
+              v-for="(message, index) in messages"
+              :key="message.time"
+              class="message-container"
+            >
+              <div v-if="shouldShowTime(index)" class="message-time">
+                {{ formatTime(message.sendtime) }}
+              </div>
+              <div
+                class="message-content"
+                :class="{
+                  'message-right': message.sendername === userinfo.nickname,
+                  'message-left': message.sendername !== userinfo.nickname,
+                }"
               >
-                {{ message.text }}
-              </el-card>
-            </template>
-          </a-comment>
-        </div>
-      </div>
-    </el-card>
-  </el-scrollbar>
+                <a-comment
+                  :author="message.sendername"
+                  :avatar="message.senderpicture"
+                >
+                  <template #content>
+                    <el-card
+                      style="
+                        max-width: 200px;
+                        word-wrap: break-word; /* 这会让长单词在达到最大宽度时换行 */
+                      "
+                    >
+                      {{ message.message }}
+                    </el-card>
+                  </template>
+                </a-comment>
+              </div>
+            </div>
+          </el-card>
+        </el-scrollbar>
       </a-row>
       <a-row style="margin-top: 0px">
         <a-textarea
@@ -108,25 +115,24 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, watchEffect } from 'vue';
-import { ref, onMounted, nextTick } from 'vue';
-import { onBeforeRouteLeave } from 'vue-router';
-import axios from 'axios';
-import { SERVER_URL } from '@/js/functions/config';
-import { getBeijingTime } from '@/js/functions/TimeAbout';
+import { onBeforeUnmount, watchEffect } from "vue";
+import { ref, onMounted, nextTick } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
+import axios from "axios";
+import { SERVER_URL } from "@/js/functions/config";
+import { getBeijingTime } from "@/js/functions/TimeAbout";
 let scrollbar = ref(null);
 let isHovered = ref(false);
 let messageInput = ref("");
 let data = ref([]);
 let messages = ref([]);
+let allMessage = ref({});
 let userinfo = ref(JSON.parse(localStorage.getItem("user")));
 let chooseTarget = ref("");
 let getIndex = ref(new Map());
 let targetName = ref("");
 let source = ref(null);
 let timer = ref(null);
-
-
 
 const handleRead = async (message) => {
   await axios
@@ -144,8 +150,33 @@ const handleLoad = async (message) => {
       console.log(err);
     });
 };
+// const loadAllConnectMessage = async () =>{
+//   await axios.get(`${SERVER_URL}/message/query/all`,{
+//     params:{
+//       receiver:userinfo.value.userid,
+//     }
+//   })
+//   .then(temp => {
+//     let had = new Set();
+//     let res = temp.data;
+//     for(let i=0;i<res.length;i++){//存放消息
+//       let sender = res[i].sender;
+//       if(had.has(sender)){
+//         allMessage.value[sender].push(res[i]);
+//       }else{
+//         allMessage.value[sender] = [res[i]];
+//         had.add(sender);
+//       }
+//     }
+//     // console.log(allMessage.value)
+//   })
+//   .catch(err =>{
+//     console.log(err);
+//   })
+// }
 const handleChoose = async (userid) => {
   chooseTarget.value = userid;
+  data.value[getIndex.value.get(userid)].unread = 0;
   await axios
     .get(`${SERVER_URL}/message/query`, {
       //查询两个人的发消息记录
@@ -155,21 +186,15 @@ const handleChoose = async (userid) => {
       },
     })
     .then(async (res) => {
-      let data = res.data;
+      let data2 = res.data;
       messages.value = [];
-      for (let i = 0; i < data.length; i++) {
-        let message = {
-          name: data[i].sendername,
-          // avatar:data[i].senderpicture,
-          avatar:
-            "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
-          text: data[i].message,
-          time: data[i].sendtime,
-        };
-        messages.value.push(message);
-        await handleRead(data[i]);
+      for (let i = 0; i < data2.length; i++) {
+        messages.value.push(data2[i]);
+        await handleRead(data2[i]);
+        await handleLoad(data2[i]);
       }
       targetName.value = data.value[getIndex.value.get(userid)].name;
+      
       scrollToBottom();
     })
     .catch((err) => {
@@ -192,27 +217,20 @@ const sendMessage = async () => {
   let senderpicture = userinfo.value.userpicture;
 
   let target = data.value[getIndex.value.get(chooseTarget.value)].userid;
+  let message = {
+    sender: userinfo.value.userid,
+    receiver: target,
+    message: messageInput.value,
+    sendtime: now,
+    sendername: userinfo.value.nickname,
+    senderpicture, //数据库里要存真的
+  };
   await axios
-    .post(`${SERVER_URL}/message/send`, {
-      sender: userinfo.value.userid,
-      receiver: target,
-      message: messageInput.value,
-      sendtime: now,
-      sendername: userinfo.value.nickname,
-      senderpicture, //数据库里要存真的
-    })
+    .post(`${SERVER_URL}/message/send`, message)
     .then((res) => {
-      messages.value.push({
-        //同时把消息更新进去
-        name: userinfo.value.nickname,
-        // avatar:senderpicture,
-        avatar:
-        "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
-        text: messageInput.value,
-        time: now,
-      });
-
-      data.value[getIndex.value.get(chooseTarget.value)].message = messageInput.value;
+      messages.value.push(message);
+      data.value[getIndex.value.get(chooseTarget.value)].message =
+        messageInput.value;
       scrollToBottom();
     })
     .catch((err) => {
@@ -247,17 +265,19 @@ const updateIndex = () => {
 const getUnReadMessage = async () => {
   //获取一下所有的未读消息
   await axios
-    .get(`${SERVER_URL}/messgae/query/unread`, {
+    .get(`${SERVER_URL}/message/query/unread`, {
       params: {
         receiver: userinfo.value.userid,
       },
     })
     .then((res) => {
-      let data = res.data;
-      for (let i = 0; i < data.length; i++) {
-        let sender = data[i].sender;
+      let data2 = res.data;
+      // console.log(data2);
+      for (let i = 0; i < data2.length; i++) {
+        let sender = data2[i].sender;
         let index = getIndex.value.get(sender); //这个人的下标
         data.value[index].unread += 1;
+        handleLoad(data2[i]);//标记一下这个消息被加载过了
       }
     })
     .catch((err) => {
@@ -297,8 +317,8 @@ const getMessageConnect = async () => {
       scrollToBottom();
     })
     .catch((err) => {
-        console.log(err);
-      });
+      console.log(err);
+    });
 };
 const queryMessage = async () => {
   //处理实时接受消息
@@ -334,22 +354,24 @@ const queryMessage = async () => {
         data.value.unshift(temp); //将元素添加到数组的开头
         updateIndex(); //更新一下索引，因为上面的ifelse修改了
       }
+      
       handleLoad(message); //更新一下已加载
+      // console.log('更新了已加载')
       if (target !== data.value[index()].userid) {
-        //如果不是当前聊天的消息，就不用继续处理
+        // console.log('更新加载数量')
+        //如果不是当前聊天的消息，就处理一下未读数量
+        let index = getIndex.value.get(target);
+        data.value[index].unread += 1;
         return;
       }
+      console.log('新增消息')
       //如果是当前聊天的消息，就要新增消息
-      messages.value.push({
-        name: message.sendername,
-        avatar:
-          "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
-        text: message.message,
-        time: message.sendtime,
-      });
+      messages.value.push(
+        message
+      );
       scrollToBottom();
       //并且还要把这条消息标为已读
-      handleRead(message);
+      await handleRead(message);
     })
     .catch((err) => {
       console.log(err);
@@ -357,13 +379,18 @@ const queryMessage = async () => {
 };
 
 onMounted(async () => {
-  scrollbar.value = document.querySelector(".el-scrollbar__wrap");
+  nextTick(() => {
+    scrollbar.value = document.querySelectorAll(".el-scrollbar__wrap")[1];
+  });
   if (timer.value) {
     clearInterval(timer.value);
   } else {
-    timer.value = setInterval(queryMessage, 1000);
+    setTimeout(() => {
+      timer.value = setInterval(queryMessage, 1000);
+    }, 5000);
   }
   await getMessageConnect(); //读取我的连接列表
+
   await getUnReadMessage(); //读取我的未读情况列表
 });
 
@@ -381,9 +408,14 @@ onBeforeUnmount(() => {
     timer.value = null;
   }
 });
-watchEffect(() => {
-  scrollToBottom();
-});
+// watchEffect(
+//   () => {
+//     if (messages.value.length > 0) {
+//       scrollToBottom();
+//     }
+//   },
+//   { deep: true }
+// );
 </script>
 
 <style scoped>

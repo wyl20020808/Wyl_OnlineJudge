@@ -76,6 +76,15 @@ public class MessageController {
         }
         return messageSQL.selectList(queryWrapper).get(0);
     }
+    @GetMapping("/query/all")
+    public List<Message> queryAll(@RequestParam int receiver){//把我的所有消息都获取过去
+        QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("receiver", receiver);
+        if(messageSQL.selectList(queryWrapper).size() == 0){
+            return null;
+        }
+        return messageSQL.selectList(queryWrapper);
+    }
     @GetMapping("/query/unread")
     public List<Message> queryUnreadMessage(@RequestParam int receiver){
         QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
