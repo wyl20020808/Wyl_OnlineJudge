@@ -4,7 +4,7 @@
       <el-button class="useless"></el-button>
       <el-button
         @click="validateLogon"
-        class="button-gp second-button"
+        class=""
         style="width: 100%; height: 50%"
         ><el-icon><Plus /></el-icon> &ensp; 新建题目</el-button
       >
@@ -68,7 +68,6 @@ export default {
   position: relative;
   width: 200px;
   left: 40px;
-  top:40px;
 }
 .useless {
   position: relative;

@@ -32,7 +32,7 @@
                   <template #avatar>
                     <a-avatar
                       style="border-radius: 50%; width: 50px; height: 50px"
-                      src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis"
+                      :src="item.picture"
                     />
                   </template>
                 </a-list-item-meta>
@@ -305,8 +305,7 @@ const getMessageConnect = async () => {
           userid: temp[i].target, //就是对方的id
           name: temp[i].targetname, //对方的名字
           // picture: temp[i].targetpicture,
-          picture:
-            "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
+          picture:temp[i].targetpicture,
           time: temp[i].latestconnecttime,
           message: temp[i].latestmessage,
           unread: 0, //没有读的消息

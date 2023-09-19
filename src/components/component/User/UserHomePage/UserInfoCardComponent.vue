@@ -12,7 +12,7 @@
             <!-- <img class="userPicture" :src="userPicture" @click="uploadPicture" alt="" /> -->
             <img
               class="userPicture"
-              src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis"
+              :src="userinfo.userpicture"
               @click="uploadPicture"
               alt="" /></a-col
           ><a-col style="margin-left: 20px"

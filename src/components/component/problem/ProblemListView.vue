@@ -88,6 +88,7 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import ProblemCreateComponent from "@/components/component/problem/ProblemCreateComponent.vue";
 export default {
+  props: ['questionBank'],
   components: {
     ProblemCreateComponent,
   },
@@ -116,9 +117,25 @@ export default {
       displayedQuestions: [],
     };
   },
-  async created() {
-    await axios
-      .get(`${SERVER_URL}/problem/query`)
+  watch: {
+    async questionBank(newVal, oldVal) {
+      // console.log('message changed from', oldVal, 'to', newVal);
+      // 在这里你可以根据 message 的新值来执行相应的操作
+      await this.getQuestions();
+    }
+  },
+
+  async mounted() {
+    await this.getQuestions();
+  },
+  methods: {
+    async getQuestions(){
+      await axios
+      .get(`${SERVER_URL}/problem/query`,{
+        params:{
+          questionbank:this.questionBank,
+        }
+      })
       .then((response) => {
         this.questions = response.data;
         this.updateDisplayedQuestions();
@@ -126,8 +143,7 @@ export default {
       .catch((error) => {
         console.log(error);
       });
-  },
-  methods: {
+    },
     handleSearch() {
       // 在这里处理搜索逻辑
       console.log(this.searchText);
@@ -160,13 +176,12 @@ export default {
   display: flex;
   position: relative;
   width: 1200px;
-  left: 200px;
   margin-bottom:20px ;
 }
 .card1 {
   position: relative;
   width: 1170px;
-  left: 200px;
+
 }
 .pagination-container {
   display: flex;

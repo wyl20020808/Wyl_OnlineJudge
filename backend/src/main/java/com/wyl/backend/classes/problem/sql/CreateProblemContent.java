@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface CreateProblemContent{
+public interface CreateProblemContent extends BaseMapper<ProblemContent>{
     @Insert("INSERT INTO problemcontent(title, background, description, inputformat, outputformat, hint) " +
             "VALUES(#{problemContent.title}, #{problemContent.background}, #{problemContent.description}, " +
             "#{problemContent.inputformat}, #{problemContent.outputformat}, #{problemContent.hint})")

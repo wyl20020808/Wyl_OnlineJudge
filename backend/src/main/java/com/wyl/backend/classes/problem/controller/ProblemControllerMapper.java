@@ -1,5 +1,6 @@
 package com.wyl.backend.classes.problem.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wyl.backend.classes.problem.Problem;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.ProblemSample;
@@ -78,9 +79,10 @@ public class ProblemControllerMapper {
     }
 
     @GetMapping("/query")
-    public List<ProblemContent> query() {
-        List<ProblemContent> queryResult = createProblemContent.selectAll();
-        return queryResult;
+    public List<ProblemContent> query(@RequestParam(value = "questionbank") String questionBank) {
+        QueryWrapper<ProblemContent> wrapper = new QueryWrapper<>();
+        wrapper.eq("questionbank", questionBank);
+        return problemContentSQL.selectList(wrapper);
     }
 
     @GetMapping("/query/{id}")
@@ -107,7 +109,7 @@ public class ProblemControllerMapper {
         int cnt = 0;
         if (problemContent.getTitle() == "")
             return "必须输入题目名称!";
-        cnt += createProblemContent.insert(problemContent);
+        cnt += problemContentSQL.insert(problemContent);
         List<ProblemContent> queryResult = createProblemContent.selectAll();
         int problemid = queryResult.get(queryResult.size() - 1).getProblemid();//计算一下当前要插入的problemid
         //找出来样例，单独存放，因为样例可能会很多

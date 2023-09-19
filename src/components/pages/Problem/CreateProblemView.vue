@@ -91,25 +91,23 @@
         <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
       </el-form-item>
       <el-form-item label="时间限制">
-        <el-select v-model="selectedTime" style="width:1200px;">
-          <el-option
-            v-for="item in timeoptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
+        <a-select
+          ref="select"
+          v-model:value="selectedTime"
+          style="width: 200px"
+          :options="timeoptions"
+          @focus="focus"
+        ></a-select>
         <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
       </el-form-item>
       <el-form-item label="空间限制">
-        <el-select v-model="selectedMemory" style="width:1200px;">
-          <el-option
-            v-for="item in memoryoptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
+        <a-select
+          ref="select"
+          v-model:value="selectedMemory"
+          style="width: 200px"
+          :options="memoryoptions"
+          @focus="focus"
+        ></a-select>
         <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
       </el-form-item>
       <el-form-item label="来源">
@@ -122,13 +120,14 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="难度">
-        <el-input
-          :autosize="{ minRows: 1, maxRows: 5 }"
-          v-model="difficulty"
-          type="textarea"
-          placeholder="难度"
-          class="input"
-        ></el-input>
+
+        <a-select
+          ref="select"
+          v-model:value="difficulty"
+          style="width: 200px"
+          :options="difficultys"
+          @focus="focus"
+        ></a-select>
       </el-form-item>
       <el-form-item label="算法">
         <el-input
@@ -139,7 +138,16 @@
           class="input"
         ></el-input>
       </el-form-item>
-      
+      <el-form-item label="所属题库">
+        <a-select
+          ref="select"
+          v-model:value="questionbank"
+          style="width: 200px"
+          :options="questionbanks"
+          @focus="focus"
+        ></a-select>
+        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+      </el-form-item>
     </el-form>
     <el-button
       style="color: aliceblue; width: 80px"
@@ -148,7 +156,6 @@
       class="save-button"
       >保存</el-button
     >
-    
   </div>
 </template>
 
@@ -170,6 +177,57 @@ export default {
       });
     }
     const memoryoptions = [];
+    const difficultys = [
+      {
+        value: "introduction",
+        label: "入门",
+      },
+      {
+        value: "easy",
+        label: "简单",
+      },
+      {
+        value: "ok",
+        label: "还行",
+      },
+      {
+        value: "common",
+        label: "一般",
+      },
+      {
+        value: "little",
+        label: "小难",
+      },
+      {
+        value: "hard",
+        label: "好难",
+      },
+      {
+        value: "disturb",
+        label: "骚难",
+      },
+    ];
+    const questionbanks = [
+      {
+        value: "jxust",
+        label: "jxust",
+      },
+      {
+        value: "loj",
+        label: "loj",
+        disabled: false,
+      },
+      {
+        value: "luogu",
+        label: "洛谷",
+        disabled: true,
+      },
+      {
+        value: "codeforces",
+        label: "CodeForces",
+        disabled: true,
+      },
+    ];
     for (let i = 0; i < 10; i++) {
       memoryoptions.push({
         value: 2 ** i,
@@ -177,9 +235,10 @@ export default {
       });
     }
     return {
-      difficulty:"",
-      algorithm:"",
-      source:"",
+      difficulty: "easy",
+      difficultys,
+      algorithm: "",
+      source: "",
       timeoptions,
       memoryoptions,
       title: "",
@@ -187,11 +246,13 @@ export default {
       description: "",
       inputFormat: "",
       outputFormat: "",
-      selectedTime:"",
-      selectedMemory:"",
+      selectedTime: 1000,
+      selectedMemory: 64,
       examples: [{ input: "", output: "" }],
       hint: "",
       mouseOnSample: new Map(),
+      questionbank: "jxust",
+      questionbanks,
     };
   },
   methods: {
@@ -227,6 +288,7 @@ export default {
         outputformat: this.outputFormat,
         hint: this.hint,
         problemsample: this.examples,
+        questionbank: this.questionbank,
       };
       axios
         .post(`${SERVER_URL}/problem/insert`, dataSend)
