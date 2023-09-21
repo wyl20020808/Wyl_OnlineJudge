@@ -1,20 +1,30 @@
 <template>
-  <div class="">
-    <div class="">
-      <div class="search">
-        <el-input v-model="searchText" placeholder="请输入搜索内容"></el-input>
-        <el-button :icon="Search" circle @click="handleSearch"></el-button>
+  <a-row>
+    <a-col>
+      <div class="search" style="display: flex;align-items: center;">
+        <a-input
+        size="large"
+          v-model:value="searchProblem"
+        
+          placeholder="输入题目名称或ID"
+          style="width: 1200px"
+        />
+        <el-button  :icon="Search" circle @click="handleSearch"></el-button>
       </div>
-      <div class="card card1 " style="">
+      <div class="card card1" style="">
         <el-pagination
           class="pagination-container"
           @current-change="handlePageChange"
           :current-page="currentPage"
           :page-size="pageSize"
           layout="prev, pager, next"
-          :total="questions.length"
+          :total="nowQuestions.length"
         ></el-pagination>
-        <el-table class="table1" :data="displayedQuestions" style="width: 100%;font-size: 16px;">
+        <el-table
+          class="table1"
+          :data="displayedQuestions"
+          style="width: 100%; font-size: 16px"
+        >
           <el-table-column
             align="center"
             width="80"
@@ -27,7 +37,6 @@
               <div
                 class="hoverable"
                 @click="push_to_problemcontent(row.problemid)"
-                
               >
                 {{ row.title }}
               </div>
@@ -41,17 +50,14 @@
           ></el-table-column>
           <el-table-column align="center" prop="algorithm" label="算法">
             <template v-slot="{ row }">
-              <div
-                class="hoverable"
-                @click="1"
-              >
-              <a-tag
-                    style="font-size: 14px"
-                    v-for="algorithm in row.algorithm"
-                    :key="algorithm"
-                    color="green"
-                    >{{ algorithm }}</a-tag
-                  >
+              <div class="hoverable" @click="1">
+                <a-tag
+                  style="font-size: 14px"
+                  v-for="algorithm in row.algorithm"
+                  :key="algorithm"
+                  color="green"
+                  >{{ algorithm }}</a-tag
+                >
               </div>
             </template>
           </el-table-column>
@@ -74,11 +80,14 @@
           :current-page="currentPage"
           :page-size="pageSize"
           layout="prev, pager, next"
-          :total="questions.length"
+          :total="nowQuestions.length"
         ></el-pagination>
       </div>
-    </div>
-  </div>
+    </a-col>
+    
+  </a-row>
+
+
 </template>
 
 <script>
@@ -86,11 +95,11 @@ import { SERVER_URL } from "../../../js/functions/config";
 import { Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import ProblemCreateComponent from "@/components/component/problem/ProblemCreateComponent.vue";
+
 export default {
-  props: ['questionBank'],
+  props: ["questionBank"],
   components: {
-    ProblemCreateComponent,
+
   },
   setup() {
     const router = useRouter();
@@ -105,44 +114,81 @@ export default {
     return {
       Search,
       push_to_problemcontent,
-      ProblemCreateComponent,
     };
   },
   data() {
     return {
       searchText: "",
       questions: [],
+      nowQuestions: [],
       currentPage: 1,
       pageSize: 20,
       displayedQuestions: [],
+      searchResult: [],
+      searchProblem: "1",
+      timeout: null,
     };
   },
   watch: {
     async questionBank(newVal, oldVal) {
-      // console.log('message changed from', oldVal, 'to', newVal);
-      // 在这里你可以根据 message 的新值来执行相应的操作
       await this.getQuestions();
-    }
+    },
+    async searchProblem(newVal, oldVal) {
+      if (!newVal) {
+        this.currentPage = 1;
+        await this.getQuestions();
+      } else {
+        await this.fetch(newVal, "problem", null);
+        let temp = [];
+        for (let i = 0; i < this.questions.length; i++) {
+          if (this.searchResult.includes(this.questions[i].problemid)) {
+            temp.push(this.questions[i]);
+          }
+        }
+        this.currentPage = 1;
+        this.updateDisplayedQuestions(temp);
+      }
+    },
   },
 
   async mounted() {
+    this.searchProblem = "";
     await this.getQuestions();
   },
   methods: {
-    async getQuestions(){
+    
+    fetch: async function (value, type, callback) {
       await axios
-      .get(`${SERVER_URL}/problem/query`,{
-        params:{
-          questionbank:this.questionBank,
-        }
-      })
-      .then((response) => {
-        this.questions = response.data;
-        this.updateDisplayedQuestions();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        .post(`${SERVER_URL}/contest/query/${type}`, {
+          //查询不同类型的数据
+          special: value, //有可能因为不是string类型出错
+        })
+        .then((res) => {
+          this.searchResult = [];
+          for (let key in res.data) {
+            this.searchResult.push(res.data[key]);
+          }
+          // console.log(this.searchMap);
+          // callback();
+        })
+        .catch((err) => {
+          console.log(err, "ahsjdhas");
+        });
+    },
+    async getQuestions() {
+      await axios
+        .get(`${SERVER_URL}/problem/query`, {
+          params: {
+            questionbank: this.questionBank,
+          },
+        })
+        .then((response) => {
+          this.questions = response.data;
+          this.updateDisplayedQuestions(this.questions);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     handleSearch() {
       // 在这里处理搜索逻辑
@@ -150,22 +196,21 @@ export default {
     },
     handlePageChange(newPage) {
       this.currentPage = newPage;
-      this.updateDisplayedQuestions();
+      this.updateDisplayedQuestions(this.nowQuestions);
     },
-    updateDisplayedQuestions() {
+    updateDisplayedQuestions(questions) {
+      this.nowQuestions = questions;
       const start = (this.currentPage - 1) * this.pageSize;
       const end = this.currentPage * this.pageSize;
-      this.displayedQuestions = this.questions
-        .slice(start, end)
-        .map((question) => ({
-          problem: question.problemid,
-          title: question.title,
-          difficulty: question.difficulty,
-          algorithm: question.algorithm.trimEnd().split(" "),
-          aceptedcount: question.aceptedcount,
-          submitcount: question.submitcount,
-          problemid: question.problemid,
-        }));
+      this.displayedQuestions = questions.slice(start, end).map((question) => ({
+        problem: question.problemid,
+        title: question.title,
+        difficulty: question.difficulty,
+        algorithm: question.algorithm.trimEnd().split(" "),
+        aceptedcount: question.aceptedcount,
+        submitcount: question.submitcount,
+        problemid: question.problemid,
+      }));
     },
   },
 };
@@ -176,12 +221,11 @@ export default {
   display: flex;
   position: relative;
   width: 1200px;
-  margin-bottom:20px ;
+  margin-bottom: 20px;
 }
 .card1 {
   position: relative;
   width: 1170px;
-
 }
 .pagination-container {
   display: flex;

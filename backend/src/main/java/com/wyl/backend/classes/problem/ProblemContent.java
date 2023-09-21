@@ -20,9 +20,7 @@ public class ProblemContent {
     private String outputformat;//输出格式
     private String hint;//提示
     private String algorithm;//
-
     private String source;
-
     private int timelimit;//时间限制
     private int memorylimit;//内存限制
     private String questionbank;
@@ -34,8 +32,5 @@ public class ProblemContent {
     private String havedata = "false";//是否有数据
     @TableField(exist = false)
     private String special;//更新单个数据，借助它来写
-
-
-
-
+    
 }

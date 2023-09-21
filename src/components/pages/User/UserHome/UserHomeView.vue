@@ -14,8 +14,5 @@ export default {
 </script>
 
 <style scoped>
-.all{
-    height: 1000px;;
-    background-color: rgb(180, 207, 234);
-}
+
 </style>

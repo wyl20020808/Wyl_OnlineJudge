@@ -1,6 +1,8 @@
 <template>
+  <div>
   <BaseComponentView />
   <router-view :key="$route.fullPath"/>
+  </div>
 </template>
 
 <script>
@@ -18,5 +20,7 @@ export default {
 </script>
 
 <style>
-
+body {
+  background-color: rgb(240, 240, 240); /* 你想要的颜色 */
+}
 </style>

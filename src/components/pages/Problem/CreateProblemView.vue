@@ -110,17 +110,7 @@
         ></a-select>
         <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
       </el-form-item>
-      <el-form-item label="来源">
-        <el-input
-          :autosize="{ minRows: 1, maxRows: 5 }"
-          v-model="source"
-          type="textarea"
-          placeholder="来源"
-          class="input"
-        ></el-input>
-      </el-form-item>
       <el-form-item label="难度">
-
         <a-select
           ref="select"
           v-model:value="difficulty"
@@ -130,13 +120,18 @@
         ></a-select>
       </el-form-item>
       <el-form-item label="算法">
-        <el-input
-          :autosize="{ minRows: 1, maxRows: 5 }"
-          v-model="algorithm"
-          type="textarea"
+        <a-select
+          v-model:value="algorithm"
+          mode="multiple"
+          show-search
           placeholder="算法"
-          class="input"
-        ></el-input>
+          style="width: 200px"
+          :options="algorithmsAndDataStructuresOptions"
+          :filter-option="filterOption"
+          @focus="handleFocus"
+          @blur="handleBlur"
+          @change="handleChange"
+        ></a-select>
       </el-form-item>
       <el-form-item label="所属题库">
         <a-select
@@ -234,10 +229,82 @@ export default {
         label: `${2 ** i}MB`,
       });
     }
+    let algorithmsAndDataStructures = [
+      // 数据结构
+      "数组",
+      "链表",
+      "栈",
+      "队列",
+      "哈希表",
+      "堆",
+      "二叉树",
+      "二叉搜索树",
+      "平衡二叉树（如AVL树）",
+      "红黑树",
+      "B树和B+树",
+      "线段树",
+      "树状数组",
+      "并查集",
+      "字典树",
+      "后缀树",
+      "图（邻接矩阵、邻接表）",
+      "稀疏表",
+      "跳表",
+      "布隆过滤器",
+
+      // 算法
+      "深度优先搜索",
+      "广度优先搜索",
+      "二分搜索",
+      "快速排序",
+      "归并排序",
+      "堆排序",
+      "动态规划",
+      "贪心算法",
+      "回溯算法",
+      "分治算法",
+      "最短路径（Dijkstra、Floyd、Bellman-Ford）",
+      "最小生成树（Prim、Kruskal）",
+      "拓扑排序",
+      "并查集算法",
+      "KMP字符串匹配",
+      "Rabin-Karp字符串匹配",
+      "Z-algorithm字符串匹配",
+      "Manacher's Algorithm",
+      "Tarjan强连通分量",
+      "Ford-Fulkerson最大流",
+      "Edmonds-Karp最大流",
+      "Dinic's Algorithm",
+      "Hungarian Algorithm（匈牙利算法）",
+      "数论算法（如欧几里得算法、中国剩余定理）",
+      "几何算法（如凸包、线段交点）",
+      "NP问题的近似算法",
+      "随机化算法",
+      "概率算法",
+      "线性规划",
+      "网络流",
+      "最大公约数和最小公倍数",
+      "素数筛法",
+      "快速幂",
+      "高精度计算",
+      "FFT（快速傅里叶变换）",
+      "N皇后问题",
+      "旅行商问题",
+      "图着色问题",
+    ];
+    let algorithmsAndDataStructuresOptions = algorithmsAndDataStructures.map(
+      (item) => {
+        return {
+          value: item,
+          label: item,
+        };
+      }
+    );
     return {
+      algorithmsAndDataStructuresOptions,
       difficulty: "easy",
       difficultys,
-      algorithm: "",
+      algorithm: [],
       source: "",
       timeoptions,
       memoryoptions,
@@ -256,6 +323,9 @@ export default {
     };
   },
   methods: {
+    filterOption(input, option) {
+      return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    },
     handleMouseEnter(index) {
       // console.log("鼠标进入了元素");
       this.mouseOnSample.set(index, true);
@@ -279,6 +349,9 @@ export default {
       this.hint = dataSend.hint;
     },
     save() {
+      let algorithms = this.algorithm[0];
+      for (let i = 1; i < this.algorithm.length; i++)
+        algorithms = algorithms + " " + this.algorithm[i];
       //向后端传送基本的题目数据
       const dataSend = {
         title: this.title,
@@ -289,6 +362,11 @@ export default {
         hint: this.hint,
         problemsample: this.examples,
         questionbank: this.questionbank,
+        difficulty: this.difficulty,
+        algorithm:algorithms,
+        timelimit:this.selectedTime,
+        memorylimit:this.selectedMemory,
+        source:JSON.parse(localStorage.getItem("user")).userid,
       };
       axios
         .post(`${SERVER_URL}/problem/insert`, dataSend)

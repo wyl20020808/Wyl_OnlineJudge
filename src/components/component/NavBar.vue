@@ -88,6 +88,14 @@
       </ul>
     </div>
   </nav>
+  <!-- <a-menu v-model:selectedKeys="current" mode="horizontal" >
+  <template  v-for="item in items" :key="item.key">
+    <a-menu-item style="font-size: 22px;margin-right: 30px;" >
+       在这里插入你想要的内容 -->
+      <!-- <div>{{item.title}}</div>
+    </a-menu-item>
+  </template>
+</a-menu> -->
   <!-- <div>
 
         <UserSelectComponent />
@@ -108,6 +116,12 @@ import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
 
+import { ref,h } from "vue";
+import {
+  MailOutlined,
+  AppstoreOutlined,
+  SettingOutlined,
+} from "@ant-design/icons-vue";
 export default {
   name: "BaseComponentView",
   components: {
@@ -115,11 +129,50 @@ export default {
     UserFilled,
     Bell,
     SwitchButton,
+    MailOutlined,
+    AppstoreOutlined,
+    SettingOutlined,
   },
-  data(){
-    return{
-      unRead:0,
-    }
+  data() {
+    return {
+      unRead: 0,
+      menuChoose: "Home",
+      items: [
+        {
+          key: "Home",
+          icon: () => h(MailOutlined),
+          label: "主页",
+          title: "主页",
+        },
+        {
+          key: "Question",
+          icon: () => h(AppstoreOutlined),
+          label: "题库",
+          title: "题库",
+        },
+        {
+          key: "Competition",
+          icon: () => h(SettingOutlined),
+          label: "比赛",
+          title: "比赛",
+        },
+        {
+          key: "Rank",
+          label: "排行榜",
+          title: "排行榜",
+        },
+        {
+          key: "Organization",
+          label: "组织",
+          title: "组织",
+        },
+        {
+          key: "Judge",
+          label: "评测队列",
+          title: "评测队列",
+        },
+      ],
+    };
   },
   computed: {
     userloginstate: function () {
@@ -143,34 +196,32 @@ export default {
     window.onbeforeunload = () => {
       // console.log(userinfo.userloginstate)
     };
-    if(localStorage.getItem("user")){//如果登录了的话
-      
+    if (localStorage.getItem("user")) {
+      //如果登录了的话
+
       this.getUnreadMessage();
     }
-    
-
   },
   setup() {},
   methods: {
-    async getUnreadMessage(){
+    async getUnreadMessage() {
       //统计一下未读的消息
-      await axios.get(`${SERVER_URL}/message/query/unread`,{
-        params:{
-          receiver:JSON.parse(localStorage.getItem("user")).userid
-        }
-      })
-      .then(response => {
-        console.log(response.data.length)
-        if(response.data)
-          this.unRead += response.data.length;
-      })
-      .catch(err => {
-        console.log(err);
-      })
-      
+      await axios
+        .get(`${SERVER_URL}/message/query/unread`, {
+          params: {
+            receiver: JSON.parse(localStorage.getItem("user")).userid,
+          },
+        })
+        .then((response) => {
+          console.log(response.data.length);
+          if (response.data) this.unRead += response.data.length;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
-    toMessage(){
-      router.push({path:'/message'});
+    toMessage() {
+      router.push({ path: "/message" });
     },
     toUseInfo() {
       router.push({
@@ -181,12 +232,12 @@ export default {
     logout() {
       console.log("logout");
       const userinfo = JSON.parse(localStorage.getItem("user"));
-      
+
       this.$store.dispatch("SynchronizeInfo", {
         userinfo,
         loginState: false,
       });
-     
+
       sleep(500).then(() => {
         window.location = `${SERVER}`;
       });

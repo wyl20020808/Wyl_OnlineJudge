@@ -2,6 +2,7 @@ package com.wyl.backend.classes.contest.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.wyl.backend.classes.auxiliary.SubstringSearch;
 import com.wyl.backend.classes.contest.*;
 import com.wyl.backend.classes.contest.SQL.*;
 import com.wyl.backend.classes.contest.auxiliaryclass.Trie;
@@ -45,13 +46,13 @@ public class ContestController {
         List<UserInfo> userinfo = userOperator.select();//查找出用户信息
         ArrayList<String> words = new ArrayList<>();
         for (UserInfo userInfo : userinfo) {//放入名称,用的是nickname
-            words.add(userInfo.getNickname() + " " + userInfo.getUserid());
             words.add(String.valueOf(userInfo.getUserid()) + " " + userInfo.getNickname());
-            map.put(userInfo.getNickname() + " " + userInfo.getUserid(), userInfo.getUserid());
             map.put(String.valueOf(userInfo.getUserid()) + " " + userInfo.getNickname(), userInfo.getUserid());
         }
-        Trie trie = new Trie(words);//用trie树来加速查找
-        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
+        SubstringSearch search = new SubstringSearch(words);
+//        Trie trie = new Trie(words);//用trie树来加速查找
+//        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
+        List<String> results = search.search(info.getSpecial());
         for(String result1 : results){
             result.put(result1, map.get(result1));
         }
@@ -69,15 +70,14 @@ public class ContestController {
             System.out.println(probleminfo.getTitle() + " " + probleminfo.getProblemid() + "abcdefg");
             String title = probleminfo.getTitle();
             while(title.charAt(0) == ' ') title = title.substring(1);//去掉前置空格
-            words.add(title + " " + probleminfo.getProblemid());
             words.add(String.valueOf(probleminfo.getProblemid()) + " " + title);
-            map.put(title + " " + probleminfo.getProblemid(), probleminfo.getProblemid());
             map.put(String.valueOf(probleminfo.getProblemid()) + " " + title, probleminfo.getProblemid());
         }
-        System.out.println(words);
-        Trie trie = new Trie(words);//用trie树来加速查找
-        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
-
+//        System.out.println(words);
+        SubstringSearch search = new SubstringSearch(words);
+//        Trie trie = new Trie(words);//用trie树来加速查找
+//        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
+        List<String> results = search.search(info.getSpecial());
         for(String result1 : results){
             result.put(result1, map.get(result1));
         }
