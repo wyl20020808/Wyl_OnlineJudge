@@ -3,39 +3,42 @@
 2、如果是比赛则需要：[contestid,problemchar,problemname]
  -->
 <template>
-  <div class="nav">
-    <h1 style="position: relative; left: 15px; top: 10px">
-      {{ titleinfo }}
-    </h1>
-  </div>
-  <div class="card nav2">
-    <div class="nav-links">
-      <div
-        @click="selectedTab = 'testInfo'"
-        :class="{ 'active-link': selectedTab === 'testInfo' }"
-      >
-        测试点信息
+  <a-row style="margin-left: 200px;margin-top: 20px;">
+    <a-col >
+      <a-card class="nav" style="margin-bottom: 10px;">
+        <h1>
+          {{ titleinfo }}
+        </h1>
+      </a-card>
+      <div class="card nav2" style="margin-bottom: 10px;">
+        <div class="nav-links">
+          <div
+            @click="selectedTab = 'testInfo'"
+            :class="{ 'active-link': selectedTab === 'testInfo' }"
+          >
+            测试点信息
+          </div>
+          <div
+            @click="selectedTab = 'code'"
+            :class="{ 'active-link': selectedTab === 'code' }"
+          >
+            代码
+          </div>
+        </div>
       </div>
-      <div
-        @click="selectedTab = 'code'"
-        :class="{ 'active-link': selectedTab === 'code' }"
-      >
-        代码
+
+      <div>
+        <JudgeContentCardComponent
+          v-if="selectedTab === 'testInfo'"
+          :judgeinfo="judgeinfo"
+        />
+        <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
       </div>
-    </div>
-  </div>
-
-  <div>
-    <JudgeContentCardComponent
-      v-if="selectedTab === 'testInfo'"
-      :judgeinfo="judgeinfo"
-    />
-
-    <JudgeContentCodesComponent v-else :judgeinfo="judgeinfo" />
-  </div>
-  <div class="">
-    <JudgeContentInfoComponent :judgeinfo="judgeinfo" />
-  </div>
+    </a-col>
+    <a-col style="margin-left: 20px;">
+      <div><JudgeContentInfoComponent :judgeinfo="judgeinfo" /></div>
+    </a-col>
+  </a-row>
 </template>
 <!-- 
 
@@ -72,16 +75,15 @@ export default {
       this.problemid = this.judgeinfo.judge.problemid;
       this.problemname = this.judgeinfo.judge.problemname;
 
-      if(!this.$route.query.contestid){
+      if (!this.$route.query.contestid) {
         this.titleinfo =
-        `测评详情 - U` +
-        this.judgeid +
-        ` - P` +
-        this.problemid +
-        `  ` +
-        this.problemname;
+          `测评详情 - U` +
+          this.judgeid +
+          ` - P` +
+          this.problemid +
+          `  ` +
+          this.problemname;
       }
-      
     },
     async addSubmitCount(problemid, userid) {
       axios
@@ -138,6 +140,7 @@ export default {
         username: JSON.parse(localStorage.getItem("user")).username,
         language: this.$route.query.language,
         problemname: this.$route.query.problemname,
+        userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
       };
       const results = judgedata.data.results;
       let runtime = 0;
@@ -259,12 +262,11 @@ export default {
     },
   },
   async created() {
-    
     if (this.$route.query.contestid) {
       //如果是比赛需要修改信息
       this.titleinfo =
         `[` + this.$route.query.problemchar + `]` + `  ` + this.problemname;
-    } 
+    }
     this.judgeid = this.$route.query.judgeid; //首先给我们的judgeid赋值
     await this.getData();
     if (this.hadinfo === false) {
@@ -304,16 +306,12 @@ export default {
 <style scoped>
 .nav {
   position: relative;
-  left: 200px;
-  top: 20px;
   width: 800px;
   min-height: 70px;
   height: auto;
 }
 .nav2 {
   position: relative;
-  left: 200px;
-  top: 30px;
   width: 800px;
   min-height: 40px;
   height: auto;

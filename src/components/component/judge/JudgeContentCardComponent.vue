@@ -228,8 +228,6 @@ export default {
 .main {
   width: 800px;
   position: relative;
-  left: 200px;
-  top: 50px;
   min-height: 90px;
   height: auto;
 }

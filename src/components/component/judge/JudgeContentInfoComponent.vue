@@ -78,8 +78,6 @@ export default {
   width: 350px;
   height: 370px;
   position: absolute;
-  bottom: 175px;
-  left: 1050px;
 }
 .image1 {
   border-radius: 50%;

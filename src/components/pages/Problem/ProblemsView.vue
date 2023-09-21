@@ -1,7 +1,7 @@
 <template>
   <a-row style="margin-left: 170px; margin-top: 20px">
     <a-col>
-      <a-card style="width: 1175px;margin-bottom: 20px;">
+      <a-card style="width: 1175px; margin-bottom: 20px">
         <a-row style="display: flex; align-items: center; margin-bottom: 20px">
           <a-col>
             <h5>所属题库：</h5>
@@ -23,6 +23,39 @@
               style="width: 150px; height: 30px; margin-left: 0px"
               ><el-icon><Plus /></el-icon> &ensp; 新建题目</el-button
             >
+          </a-col>
+        </a-row>
+        <a-row style="display: flex; align-items: center; margin-bottom: 0px">
+          <a-col>
+            <h5>难度：</h5>
+          </a-col>
+          <a-col style="margin-left: 40px"
+            ><a-select
+              ref="select"
+              v-model:value="difficulty"
+              style="width: 200px"
+              :options="difficultys"
+              @focus="focus"
+              placeholder="难度"
+            ></a-select
+          ></a-col>
+
+          <a-col style="margin-left: 20px">
+            <h5>算法：</h5>
+          </a-col>
+          <a-col>
+            <a-select
+              v-model:value="algorithm"
+              mode="multiple"
+              show-search
+              placeholder="算法"
+              style="width: 200px"
+              :options="algorithmsAndDataStructuresOptions"
+              :filter-option="filterOption"
+              @focus="handleFocus"
+              @blur="handleBlur"
+              @change="handleChange"
+            ></a-select>
           </a-col>
         </a-row>
       </a-card>
@@ -64,9 +97,54 @@ export default {
     Plus,
   },
   data() {
+    const difficultys = [
+      {
+        value: "无",
+        label: "无",
+      },
+      {
+        value: "暂无评定",
+        label: "暂无评定",
+      },
+      {
+        value: "入门",
+        label: "入门",
+      },
+      {
+        value: "简单",
+        label: "简单",
+      },
+      {
+        value: "还行",
+        label: "还行",
+      },
+      {
+        value: "一般",
+        label: "一般",
+      },
+      {
+        value: "小难",
+        label: "小难",
+      },
+      {
+        value: "好难",
+        label: "好难",
+      },
+      {
+        value: "骚难",
+        label: "骚难",
+      },
+    ];
+    const {
+      algorithmsAndDataStructuresOptions,
+    } = require("../../../js/values/value");
     return {
       questionBank: "loj",
       centerDialogVisible: false,
+      difficultys,
+      difficulty: "无",
+      algorithm: [],
+      algorithmsAndDataStructuresOptions,
     };
   },
   methods: {

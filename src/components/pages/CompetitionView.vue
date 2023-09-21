@@ -4,7 +4,7 @@
       <ContestListComponent />
     </a-col>
     <a-col :span="5" class="button1">
-      <a-button @click="createContest" style="color: white;background-color:#1dad8e;" type="primary">+ 创建比赛</a-button>
+      <a-button @click="createContest" style="color: white;background-color:rgb(37, 187, 155);" type="primary">+ 创建比赛</a-button>
     </a-col>
   </a-row>
   

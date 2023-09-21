@@ -1,44 +1,151 @@
 <template>
-  <div class="card card1">
-    <el-button type="primary" class="button1"  @click="resetFilters">重置所有筛选</el-button>
-    <div class="select1">
-      <el-select v-model="judgevalue" clearable placeholder="状态">
-        <el-option
-          v-for="item in judgestates"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-    </div>
-    <div class="select2">
-      <el-select v-model="languagevalue" clearable placeholder="语言">
-        <el-option
-          v-for="item in languages"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-    </div>
+  
+  <a-row style="margin-left: 150px; margin-top: 20px">
+    <a-row>
+      <a-card style="width: 1200px">
+        <a-row>
+          <el-button type="primary" class="button1" @click="resetFilters"
+            >重置所有筛选</el-button
+          >
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col style="margin-right: 50px"
+            ><el-input
+              style="width: 295px"
+              v-model="problemidinput"
+              placeholder="输入题目的id或者名称"
+              clearable
+          /></a-col>
 
-    <div class="input1">
-      <el-input
-        v-model="problemidinput"
-        placeholder="输入题目的id或者名称"
-        clearable
-      />
-    </div>
-    <div class="input2">
-      <el-input
-        v-model="useridinput"
-        placeholder="输入用户的id或者名称"
-        clearable
-      />
-    </div>
-  </div>
+          <a-col style="margin-right: 50px"
+            ><el-input
+              style="width: 295px"
+              v-model="useridinput"
+              placeholder="输入用户的id或者名称"
+              clearable
+          /></a-col>
+          <a-col style="margin-right: 50px"
+            ><el-select v-model="judgevalue" clearable placeholder="状态">
+              <el-option
+                v-for="item in judgestates"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              /> </el-select
+          ></a-col>
 
-  <div class="card card2">
+          <a-col
+            ><el-select v-model="languagevalue" clearable placeholder="语言">
+              <el-option
+                v-for="item in languages"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              /> </el-select
+          ></a-col>
+        </a-row>
+      </a-card>
+    </a-row>
+    
+    <a-row style="margin-top: 20px">
+      <a-col>
+        <a-card style="width: 1200px;">
+        <a-row
+          style="
+            padding: 10px;
+            border-bottom: 1px solid rgb(227, 227, 227);
+            background-color: white;
+          "
+          v-for="judgeinfo in tableData"
+          :key="judgeinfo.judgeid"
+        >
+          <a-col>
+            <a-row style="display: flex; align-items: center">
+              <a-col>
+                <img
+                  style="width: 50px; height: 50px; border-radius: 50%"
+                  :src="judgeinfo.userpicture"
+                  alt=""
+                />
+              </a-col>
+              <a-col style="margin-left: 10px">
+                <a-row
+                  style="font-size: 18px; color: #3498db"
+                  class="hoverable"
+                  @click="goToUser(judgeinfo.userid)"
+                  >{{ judgeinfo.username }}</a-row
+                >
+                <a-row>{{ judgeinfo.submittime }}</a-row>
+              </a-col>
+            </a-row>
+          </a-col>
+
+          <a-col
+            @click="goToJudgeContent(judgeinfo.judgeid)"
+            class="hoverable2"
+            style="margin-left: 100px"
+          >
+            <div
+              :style="{
+                backgroundColor: getJudgeStateColor(judgeinfo.judgestate),
+              }"
+              style="color: white; padding: 2px; border-radius: 4px"
+            >
+              {{ judgeinfo.judgestate }}
+            </div>
+            <div
+              :style="{
+                color: getJudgeStateColor(judgeinfo.judgestate),
+              }"
+              style="font-weight: bold"
+            >
+              {{ judgeinfo.score }}
+            </div>
+          </a-col>
+          <a-col style="position: absolute;margin-top: 10px; left: 577px;">
+            <div
+              style="font-size: 16px; color: #3498db"
+              class="hoverable"
+              @click="goToProblem(judgeinfo.problemid)"
+            >
+              P{{ judgeinfo.problemid }} {{ judgeinfo.problemname }}
+            </div>
+          </a-col>
+          <a-col
+            style="
+              color: gray;
+              position: absolute;margin-top: 10px; left: 900px;
+            "
+          >
+            <div style="display: flex;align-items: center;">
+            <ClockCircleOutlined /> {{ judgeinfo.totaltime }} /
+            <DatabaseOutlined /> {{ judgeinfo.memory }} / <CodeOutlined />{{
+              judgeinfo.language
+            }}
+            </div>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px;">
+      <a-col
+     
+      >
+        <el-pagination
+          background
+          @current-change="handlePageChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          layout="prev, pager, next"
+          :total="judge.length"
+        ></el-pagination>
+      </a-col>
+    </a-row>
+      </a-card>
+      </a-col></a-row
+    >
+   
+  </a-row>
+
+  <!-- <div class="card card2">
     
     <el-table ref="tableRef" :data="tableData" style="width: 100%" >
       <el-table-column align="center"
@@ -56,7 +163,7 @@
         </template>
       </el-table-column>
       <el-table-column align="center" prop="problemname" label="题目">
-        <!-- 这个row指的就是tableData里面存放的信息 -->
+  
         <template  v-slot:default="{ row }">
           <div class="hoverable" @click="goToProblem(row.problemid)">
             {{ row.problemname }}
@@ -78,14 +185,25 @@
       :total="judge.length"
     ></el-pagination>
   </div>
-  </div>
+  </div> -->
 </template>
 
 <script>
 import axios from "axios";
 import { SERVER_URL } from "../../js/functions/config.js";
 import router from "@/router/router";
+
+import {
+  ClockCircleOutlined,
+  DatabaseOutlined,
+  CodeOutlined,
+} from "@ant-design/icons-vue";
 export default {
+  components: {
+    ClockCircleOutlined,
+    DatabaseOutlined,
+    CodeOutlined,
+  },
   data() {
     const judgestates = [
       {
@@ -109,9 +227,9 @@ export default {
         label: "Wrong Answer",
       },
       {
-        value:"Compilation Error",
+        value: "Compilation Error",
         label: "Compilation Error",
-      }
+      },
     ];
     const languages = [
       { value: 45, label: "Assembly (NASM 2.14.02)", is_archived: false },
@@ -192,102 +310,105 @@ export default {
       judge: [],
       currentPage: 1,
       pageSize: 15,
-      judgestatefilters:[
-        {text: "Compilation Error", value:"Compilation Error"},
-        {text: "Accepted", value:"Accepted"},
-        {text: "Time Limit Exceeded", value:"Time Limit Exceeded"},
-        {text: "Runtime Error", value:"Runtime Error"},
-        {text: "Wrong Answer", value:"Wrong Answer"},
+      judgestatefilters: [
+        { text: "Compilation Error", value: "Compilation Error" },
+        { text: "Accepted", value: "Accepted" },
+        { text: "Time Limit Exceeded", value: "Time Limit Exceeded" },
+        { text: "Runtime Error", value: "Runtime Error" },
+        { text: "Wrong Answer", value: "Wrong Answer" },
       ],
       originalJudge: [],
-      
     };
   },
   methods: {
     resetFilters() {
-    this.$refs.tableRef.clearFilter();
-    this.judge = [...this.originalJudge];
-    this.updateTableData();
-  },
-    filterHandler(value, row, column) {
-
-    const property = column["property"];
-    
-    if (value) {
-      this.judge = this.originalJudge.filter(item => item[property] === value);
-      this.updateTableData();
-    }
-  },
-  handleFilterChange(filters) {
-    if (Object.keys(filters).every(key => filters[key] === undefined)) {  // 如果所有的筛选都被重置，恢复到原始的judge数组
+      this.$refs.tableRef.clearFilter();
       this.judge = [...this.originalJudge];
       this.updateTableData();
-    }
-  },
-    updateTableData() {
-  this.tableData = [];
-  const start = (this.currentPage - 1) * this.pageSize;
-  const end = Math.min(this.currentPage * this.pageSize, this.judge.length);  // 添加了Math.min
-  for (let i = start; i < end; i++) {  // 修改了循环的条件
-    this.tableData.push({
-      judgestate: this.judge[i].judgestate,
-      problemname: this.judge[i].problemname,
-      username: this.judge[i].username,
-      runtime: this.judge[i].runtime + ` ms`,
-      memory: this.judge[i].memory + ` KB`,
-      language: this.judge[i].language,
-      submittime: this.judge[i].submittime,
-      problemid: this.judge[i].problemid,
-      judgeid:this.judge[i].judgeid,
-    });
-  }
+    },
+    filterHandler(value, row, column) {
+      const property = column["property"];
 
-},
+      if (value) {
+        this.judge = this.originalJudge.filter(
+          (item) => item[property] === value
+        );
+        this.updateTableData();
+      }
+    },
+    handleFilterChange(filters) {
+      if (Object.keys(filters).every((key) => filters[key] === undefined)) {
+        // 如果所有的筛选都被重置，恢复到原始的judge数组
+        this.judge = [...this.originalJudge];
+        this.updateTableData();
+      }
+    },
+    updateTableData() {
+      this.tableData = [];
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = Math.min(this.currentPage * this.pageSize, this.judge.length); // 添加了Math.min
+      for (let i = start; i < end; i++) {
+        // 修改了循环的条件
+        this.tableData.push({
+          judgestate: this.judge[i].judgestate,
+          problemname: this.judge[i].problemname,
+          username: this.judge[i].username,
+          totaltime: this.judge[i].totaltime + `ms`,
+          memory: this.judge[i].memory + `KB`,
+          language: this.judge[i].language,
+          submittime: this.judge[i].submittime,
+          problemid: this.judge[i].problemid,
+          judgeid: this.judge[i].judgeid,
+          userpicture: this.judge[i].userpicture,
+          score: this.judge[i].score,
+          userid: this.judge[i].userid,
+        });
+      }
+    },
     handlePageChange(newPage) {
       this.currentPage = newPage;
       this.updateTableData();
     },
-    getJudgeStateColor(judgestate){
-      if(judgestate === "Accepted")
-        return "#25ad40";
-      else if(judgestate === "Compilation Error")
-        return "orange";
-      else 
-        return "red";
+    getJudgeStateColor(judgestate) {
+      if (judgestate === "Accepted") return "#25ad40";
+      else if (judgestate === "Compilation Error") return "orange";
+      else return "red";
     },
-    goToJudgeContent(judgeid){
-      router.push({name:"judgecontent",query:{
-        judgeid:judgeid,
-      }})
-    },
-    goToProblem(problemid){
+    goToJudgeContent(judgeid) {
       router.push({
-          path: '/problem',
-          query: {
-            problemid: problemid,
-          }
-        })
+        name: "judgecontent",
+        query: {
+          judgeid: judgeid,
+        },
+      });
+    },
+    goToProblem(problemid) {
+      router.push({
+        path: "/problem",
+        query: {
+          problemid: problemid,
+        },
+      });
     },
   },
   async created() {
-  await axios
-    .get(`${SERVER_URL}/judge/query/alljudge`)
-    .then((response) => {
-      console.log(response.data);
-      this.originalJudge = response.data.reverse();
-      this.judge = [...this.originalJudge];
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  this.updateTableData();
-},
+    await axios
+      .get(`${SERVER_URL}/judge/query/alljudge`)
+      .then((response) => {
+        console.log(response.data);
+        this.originalJudge = response.data.reverse();
+        this.judge = [...this.originalJudge];
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    this.updateTableData();
+  },
 };
 </script>
 
 <style scoped>
 .hoverable {
-  color:#3498db;
   transition: color 0.3s ease, text-decoration 0.3s ease;
   cursor: pointer;
 }
@@ -296,51 +417,29 @@ export default {
   filter: brightness(1.3);
   text-decoration: underline;
 }
+.hoverable2 {
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.hoverable2:hover {
+  filter: brightness(1.3);
+}
 .card2 {
   position: relative;
-  top: 200px;
   width: 1300px;
-  left: 100px;
 }
 .card1 {
-  width: 1300px;
-  position: absolute;
-  left: 100px;
-  top: 90px;
-}
-.select1 {
-  position: relative;
-  left: 1030px;
-  top: 80px;
-  z-index: 1;
-}
-.select2 {
-  position: relative;
-  left: 720px;
-  top: 49px;
-}
-.input1 {
-  position: relative;
-  left: 360px;
-  width: 200px;
-  top: 18px;
-}
-.input2 {
-  position: relative;
-  width: 200px;
-  bottom: 12px;
-  left: 50px;
+  width: 1200px;
 }
 .pagination-container {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.button1{
+.button1 {
   width: 100px;
   color: white;
   position: relative;
-  left: 1130px;
-  top: 70px;
 }
 </style>

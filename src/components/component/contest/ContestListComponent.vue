@@ -6,12 +6,37 @@
         getContestStatus(contestList[index - 1]) !== getContestStatus(contest)
       "
     >
-      <h2>{{ getContestStatusText(contest) }}</h2>
+      <div
+        class="alert alert-primary"
+        role="alert"
+        style="
+        width: 1000px;
+          border-left: 5px solid rgb(37, 187, 155);
+          background-color: rgb(255, 255, 255);
+        "
+      >
+        <h4>{{ getContestStatusText(contest) }}</h4>
+      </div>
     </div>
     <div class="card mb-3 card1" style="max-width: 1000px; max-height: 400px">
+      <div
+        style="
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 5px;
+          background-color: rgb(37, 187, 155);
+        "
+      ></div>
       <div class="row g-0">
         <div class="col-md-3 d-flex justify-content-center align-items-center">
-          <img :src="SERVER_URL" class="img-fluid rounded-start" alt="..." />
+          <img
+            style="width: 80%"
+            :src="SERVER_URL"
+            class="img-fluid rounded-start"
+            alt="..."
+          />
         </div>
         <div class="col-md-7">
           <div class="card-body">
@@ -64,7 +89,7 @@
                 color: white;
                 width: 150px;
                 margin-right: 20px;
-                background-color: #1dad8e;
+                background-color: rgb(37, 187, 155);
               "
               type="primary"
               @click="viewContest(contest.contestid)"
@@ -81,7 +106,7 @@
                 color: white;
                 width: 150px;
                 margin-right: 20px;
-                background-color: #1dad8e;
+                background-color: rgb(37, 187, 155);
               "
               type="primary"
               @click="cancleJoinContest(contest.contestid)"
@@ -98,7 +123,7 @@
                 color: white;
                 width: 150px;
                 margin-right: 20px;
-                background-color: #1dad8e;
+                background-color: rgb(37, 187, 155);
               "
               type="primary"
               @click="
@@ -298,7 +323,7 @@ export default {
     },
     async checkJoinState() {
       this.joinSet.clear(); //清空一下
-      if(!localStorage.getItem("user"))return;
+      if (!localStorage.getItem("user")) return;
       //查询一下用户的报名信息
       await axios
         .get(`${SERVER_URL}/contest/query/join/personal`, {

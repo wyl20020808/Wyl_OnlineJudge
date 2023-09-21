@@ -1,9 +1,8 @@
 <template>
-  <div style="width: 800px;">
+  <div>
   <a-row>
-    <a-col style="margin-left: 200px;margin-top: 30px;" :span="24">
+    <a-col >
         <a-typography-paragraph>
-          
           <pre>{{ judgeinfo.judge.code }}</pre>
         </a-typography-paragraph>
     </a-col>

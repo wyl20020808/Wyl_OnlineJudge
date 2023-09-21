@@ -173,32 +173,36 @@ export default {
     }
     const memoryoptions = [];
     const difficultys = [
+     {
+        value: "暂无评定",
+        label: "暂无评定",
+      },
       {
-        value: "introduction",
+        value: "入门",
         label: "入门",
       },
       {
-        value: "easy",
+        value: "简单",
         label: "简单",
       },
       {
-        value: "ok",
+        value: "还行",
         label: "还行",
       },
       {
-        value: "common",
+        value: "一般",
         label: "一般",
       },
       {
-        value: "little",
+        value: "小难",
         label: "小难",
       },
       {
-        value: "hard",
+        value: "好难",
         label: "好难",
       },
       {
-        value: "disturb",
+        value: "骚难",
         label: "骚难",
       },
     ];

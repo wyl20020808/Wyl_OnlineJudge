@@ -5,7 +5,6 @@
         <a-input
         size="large"
           v-model:value="searchProblem"
-        
           placeholder="输入题目名称或ID"
           style="width: 1200px"
         />
@@ -13,6 +12,8 @@
       </div>
       <div class="card card1" style="">
         <el-pagination
+        style="margin: 10px;"
+        background
           class="pagination-container"
           @current-change="handlePageChange"
           :current-page="currentPage"
@@ -75,6 +76,8 @@
           ></el-table-column>
         </el-table>
         <el-pagination
+        style="margin: 10px;"
+        background
           class="pagination-container"
           @current-change="handlePageChange"
           :current-page="currentPage"
