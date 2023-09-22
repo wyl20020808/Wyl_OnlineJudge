@@ -1,65 +1,74 @@
 <template>
-  <div class="">
-    <a-row class="row1">
-      <a-col style="margin-left: 260px;" :span="24">
-        <a-row style="margin-top: 20px; display: flex; align-items: center">
-          <el-icon size="40" color="rgb(24, 144, 255)" style="margin-right: 8px"
-            ><Trophy
-          /></el-icon>
-          <h1>{{ contest.contestcontent?.contestname }}</h1>
-        </a-row>
-        <a-row style="margin-top: 20px; display: flex; align-items: center">
-          <NotificationTwoTone style="margin-right: 3px" />
-          <a-col style="font-size: 18px" :span="8"
-            >比赛时间：{{ toBeijingTime(contest.contestcontent?.startdate) }} ~
-            {{ toBeijingTime(contest.contestcontent?.enddate) }}</a-col
+  <a-row style="justify-content: center;align-items: center;">
+    <a-card style="width: 1015px;  margin-top: 20px">
+      <a-row class="row1">
+        <a-col>
+          <a-row style="display: flex; align-items: center">
+            <el-icon
+              size="40"
+              color="rgb(24, 144, 255)"
+              style="margin-right: 8px"
+              ><Trophy
+            /></el-icon>
+            <h1>{{ contest.contestcontent?.contestname }}</h1>
+          </a-row>
+          <a-row style="margin-top: 20px; display: flex; align-items: center">
+            <NotificationTwoTone style="margin-right: 3px" />
+            <a-col style="font-size: 18px; margin-right: 40px"
+              >比赛时间：{{
+                toBeijingTime(contest.contestcontent?.startdate)
+              }}
+              ~ {{ toBeijingTime(contest.contestcontent?.enddate) }}</a-col
+            >
+            <el-icon size="20" color="rgb(24, 144, 255)"><Timer /></el-icon>
+            <a-col style="font-size: 18px"
+              >时长：{{
+                getTimeDifference(
+                  contest.contestcontent?.startdate,
+                  contest.contestcontent?.enddate
+                )
+              }}</a-col
+            >
+          </a-row>
+          <a-row
+            style="
+              margin-top: 20px;
+              display: flex;
+              align-items: center;
+              position: relative;
+              right: 3px;
+            "
           >
-          <el-icon size="20" color="rgb(24, 144, 255)"><Timer /></el-icon>
-          <a-col style="font-size: 18px" :span="6"
-            >时长：{{
-              getTimeDifference(
-                contest.contestcontent?.startdate,
-                contest.contestcontent?.enddate
-              )
-            }}</a-col
-          >
-        </a-row>
-        <a-row
-          style="
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            position: relative;
-            right: 3px;
-          "
-        >
-          <el-icon style="" size="20" color="rgb(24, 144, 255)"
-            ><User
-          /></el-icon>
-          <a-col style="font-size: 18px"
-            >参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col
-          >
-        </a-row>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 40px">
-      <a-col style="margin-left: 260px;" :span="16">
-        <a-tabs class="my-tabs" v-model:activeKey="activeKey">
-          <a-tab-pane key="1" tab="比赛说明"
-            ><ContestDescriptionComponent :contest="contest"
-          /></a-tab-pane>
-          <a-tab-pane key="2" tab="题目" force-render
-            ><ContestProblemComponent :contest="contest"
-          /></a-tab-pane>
-          <a-tab-pane key="3" tab="提交"
-            ><ContestSubmitComponent :contest="contest"
-          /></a-tab-pane>
-          <a-tab-pane key="4" tab="排名"><ContestRankComponent :contest="contest"
-          /></a-tab-pane>
-        </a-tabs></a-col
-      >
-    </a-row>
-  </div>
+            <el-icon style="" size="20" color="rgb(24, 144, 255)"
+              ><User
+            /></el-icon>
+            <a-col style="font-size: 18px"
+              >参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col
+            >
+          </a-row>
+        </a-col>
+      </a-row>
+    </a-card>
+    <a-card style="margin-top: 20px; width: 1015px;margin-bottom: 20px;">
+      <a-row>
+        <a-col style="">
+          <a-tabs class="my-tabs" v-model:activeKey="activeKey">
+            <a-tab-pane style="width:950px ;" key="1" tab="比赛说明"
+              ><ContestDescriptionComponent :contest="contest"
+            /></a-tab-pane>
+            <a-tab-pane style="width:950px ;" key="2" tab="题目" force-render
+              ><ContestProblemComponent :contest="contest"
+            /></a-tab-pane >
+            <a-tab-pane style="width:950px ;" key="3" tab="提交"
+              ><ContestSubmitComponent :contest="contest"
+            /></a-tab-pane>
+            <a-tab-pane style="width:950px ;" key="4" tab="排名"
+              ><ContestRankComponent :contest="contest"
+            /></a-tab-pane> </a-tabs
+        ></a-col>
+      </a-row>
+    </a-card>
+  </a-row>
 </template>
 
 <script>
@@ -139,9 +148,9 @@ export default {
 };
 </script>
 
-<style>
-.row1 {
-  margin-top: 20px;
+<style scope>
+.my-tabs {
+  background-color: white; /* 你可以选择你想要的颜色 */
 }
 .my-tabs .ant-tabs-tab {
   font-size: 24px;

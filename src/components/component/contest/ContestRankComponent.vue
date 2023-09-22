@@ -1,22 +1,41 @@
 <template>
   <table>
-    <thead style="background-color: #e8e8e8;">
+    <thead style="background-color: #e8e8e8">
       <tr>
-        <th v-for="(column, index) in columns" :key="index" class="centered-header">
+        <th
+          v-for="(column, index) in columns"
+          :key="index"
+          class="centered-header"
+        >
           {{ column.title }}
         </th>
       </tr>
     </thead>
-    <tbody style="background-color: #f4f4f4;">
+    <tbody style="background-color: #f4f4f4">
       <tr v-for="(row, rowIndex) in tableData" :key="rowIndex" style="">
-        <td v-for="(column, columnIndex) in columns" :key="columnIndex" :style="{width: column.width,height:'110px',position: 'relative', padding: '0'}">
+        <td
+          v-for="(column, columnIndex) in columns"
+          :key="columnIndex"
+          :style="{
+            width: column.width,
+            position: 'relative',
+            padding: '0',
+          }"
+        >
           <div
             class="hoverable"
-            :style="{...getStyle(columnIndex, row, column), border: '1px solid #ddd'}"
-            style=""
+            :style="{
+              height: getHeight(),
+              ...getStyle(columnIndex, row, column),
+            }"
+            style="border-bottom: 1px dashed #ddd"
           >
             {{ row[column.dataIndex] }}
-            <div v-if="columnIndex > 3 && usersubmit.get(row.userid).get(column.title)">
+            <div
+              v-if="
+                columnIndex > 3 && usersubmit.get(row.userid).get(column.title)
+              "
+            >
               (-{{ usersubmit.get(row.userid).get(column.title) }})
             </div>
           </div>
@@ -83,26 +102,37 @@ export default {
     };
   },
   methods: {
+    getHeight() {
+      let tableWidth = 950;
+      let fixedWidth = 80 * 4; // 前4列的总宽度
+      let remainingWidth = tableWidth - fixedWidth;
+      let columnCount = this.columns.length - 4; // 减去前4列
+      let cellWidth = remainingWidth / columnCount;
+      return cellWidth + "px";
+    },
     getStyle(index, record, column) {
-    let baseStyle = {
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '50px',
-      width:"100%",
-      height:"100%",
-    };
+      let baseStyle = {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      };
 
-    if (index > 3 && this.userActime.get(record.userid).get(column.title)) {
-      // 添加额外的样式
-      baseStyle.backgroundColor = '#eff9f7';
-    }else if(index > 3 && this.usersubmit.get(record.userid).get(column.title)){
-      baseStyle.backgroundColor = '#ffecec';
-    }
+      if (index === 3) {
+        baseStyle.borderRight = "1px solid rgb(220, 220, 220)"; // 添加右边框
+      }
+      if (index > 3 && this.userActime.get(record.userid).get(column.title)) {
+        // 添加额外的样式
+        baseStyle.backgroundColor = "#eff9f7";
+      } else if (
+        index > 3 &&
+        this.usersubmit.get(record.userid).get(column.title)
+      ) {
+        baseStyle.backgroundColor = "#ffecec";
+      }
 
-    return baseStyle;
-  },
+      return baseStyle;
+    },
     updateTableData() {
       let data = []; //为了最后排序后计算rank
       console.log(this.userActime);
@@ -262,7 +292,6 @@ export default {
       // console.log(this.usersubmit, this.userActime, this.userinfo);
     },
     diffMinutes(dateStr1, dateStr2) {
-
       // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
       let isoDateStr1 = dateStr1.replace(" ", "T") + "+08:00";
 
@@ -323,7 +352,8 @@ table {
   border-collapse: collapse; /* 合并相邻的边框 */
 }
 
-th, td {
+th,
+td {
   padding: 10px; /* 设置单元格的内边距 */
   /* border: 1px solid #ddd; 设置单元格的边框 */
 }
@@ -334,5 +364,4 @@ th, td {
 th {
   text-align: center;
 }
-
 </style>

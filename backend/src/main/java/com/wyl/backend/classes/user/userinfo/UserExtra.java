@@ -19,7 +19,7 @@ public class UserExtra {
     private int concern;
     private int rating;
     private int ranking;
-    @TableField(select = false)
+    @TableField(exist = false)
     private String special;
 
 

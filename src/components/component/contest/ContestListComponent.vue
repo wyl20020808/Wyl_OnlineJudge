@@ -1,185 +1,197 @@
 <template>
-  <div v-for="(contest, index) in contestList" :key="contest.contestid">
-    <div
-      v-if="
-        index === 0 ||
-        getContestStatus(contestList[index - 1]) !== getContestStatus(contest)
-      "
-    >
-      <div
-        class="alert alert-primary"
-        role="alert"
-        style="
-        width: 1000px;
-          border-left: 5px solid rgb(37, 187, 155);
-          background-color: rgb(255, 255, 255);
-        "
-      >
-        <h4>{{ getContestStatusText(contest) }}</h4>
-      </div>
-    </div>
-    <div class="card mb-3 card1" style="max-width: 1000px; max-height: 400px">
-      <div
-        style="
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 5px;
-          background-color: rgb(37, 187, 155);
-        "
-      ></div>
-      <div class="row g-0">
-        <div class="col-md-3 d-flex justify-content-center align-items-center">
-          <img
-            style="width: 80%"
-            :src="SERVER_URL"
-            class="img-fluid rounded-start"
-            alt="..."
-          />
-        </div>
-        <div class="col-md-7">
-          <div class="card-body">
-            <a-row style="display: flex; align-items: center">
-              <el-icon
-                size="40"
-                color="rgb(24, 144, 255)"
-                style="margin-right: 8px"
-                ><Trophy
-              /></el-icon>
-              <h2
-                @click="viewContest(contest.contestid)"
-                class="card-title hoverable"
-              >
-                {{ contest.contestname }}
-              </h2></a-row
-            >
-
-            <div class="contesttime1 d-flex align-items-center">
-              <NotificationTwoTone style="fontsize: 24px" />
-              <span style="font-size: 16px; margin-left: 5px">
-                比赛时间：{{ toBeijingTime(contest.startdate) }} ~
-                {{ toBeijingTime(contest.enddate) }} ({{
-                  getTimeDifference(contest.startdate, contest.enddate)
-                }})
-              </span>
-            </div>
-            <div class="organizer1 d-flex align-items-center">
-              <HomeTwoTone style="fontsize: 24px" />
-              <span style="font-size: 16px; margin-left: 5px"
-                >主办方：{{ contest.username }}</span
-              >
-            </div>
-            <div class="people1 d-flex align-items-center">
-              <el-icon size="20" color="rgb(24, 144, 255)"><User /></el-icon>
-              <span style="font-size: 16px; margin-left: 5px"
-                >参赛人数：{{ contest.joinpeople }}</span
-              >
-            </div>
+  <a-row style="align-items: center; justify-content: center;width: 1200px;">
+    <a-col>
+      <div v-for="(contest, index) in contestList" :key="contest.contestid">
+        <div
+          v-if="
+            index === 0 ||
+            getContestStatus(contestList[index - 1]) !==
+              getContestStatus(contest)
+          "
+        >
+          <div
+            class="alert alert-primary"
+            role="alert"
+            style="
+              width: 1000px;
+              border-left: 5px solid rgb(37, 187, 155);
+              background-color: rgb(255, 255, 255);
+            "
+          >
+            <h4>{{ getContestStatusText(contest) }}</h4>
           </div>
         </div>
-        <div class="col-md-2">
+        <div
+          class="card mb-3 card1"
+          style="max-width: 1000px; max-height: 400px"
+        >
           <div
-            class="card-body d-flex flex-column justify-content-center align-items-center"
-            style="height: 100%"
-          >
-            <a-button
-              size="large"
-              style="
-                color: white;
-                width: 150px;
-                margin-right: 20px;
-                background-color: rgb(37, 187, 155);
-              "
-              type="primary"
-              @click="viewContest(contest.contestid)"
-              v-if="
-                cmpNowTime(contest.enddate) === true &&
-                joinSet.has(contest.contestid) === true &&
-                getContestStatus(contest) === '进行中'
-              "
-              >进入比赛</a-button
+            style="
+              position: absolute;
+              left: 0;
+              top: 0;
+              bottom: 0;
+              width: 5px;
+              background-color: rgb(37, 187, 155);
+            "
+          ></div>
+          <div class="row g-0">
+            <div
+              class="col-md-3 d-flex justify-content-center align-items-center"
             >
-            <a-button
-              size="large"
-              style="
-                color: white;
-                width: 150px;
-                margin-right: 20px;
-                background-color: rgb(37, 187, 155);
-              "
-              type="primary"
-              @click="cancleJoinContest(contest.contestid)"
-              v-else-if="
-                cmpNowTime(contest.enddate) === true &&
-                joinSet.has(contest.contestid) === true &&
-                getContestStatus(contest) === '未开始'
-              "
-              >已报名
-            </a-button>
-            <a-button
-              size="large"
-              style="
-                color: white;
-                width: 150px;
-                margin-right: 20px;
-                background-color: rgb(37, 187, 155);
-              "
-              type="primary"
-              @click="
-                joinContest(
-                  contest.contestid,
-                  contest.contestlimit,
-                  contest.contestpassword
-                )
-              "
-              v-else-if="cmpNowTime(contest.enddate) === true"
-              >报名</a-button
-            >
-            <a-button
-              size="large"
-              style="
-                color: white;
-                width: 150px;
-                margin-right: 20px;
-                background-color: rgb(166, 164, 164);
-              "
-              type="primary"
-              @click="viewContest(contest.contestid)"
-              v-else
-              >回顾比赛</a-button
-            >
-            <div class="countdown">
-              <Countdown
-                :startdate="contest.startdate"
-                :enddate="contest.enddate"
+              <img
+                style="width: 80%"
+                :src="SERVER_URL"
+                class="img-fluid rounded-start"
+                alt="..."
               />
             </div>
+            <div class="col-md-7">
+              <div class="card-body">
+                <a-row style="display: flex; align-items: center">
+                  <el-icon
+                    size="40"
+                    color="rgb(24, 144, 255)"
+                    style="margin-right: 8px"
+                    ><Trophy
+                  /></el-icon>
+                  <h2
+                    @click="viewContest(contest.contestid)"
+                    class="card-title hoverable"
+                  >
+                    {{ contest.contestname }}
+                  </h2></a-row
+                >
+
+                <div class="contesttime1 d-flex align-items-center">
+                  <NotificationTwoTone style="fontsize: 24px" />
+                  <span style="font-size: 16px; margin-left: 5px">
+                    比赛时间：{{ toBeijingTime(contest.startdate) }} ~
+                    {{ toBeijingTime(contest.enddate) }} ({{
+                      getTimeDifference(contest.startdate, contest.enddate)
+                    }})
+                  </span>
+                </div>
+                <div class="organizer1 d-flex align-items-center">
+                  <HomeTwoTone style="fontsize: 24px" />
+                  <span style="font-size: 16px; margin-left: 5px"
+                    >主办方：{{ contest.username }}</span
+                  >
+                </div>
+                <div class="people1 d-flex align-items-center">
+                  <el-icon size="20" color="rgb(24, 144, 255)"
+                    ><User
+                  /></el-icon>
+                  <span style="font-size: 16px; margin-left: 5px"
+                    >参赛人数：{{ contest.joinpeople }}</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div
+                class="card-body d-flex flex-column justify-content-center align-items-center"
+                style="height: 100%"
+              >
+                <a-button
+                  size="large"
+                  style="
+                    color: white;
+                    width: 150px;
+                    margin-right: 20px;
+                    background-color: rgb(37, 187, 155);
+                  "
+                  type="primary"
+                  @click="viewContest(contest.contestid)"
+                  v-if="
+                    cmpNowTime(contest.enddate) === true &&
+                    joinSet.has(contest.contestid) === true &&
+                    getContestStatus(contest) === '进行中'
+                  "
+                  >进入比赛</a-button
+                >
+                <a-button
+                  size="large"
+                  style="
+                    color: white;
+                    width: 150px;
+                    margin-right: 20px;
+                    background-color: rgb(37, 187, 155);
+                  "
+                  type="primary"
+                  @click="cancleJoinContest(contest.contestid)"
+                  v-else-if="
+                    cmpNowTime(contest.enddate) === true &&
+                    joinSet.has(contest.contestid) === true &&
+                    getContestStatus(contest) === '未开始'
+                  "
+                  >已报名
+                </a-button>
+                <a-button
+                  size="large"
+                  style="
+                    color: white;
+                    width: 150px;
+                    margin-right: 20px;
+                    background-color: rgb(37, 187, 155);
+                  "
+                  type="primary"
+                  @click="
+                    joinContest(
+                      contest.contestid,
+                      contest.contestlimit,
+                      contest.contestpassword
+                    )
+                  "
+                  v-else-if="cmpNowTime(contest.enddate) === true"
+                  >报名</a-button
+                >
+                <a-button
+                  size="large"
+                  style="
+                    color: white;
+                    width: 150px;
+                    margin-right: 20px;
+                    background-color: rgb(166, 164, 164);
+                  "
+                  type="primary"
+                  @click="viewContest(contest.contestid)"
+                  v-else
+                  >回顾比赛</a-button
+                >
+                <div class="countdown">
+                  <Countdown
+                    :startdate="contest.startdate"
+                    :enddate="contest.enddate"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <!-- <a-button @click="dialogVisible = true" >uye</a-button> -->
-  <el-dialog
-    title="Please Input The Password"
-    v-model="dialogVisible"
-    width="30%"
-  >
-    <el-input v-model="password" placeholder="password"></el-input>
-    <template v-slot:footer>
-      <el-button
-        @click="
-          dialogVisible = false;
-          password = '';
-        "
-        >取 消</el-button
+      <!-- <a-button @click="dialogVisible = true" >uye</a-button> -->
+      <el-dialog
+        title="Please Input The Password"
+        v-model="dialogVisible"
+        width="30%"
       >
-      <el-button style="color: white" type="primary" @click="handleConfirm"
-        >确 定</el-button
-      >
-    </template>
-  </el-dialog>
+        <el-input v-model="password" placeholder="password"></el-input>
+        <template v-slot:footer>
+          <el-button
+            @click="
+              dialogVisible = false;
+              password = '';
+            "
+            >取 消</el-button
+          >
+          <el-button style="color: white" type="primary" @click="handleConfirm"
+            >确 定</el-button
+          >
+        </template>
+      </el-dialog>
+    </a-col>
+  </a-row>
 </template>
 
 <script>

@@ -106,7 +106,7 @@
           style="margin-top: 0px"
           justify="space-between"
         >
-          <a-col style="margin-left: 40px">
+          <a-col style="margin-left: 30px;position: relative;bottom: 3px;">
             <a-tabs
               tabBarGutter="0px"
               class="my-tabs"

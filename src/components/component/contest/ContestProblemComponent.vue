@@ -11,7 +11,6 @@
       title="题目名称"
       dataIndex="problemname"
       key="problemname"
-      width="600px"
       align="center"
     >
       <template v-slot="{ record }">

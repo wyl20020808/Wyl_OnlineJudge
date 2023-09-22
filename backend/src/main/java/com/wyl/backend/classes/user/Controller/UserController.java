@@ -2,7 +2,10 @@ package com.wyl.backend.classes.user.Controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wyl.backend.classes.user.sql.UserExtraOperator;
 import com.wyl.backend.classes.user.sql.UserOperator;
+import com.wyl.backend.classes.user.userinfo.User;
+import com.wyl.backend.classes.user.userinfo.UserExtra;
 import com.wyl.backend.classes.user.userinfo.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,6 +27,8 @@ import java.util.Objects;
 public class UserController {
     @Autowired //注入，一定要写
     private UserOperator userOperator;
+    @Autowired
+    private UserExtraOperator userExtraOperator;
     private Boolean exists(String username) {
         List<UserInfo> userinfo = userOperator.select();
         for (UserInfo userInfo : userinfo) {
@@ -38,6 +45,20 @@ public class UserController {
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
         return userOperator.selectById(userInfo.getUserid());
     }
+    @GetMapping("/query/all")
+    public List<User> queryUserInfoAll() {
+        List<User> user = new ArrayList<>();
+       List<UserInfo> userinfo =  userOperator.selectList(null);
+       List<UserExtra> extra = userExtraOperator.selectList(null);
+        for (int i = 0; i < userinfo.size(); i++) {
+            UserInfo userInfo = userinfo.get(i);
+            UserExtra userExtra = extra.get(i);
+            // 在这里，i 就是元素的下标
+            user.add(new User(userInfo,userExtra));
+        }
+        return user;
+    }
+
 
     @PostMapping("/synchronize/userinfo")
     public String synchronizeUserInfo(@RequestBody UserInfo userInfo) {

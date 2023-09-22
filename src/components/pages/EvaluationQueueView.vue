@@ -1,9 +1,10 @@
 <template>
   
-  <a-row style="margin-left: 150px; margin-top: 20px">
-    <a-row>
-      <a-card style="width: 1200px">
-        <a-row>
+  <a-row style="justify-content: center;align-items: center;margin-top: 20px">
+    <a-col>
+    <a-row >
+      <a-card style="width: 1200px;">
+        <a-row >
           <el-button type="primary" class="button1" @click="resetFilters"
             >重置所有筛选</el-button
           >
@@ -60,7 +61,8 @@
           :key="judgeinfo.judgeid"
         >
           <a-col>
-            <a-row style="display: flex; align-items: center">
+            <a-row class="hoverable2"
+                  @click="jumpToUserInfo(judgeinfo.userid)" style="display: flex; align-items: center">
               <a-col>
                 <img
                   style="width: 50px; height: 50px; border-radius: 50%"
@@ -68,11 +70,10 @@
                   alt=""
                 />
               </a-col>
-              <a-col style="margin-left: 10px">
+              <a-col  style="margin-left: 10px">
                 <a-row
                   style="font-size: 18px; color: #3498db"
-                  class="hoverable"
-                  @click="goToUser(judgeinfo.userid)"
+                  
                   >{{ judgeinfo.username }}</a-row
                 >
                 <a-row>{{ judgeinfo.submittime }}</a-row>
@@ -105,7 +106,7 @@
           <a-col style="position: absolute;margin-top: 10px; left: 577px;">
             <div
               style="font-size: 16px; color: #3498db"
-              class="hoverable"
+              class="hoverable2"
               @click="goToProblem(judgeinfo.problemid)"
             >
               P{{ judgeinfo.problemid }} {{ judgeinfo.problemname }}
@@ -125,9 +126,9 @@
             </div>
           </a-col>
         </a-row>
-        <a-row style="margin-top: 20px;">
+        <a-row style="margin-top: 20px;justify-content: center;align-items: center;">
       <a-col
-     
+     style=""
       >
         <el-pagination
           background
@@ -142,50 +143,10 @@
       </a-card>
       </a-col></a-row
     >
-   
+  </a-col>
   </a-row>
 
-  <!-- <div class="card card2">
-    
-    <el-table ref="tableRef" :data="tableData" style="width: 100%" >
-      <el-table-column align="center"
-      @filter-change="handleFilterChange"
-        prop="judgestate"
-        label="状态"
-        sortable
-        :filters=judgestatefilters
-        :filter-method="filterHandler"
-      >
-      <template v-slot:default="{ row }">
-          <div class="hoverable" @click="goToJudgeContent(row.judgeid)"  :style="{color:getJudgeStateColor(row.judgestate)}" >
-            {{ row.judgestate }}
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="problemname" label="题目">
   
-        <template  v-slot:default="{ row }">
-          <div class="hoverable" @click="goToProblem(row.problemid)">
-            {{ row.problemname }}
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="username" label="提交者"> </el-table-column>
-      <el-table-column align="center" prop="runtime" label="运行时间"> </el-table-column>
-      <el-table-column align="center" prop="memory" label="占用内存"> </el-table-column>
-      <el-table-column align="center" prop="language" label="语言"> </el-table-column>
-      <el-table-column align="center" prop="submittime" label="提交时间"> </el-table-column>
-    </el-table>
-    <div class="pagination-container">
-    <el-pagination
-      @current-change="handlePageChange"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      layout="prev, pager, next"
-      :total="judge.length"
-    ></el-pagination>
-  </div>
-  </div> -->
 </template>
 
 <script>
@@ -321,6 +282,12 @@ export default {
     };
   },
   methods: {
+    jumpToUserInfo(userid) {
+      router.push({
+        name: "userhome",
+        query: { userid },
+      });
+    },
     resetFilters() {
       this.$refs.tableRef.clearFilter();
       this.judge = [...this.originalJudge];
@@ -409,16 +376,15 @@ export default {
 
 <style scoped>
 .hoverable {
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: color 0.3s ease ;
   cursor: pointer;
 }
 
 .hoverable:hover {
   filter: brightness(1.3);
-  text-decoration: underline;
 }
 .hoverable2 {
-  transition: color 0.3s ease;
+  transition: color 0.3s ease ;
   cursor: pointer;
 }
 

@@ -2,6 +2,15 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav">
+        <li class="nav-item logo">
+          <router-link :to="{ name: 'home' }">
+            <img
+              style="width: 200px;"
+              src="../../assets/static/pictures/江西理工大学logo.png"
+              alt="Avatar"
+            />
+          </router-link>
+        </li>
         <li class="nav-item">
           <router-link class="nav-link" :to="{ name: 'home' }"
             >首页</router-link
@@ -17,15 +26,7 @@
             >比赛</router-link
           >
         </li>
-        <li class="nav-item logo">
-          <router-link :to="{ name: 'home' }">
-            <img
-              class="avatar"
-              src="../../assets/static/pictures/templogo.png"
-              alt="Avatar"
-            />
-          </router-link>
-        </li>
+        
         <li class="nav-item">
           <router-link class="nav-link" :to="{ name: 'ranklist' }"
             >排行榜</router-link
@@ -249,7 +250,7 @@ export default {
 
 <style scoped>
 .navbar {
-  padding-left: 50px;
+  padding-left: 0px;
   border-bottom: 1px solid #ccc;
 }
 .navbar-nav {
@@ -257,7 +258,7 @@ export default {
   justify-content: space-between;
 }
 .navbar-nav .logo {
-  flex-grow: 2.5;
+  flex-grow: 1;
 }
 .nav-item {
   flex-grow: 1;
@@ -281,4 +282,5 @@ export default {
   height: 40px;
   outline: none;
 }
+
 </style>
