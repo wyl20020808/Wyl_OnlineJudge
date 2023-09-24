@@ -61,6 +61,7 @@ const ModuleUserInfo = ({
         const response = await axios.post(`${SERVER_URL}/user/query`, info.userinfo);
         response.data.userloginstate = info.loginState;
         localStorage.setItem('user', JSON.stringify(response.data));//同步本地数据
+        
         await axios.post(`${SERVER_URL}/user/synchronize/userinfo`, response.data);
         context.dispatch("notice", {
           title: 'Success',
@@ -73,11 +74,11 @@ const ModuleUserInfo = ({
           type: "success",
         });
       } catch (error) {
-        context.dispatch("notice", {
-          title: 'Error',
-          message: "服务器后端有异常！ " + error,
-          type: 'error',
-        });
+        // context.dispatch("notice", {
+        //   title: 'Error',
+        //   message: "服务器后端有异常！ " + error,
+        //   type: 'error',
+        // });
       }
     },
     login(context,userinfo){
@@ -128,11 +129,11 @@ const ModuleUserInfo = ({
           }
         })
         .catch(error => {
-          context.dispatch("notice",{
-            title: 'Error',
-            message: "服务器异常！ " + error ,
-            type: 'error',
-          })
+          // context.dispatch("notice",{
+          //   title: 'Error',
+          //   message: "服务器异常！ " + error ,
+          //   type: 'error',
+          // })
         });
     }
   },

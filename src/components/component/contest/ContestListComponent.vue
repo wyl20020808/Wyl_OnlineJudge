@@ -55,12 +55,12 @@
                     style="margin-right: 8px"
                     ><Trophy
                   /></el-icon>
-                  <h2
+                  <div style="font-size: 36px;"
                     @click="viewContest(contest.contestid)"
                     class="card-title hoverable"
                   >
                     {{ contest.contestname }}
-                  </h2></a-row
+                  </div></a-row
                 >
 
                 <div class="contesttime1 d-flex align-items-center">

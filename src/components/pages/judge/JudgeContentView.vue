@@ -6,9 +6,9 @@
   <a-row style="margin-left: 200px;margin-top: 20px;">
     <a-col >
       <a-card class="nav" style="margin-bottom: 10px;">
-        <h1>
+        <div style="font-size: 36px;">
           {{ titleinfo }}
-        </h1>
+        </div>
       </a-card>
       <div class="card nav2" style="margin-bottom: 10px;">
         <div class="nav-links">

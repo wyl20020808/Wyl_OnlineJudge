@@ -10,7 +10,7 @@
               style="margin-right: 8px"
               ><Trophy
             /></el-icon>
-            <h1>{{ contest.contestcontent?.contestname }}</h1>
+            <div style="font-size: 36px;">{{ contest.contestcontent?.contestname }}</div>
           </a-row>
           <a-row style="margin-top: 20px; display: flex; align-items: center">
             <NotificationTwoTone style="margin-right: 3px" />

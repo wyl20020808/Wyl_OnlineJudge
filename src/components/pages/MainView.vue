@@ -2,7 +2,7 @@
     
     <div class="news-card card">
         <div class="news-card-header">
-            <h2 class="news-card-title">新闻</h2>
+            <div style="font-size: 36px;" class="news-card-title">新闻</div>
         </div>
         <div class="news-card-body">
             <!-- 这里可以通过后端传递的数据来展示新闻内容 -->
@@ -11,7 +11,7 @@
     </div>
      <div class="fortune-card card">
         <div class="fortune-card-header">
-            <h2 class="fortune-card-title">今日</h2>
+            <div style="font-size: 36px;" class="fortune-card-title">今日</div>
         </div>
         <div class="fortune-card-body">
             <div class="fortune-data">

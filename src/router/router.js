@@ -20,11 +20,17 @@ import ProblemContentView2 from "@/components/component/problem/ProblemContentVi
 import ContestProblemView from "@/components/pages/contest/ContestProblemView.vue"
 import ContestSubmitView from "../components/pages/contest/ContestSubmitView.vue"
 import MessageView from "@/components/pages/message/MessageView.vue"
+import codeEditorComponent from "@/components/component/code/codeEditorComponent"
 const routes = [
   {
     path: '/',
     name: 'home',
     component: MainView
+  },
+  {
+    path: '/code/',
+    name: 'code',
+    component: codeEditorComponent
   },
   {
     path: '/competition/',

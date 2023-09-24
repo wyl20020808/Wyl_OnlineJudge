@@ -2,7 +2,7 @@
   <div class="card main1">
     <a-row style="margin-top: 20px">
       <a-col :offset="1" :span="24">
-        <h2>比赛信息</h2>
+        <div style="font-size: 36px;">比赛信息</div>
       </a-col>
     </a-row>
     <a-row style="margin-top: 20px">
@@ -71,7 +71,7 @@
     </a-row>
     <a-row style="margin-top: 20px">
       <a-col :offset="1" :span="24">
-        <h2>比赛权限</h2>
+        <div style="font-size: 36px;">比赛权限</div>
       </a-col>
     </a-row>
     <a-row style="margin-top: 20px">

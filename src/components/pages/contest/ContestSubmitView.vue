@@ -2,7 +2,7 @@
   <div>
     <div class="card out2">
       <div class="title1">
-        <h2>提交代码 - [{{ problemchar }}] {{ problemname }}   </h2>
+        <div style="font-size: 36px;">提交代码 - [{{ problemchar }}] {{ problemname }}   </div>
       </div>
       <div class="buttons">
         <el-button @click="backToProblem" class="button2" type="primary"

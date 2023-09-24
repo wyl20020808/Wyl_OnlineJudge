@@ -1,106 +1,93 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav">
-        <li class="nav-item logo">
-          <router-link :to="{ name: 'home' }">
-            <img
-              style="width: 200px;"
-              src="../../assets/static/pictures/江西理工大学logo.png"
-              alt="Avatar"
-            />
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'home' }"
-            >首页</router-link
-          >
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'problems' }"
-            >题库</router-link
-          >
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'competition' }"
-            >比赛</router-link
-          >
-        </li>
-        
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'ranklist' }"
-            >排行榜</router-link
-          >
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'tissue' }"
-            >组织</router-link
-          >
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" :to="{ name: 'evaluationqueue' }"
-            >评测队列</router-link
-          >
-        </li>
-        <li class="nav-item dropdown" v-if="userloginstate === 'true'">
-          <el-dropdown>
-            <span class="el-dropdown-link">
-              <img class="avatar" :src="userpicture" alt="Avatar" />
-              <a-badge v-if="unRead > 0" dot></a-badge>
-              <el-icon class="el-icon--right">
-                <arrow-down />
-              </el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item
-                  ><div @click="toUseInfo" class="dropdown-item"
-                    ><el-icon><UserFilled /></el-icon
-                    >&ensp;个人资料</div
-                  ></el-dropdown-item
-                >
-                <el-dropdown-item
-                  ><router-link :to="{ name: 'home' }" class="dropdown-item"
-                    ><el-icon><Setting /></el-icon> &ensp;设置</router-link
-                  ></el-dropdown-item
-                >
-                <el-dropdown-item
-                  ><div @click="toMessage" class="dropdown-item"
-                    ><el-icon><Bell /></el-icon>&ensp;消息</div
-                  > <a-badge :count="unRead" class="item">
-   
-  </a-badge>
-                  </el-dropdown-item
-                >
-                <el-dropdown-item
-                  ><a @click="logout" class="dropdown-item"
-                    ><el-icon><SwitchButton /></el-icon>&ensp;退出</a
-                  ></el-dropdown-item
-                >
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </li>
-        <li class="nav-item" v-else>
-          <router-link class="nav-link" :to="{ name: 'userlogin' }"
-            >登录</router-link
-          >
-        </li>
-      </ul>
-    </div>
-  </nav>
-  <!-- <a-menu v-model:selectedKeys="current" mode="horizontal" >
-  <template  v-for="item in items" :key="item.key">
-    <a-menu-item style="font-size: 22px;margin-right: 30px;" >
-       在这里插入你想要的内容 -->
-      <!-- <div>{{item.title}}</div>
-    </a-menu-item>
-  </template>
-</a-menu> -->
-  <!-- <div>
 
-        <UserSelectComponent />
-    </div> -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item logo" style="margin-left: 20px">
+              <router-link :to="{ name: 'home' }">
+                <img
+                  style="width: 200px"
+                  src="../../assets/static/pictures/江西理工大学logo.png"
+                  alt="Avatar"
+                />
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'home' }"
+                >首页</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'problems' }"
+                >题库</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'competition' }"
+                >比赛</router-link
+              >
+            </li>
+
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'ranklist' }"
+                >排行榜</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'tissue' }"
+                >工作室</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'evaluationqueue' }"
+                >评测队列</router-link
+              >
+            </li>
+            <li class="nav-item dropdown" v-if="userloginstate === 'true'">
+              <el-dropdown>
+                <span class="el-dropdown-link">
+                  <img class="avatar" :src="userpicture" alt="Avatar" />
+                  <a-badge v-if="unRead > 0" dot></a-badge>
+                  <el-icon class="el-icon--right">
+                    <arrow-down />
+                  </el-icon>
+                </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      ><div @click="toUseInfo" class="dropdown-item">
+                        <el-icon><UserFilled /></el-icon>&ensp;个人资料
+                      </div></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><router-link :to="{ name: 'home' }" class="dropdown-item"
+                        ><el-icon><Setting /></el-icon> &ensp;设置</router-link
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><div @click="toMessage" class="dropdown-item">
+                        <el-icon><Bell /></el-icon>&ensp;消息
+                      </div>
+                      <a-badge :count="unRead" class="item"> </a-badge>
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      ><a @click="logout" class="dropdown-item"
+                        ><el-icon><SwitchButton /></el-icon>&ensp;退出</a
+                      ></el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </li>
+            <li class="nav-item" v-else>
+              <router-link class="nav-link" :to="{ name: 'userlogin' }"
+                >登录</router-link
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+ 
 </template>
 
 <script>
@@ -117,7 +104,7 @@ import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
 
-import { ref,h } from "vue";
+import { ref, h } from "vue";
 import {
   MailOutlined,
   AppstoreOutlined,
@@ -238,7 +225,7 @@ export default {
         userinfo,
         loginState: false,
       });
-
+      localStorage.setItem('user', null);
       sleep(500).then(() => {
         window.location = `${SERVER}`;
       });
@@ -282,5 +269,4 @@ export default {
   height: 40px;
   outline: none;
 }
-
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1 style="font-size: 36px" class="title">新建题目</h1>
+    <div style="font-size: 36px;"  class="title">新建题目</div>
     <el-form label-position="left" label-width="100px">
       <el-form-item label="题目名称">
         <el-input
