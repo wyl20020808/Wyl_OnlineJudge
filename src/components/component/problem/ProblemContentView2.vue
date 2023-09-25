@@ -1,350 +1,389 @@
 <template>
   <!-- <v-md-editor v-model="text" height="400px"></v-md-editor>
     -->
-
-  <div class="topcard">
-    <a-row>
-      <a-col :offset="3" style="color: white; font-size: 16px; margin-top: 5px">
-        <a-breadcrumb style="color: white">
-          <a-breadcrumb-item
-            class="hoverable"
-            @click="jump('/')"
-            style="color: white"
-            >主页</a-breadcrumb-item
-          >
-          <a-breadcrumb-item
-            class="hoverable"
-            @click="jump('/problems')"
-            style="color: white"
-            >题库</a-breadcrumb-item
-          >
-          <a-breadcrumb-item style="color: white">{{
-            problemcontent.title
-          }}</a-breadcrumb-item>
-        </a-breadcrumb></a-col
-      >
-    </a-row>
-    <a-row style="">
-      <a-col
-        :offset="3"
-        style="
-          color: white;
-          font-size: 30px;
-          font-weight: bold;
-          margin-top: 10px;
-        "
-        >P{{ problemcontent.problemid }} {{ problemcontent.title }}
-      </a-col>
-    </a-row>
-    <a-row class="nowrap-row" style="margin-top: 20px">
-      <a-col :offset="3">
-        <a-button @click="submitProblem" style="color: white" type="primary"
-          >提交答案</a-button
-        >
-      </a-col>
-      <a-col>
-        <a-button
-          @click="editProblem"
-          style="color: white; margin-left: 10px"
-          ghost
-          >编辑题目</a-button
-        >
-      </a-col>
-      <a-col
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-
-          margin-right: 5px;
-        "
-        :offset="12"
-      >
-        <span style="color: white; display: block">提交</span>
-        <span style="color: white; display: block; font-weight: bold">{{
-          problemcontent.submitcount
-        }}</span>
-      </a-col>
-      <a-col>
-        <a-divider
-          type="vertical"
-          style="height: 44px; background-color: white"
-        />
-      </a-col>
-      <a-col
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          margin-left: 5px;
-          margin-right: 5px;
-        "
-      >
-        <span style="color: white; display: block">通过</span>
-        <span style="color: white; display: block; font-weight: bold">{{
-          problemcontent.aceptedcount
-        }}</span>
-      </a-col>
-      <a-col>
-        <a-divider
-          type="vertical"
-          style="height: 44px; background-color: white"
-        />
-      </a-col>
-      <a-col
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          margin-left: 5px;
-          margin-right: 5px;
-        "
-      >
-        <span style="color: white; display: block">时间限制</span>
-        <span style="color: white; display: block; font-weight: bold"
-          >{{ problemcontent.timelimit }}ms</span
-        >
-      </a-col>
-      <a-col>
-        <a-divider
-          type="vertical"
-          style="height: 44px; background-color: white"
-        />
-      </a-col>
-      <a-col
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          margin-left: 5px;
-          margin-right: 5px;
-        "
-      >
-        <span style="color: white; display: block">空间限制</span>
-        <span style="color: white; display: block; font-weight: bold"
-          >{{ problemcontent.memorylimit }}MB</span
-        >
-      </a-col>
-    </a-row>
-  </div>
-  <div class="center1">
-    <a-row>
-      <a-col style="margin-top: 30px" :span="13" :offset="3">
-        <a-card>
-          <a-row v-if="problemcontent.background !== '无'">
-            <a-col>
-              <h5 style="font-weight: bold">题目背景</h5>
-              <div
-                style="font-size: 16px"
-                class=""
-                v-html="
-                  parsedDescription(formattedText(problemcontent.background))
-                "
-              ></div>
-            </a-col>
-          </a-row>
-          <a-row
-            :style="{
-              'margin-top': problemcontent.background !== '无' ? '10px' : '0px',
-            }"
-          >
-            <a-col>
-              <h5 style="font-weight: bold">题目描述</h5>
-
-              <div
-                style="font-size: 16px"
-                class=""
-                v-html="
-                  parsedDescription(formattedText(problemcontent.description))
-                "
-              ></div>
-            </a-col>
-          </a-row>
-          <a-row style="margin-top: 10px">
-            <a-col>
-              <h5 style="font-weight: bold">输入格式</h5>
-
-              <div
-                style="font-size: 16px"
-                class=""
-                v-html="
-                  parsedDescription(formattedText(problemcontent.inputformat))
-                "
-              ></div>
-            </a-col>
-          </a-row>
-          <a-row style="margin-top: 10px">
-            <a-col>
-              <h5 style="font-weight: bold">输出格式</h5>
-
-              <div
-                style="font-size: 16px"
-                class=""
-                v-html="
-                  parsedDescription(formattedText(problemcontent.outputformat))
-                "
-              ></div>
-            </a-col>
-          </a-row>
-          <a-row style="margin-top: 10px">
-            <a-col>
-              <h5 style="font-weight: bold">输入输出样例</h5>
-            </a-col>
-          </a-row>
-          <a-row
-            v-for="(sample, index) in problemSample"
-            :key="sample.input + sample.output"
-            style="margin-top: 10px"
-          >
-            <a-col :span="11">
-              <a-row type="flex" justify="space-between">
-                <a-col>
-                  <h6 style="font-weight: bold">输入 #{{ index + 1 }}</h6>
-                </a-col>
-                <a-col>
-                  <a-tooltip placement="top">
-                    <template #title>
-                      <span>复制</span>
-                    </template>
-                    <CopyTwoTone
-                      @click="copyText(sample.input)"
-                      class="hoverable"
-                    /> </a-tooltip
-                ></a-col>
-              </a-row>
-              <a-typography-paragraph>
-                <pre style="font-size: 16px">{{ sample.input }}</pre>
-              </a-typography-paragraph>
-            </a-col>
-            <a-col style="margin-left: 20px" :span="11">
-              <a-row type="flex" justify="space-between">
-                <a-col>
-                  <h6 style="font-weight: bold">输出 #{{ index + 1 }}</h6>
-                </a-col>
-                <a-col>
-                  <a-tooltip placement="top">
-                    <template #title>
-                      <span>复制</span>
-                    </template>
-                    <CopyTwoTone
-                      @click="copyText(sample.output)"
-                      class="hoverable"
-                    /> </a-tooltip
-                ></a-col>
-              </a-row>
-              <a-typography-paragraph>
-                <pre style="font-size: 16px">{{ sample.output }}</pre>
-              </a-typography-paragraph>
-            </a-col>
-          </a-row>
-          <a-row style="margin-top: 10px">
-            <a-col>
-              <h5 style="font-weight: bold">说明/提示</h5>
-
-              <div
-                style="font-size: 16px"
-                v-html="parsedDescription(formattedText(problemcontent.hint))"
-              ></div>
-            </a-col>
-          </a-row>
-        </a-card>
-      </a-col>
-      <a-col style="margin-top: 30px; margin-left: 20px" :span="6">
-        <a-row>
-          <a-col :span="24">
-            <a-card>
-              <a-row type="flex" align="middle" justify="space-between">
-                <a-col style="font-size: 16px">题目来源</a-col>
-                <a-col :span="8">
-                  <a-row
+  <a-row  style="width: 100%"
+    ><a-col :span="24">
+      <a-row style="width: 100%"
+        ><a-col :span="24">
+          <div class="topcard">
+            <a-row>
+              <a-col
+                :offset="3"
+                style="color: white; font-size: 16px; margin-top: 5px"
+              >
+                <a-breadcrumb style="color: white">
+                  <a-breadcrumb-item
                     class="hoverable"
-                    type="flex"
-                    align="middle"
-                    justify="space-between"
-                    @click="jumpToUserInfo"
+                    @click="jump('/')"
+                    style="color: white"
+                    >主页</a-breadcrumb-item
                   >
+                  <a-breadcrumb-item
+                    class="hoverable"
+                    @click="jump('/problems')"
+                    style="color: white"
+                    >题库</a-breadcrumb-item
+                  >
+                  <a-breadcrumb-item style="color: white">{{
+                    problemcontent.title
+                  }}</a-breadcrumb-item>
+                </a-breadcrumb></a-col
+              >
+            </a-row>
+            <a-row style="">
+              <a-col
+                :offset="3"
+                style="
+                  color: white;
+                  font-size: 30px;
+                  font-weight: bold;
+                  margin-top: 10px;
+                "
+                >P{{ problemcontent.problemid }} {{ problemcontent.title }}
+              </a-col>
+            </a-row>
+            <a-row class="nowrap-row" style="margin-top: 20px">
+              <a-col :offset="3">
+                <a-button
+                  @click="submitProblem"
+                  style="color: white"
+                  type="primary"
+                  >提交答案</a-button
+                >
+              </a-col>
+              <a-col>
+                <a-button
+                  @click="editProblem"
+                  style="color: white; margin-left: 10px"
+                  ghost
+                  >编辑题目</a-button
+                >
+              </a-col>
+              <a-col
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100%;
+                  margin-right: 5px;
+                "
+                :offset="12"
+              >
+                <span style="color: white; display: block">提交</span>
+                <span style="color: white; display: block; font-weight: bold">{{
+                  problemcontent.submitcount
+                }}</span>
+              </a-col>
+              <a-col>
+                <a-divider
+                  type="vertical"
+                  style="height: 44px; background-color: white"
+                />
+              </a-col>
+              <a-col
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100%;
+                  margin-left: 5px;
+                  margin-right: 5px;
+                "
+              >
+                <span style="color: white; display: block">通过</span>
+                <span style="color: white; display: block; font-weight: bold">{{
+                  problemcontent.aceptedcount
+                }}</span>
+              </a-col>
+              <a-col>
+                <a-divider
+                  type="vertical"
+                  style="height: 44px; background-color: white"
+                />
+              </a-col>
+              <a-col
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100%;
+                  margin-left: 5px;
+                  margin-right: 5px;
+                "
+              >
+                <span style="color: white; display: block">时间限制</span>
+                <span style="color: white; display: block; font-weight: bold"
+                  >{{ problemcontent.timelimit }}ms</span
+                >
+              </a-col>
+              <a-col>
+                <a-divider
+                  type="vertical"
+                  style="height: 44px; background-color: white"
+                />
+              </a-col>
+              <a-col
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100%;
+                  margin-left: 5px;
+                  margin-right: 5px;
+                "
+              >
+                <span style="color: white; display: block">空间限制</span>
+                <span style="color: white; display: block; font-weight: bold"
+                  >{{ problemcontent.memorylimit }}MB</span
+                >
+              </a-col>
+            </a-row>
+          </div>
+          <div class="center1">
+            <a-row>
+              <a-col style="margin-top: 30px" :span="13" :offset="3">
+                <a-card>
+                  <a-row v-if="problemcontent.background !== '无'">
                     <a-col>
-                      <img
-                        :src="userinfo.userpicture"
-                        class="avatar"
-                        alt="Avatar"
-                      />
-                    </a-col>
-                    <a-col style="font-size: 16px; color: #2c93d7">
-                      {{ userinfo.username }}
+                      <h5 style="font-weight: bold">题目背景</h5>
+                      <div
+                        style="font-size: 16px"
+                        class=""
+                        v-html="
+                          parsedDescription(
+                            formattedText(problemcontent.background)
+                          )
+                        "
+                      ></div>
                     </a-col>
                   </a-row>
-                </a-col>
-              </a-row>
-              <a-row
-                style="margin-top: 10px"
-                type="flex"
-                align="middle"
-                justify="space-between"
-              >
-                <a-col style="font-size: 16px">难度</a-col>
-                <a-col style="font-size: 16px; color: #2c93d7">
-                  {{ problemcontent.difficulty }}
-                </a-col>
-              </a-row>
-              <a-row
-                style="margin-top: 15px"
-                type="flex"
-                align="middle"
-                justify="space-between"
-              >
-                <a-col style="font-size: 16px">历史分数</a-col>
-                <a-col style="font-size: 16px; color: #2c93d7"> 无 </a-col>
-              </a-row>
-              <a-row
-                style="margin-top: 15px"
-                type="flex"
-                align="middle"
-                class="hoverable"
-              >
-                <a-col style="font-size: 16px">
-                  <PieChartTwoTone style="font-size: 24px"
-                /></a-col>
-                <a-col
-                  style="font-size: 16px; margin-left: 5px; color: #2c93d7"
-                >
-                  提交记录</a-col
-                >
-              </a-row>
-            </a-card>
-          </a-col>
-        </a-row>
-        <a-row style="margin-top: 20px">
-          <a-col :span="24">
-            <a-card>
-              <a-row>
-                <h5>标签</h5>
-              </a-row>
-              <a-row style="margin-top: 5px">
-                <a-col :span="24">
-                  <a-tag
-                    style="font-size: 14px"
-                    v-for="algorithm in algorithm"
-                    :key="algorithm"
-                    color="green"
-                    >{{ algorithm }}</a-tag
+                  <a-row
+                    :style="{
+                      'margin-top':
+                        problemcontent.background !== '无' ? '10px' : '0px',
+                    }"
                   >
-                </a-col>
-              </a-row>
-            </a-card>
-          </a-col>
-        </a-row>
-      </a-col>
-    </a-row>
-  </div>
+                    <a-col>
+                      <h5 style="font-weight: bold">题目描述</h5>
+
+                      <div
+                        style="font-size: 16px"
+                        class=""
+                        v-html="
+                          parsedDescription(
+                            formattedText(problemcontent.description)
+                          )
+                        "
+                      ></div>
+                    </a-col>
+                  </a-row>
+                  <a-row style="margin-top: 10px">
+                    <a-col>
+                      <h5 style="font-weight: bold">输入格式</h5>
+
+                      <div
+                        style="font-size: 16px"
+                        class=""
+                        v-html="
+                          parsedDescription(
+                            formattedText(problemcontent.inputformat)
+                          )
+                        "
+                      ></div>
+                    </a-col>
+                  </a-row>
+                  <a-row style="margin-top: 10px">
+                    <a-col>
+                      <h5 style="font-weight: bold">输出格式</h5>
+
+                      <div
+                        style="font-size: 16px"
+                        class=""
+                        v-html="
+                          parsedDescription(
+                            formattedText(problemcontent.outputformat)
+                          )
+                        "
+                      ></div>
+                    </a-col>
+                  </a-row>
+                  <a-row style="margin-top: 10px">
+                    <a-col>
+                      <h5 style="font-weight: bold">输入输出样例</h5>
+                    </a-col>
+                  </a-row>
+                  <a-row
+                    v-for="(sample, index) in problemSample"
+                    :key="sample.input + sample.output"
+                    style="margin-top: 10px"
+                  >
+                    <a-col :span="11">
+                      <a-row type="flex" justify="space-between">
+                        <a-col>
+                          <h6 style="font-weight: bold">
+                            输入 #{{ index + 1 }}
+                          </h6>
+                        </a-col>
+                        <a-col>
+                          <a-tooltip placement="top">
+                            <template #title>
+                              <span>复制</span>
+                            </template>
+                            <CopyTwoTone
+                              @click="copyText(sample.input)"
+                              class="hoverable"
+                            /> </a-tooltip
+                        ></a-col>
+                      </a-row>
+                      <a-typography-paragraph>
+                        <pre style="font-size: 16px">{{ sample.input }}</pre>
+                      </a-typography-paragraph>
+                    </a-col>
+                    <a-col style="margin-left: 20px" :span="11">
+                      <a-row type="flex" justify="space-between">
+                        <a-col>
+                          <h6 style="font-weight: bold">
+                            输出 #{{ index + 1 }}
+                          </h6>
+                        </a-col>
+                        <a-col>
+                          <a-tooltip placement="top">
+                            <template #title>
+                              <span>复制</span>
+                            </template>
+                            <CopyTwoTone
+                              @click="copyText(sample.output)"
+                              class="hoverable"
+                            /> </a-tooltip
+                        ></a-col>
+                      </a-row>
+                      <a-typography-paragraph>
+                        <pre style="font-size: 16px">{{ sample.output }}</pre>
+                      </a-typography-paragraph>
+                    </a-col>
+                  </a-row>
+                  <a-row style="margin-top: 10px">
+                    <a-col>
+                      <h5 style="font-weight: bold">说明/提示</h5>
+
+                      <div
+                        style="font-size: 16px"
+                        v-html="
+                          parsedDescription(formattedText(problemcontent.hint))
+                        "
+                      ></div>
+                    </a-col>
+                  </a-row>
+                </a-card>
+              </a-col>
+              <a-col style="margin-top: 30px; margin-left: 20px" :span="6">
+                <a-row>
+                  <a-col :span="24">
+                    <a-card>
+                      <a-row type="flex" align="middle" justify="space-between">
+                        <a-col style="font-size: 16px">题目来源</a-col>
+                        <a-col :span="8">
+                          <a-row
+                            class="hoverable"
+                            type="flex"
+                            align="middle"
+                            justify="space-between"
+                            @click="jumpToUserInfo"
+                          >
+                            <a-col>
+                              <img
+                                :src="userinfo.userpicture"
+                                class="avatar"
+                                alt="Avatar"
+                              />
+                            </a-col>
+                            <a-col style="font-size: 16px; color: #2c93d7">
+                              {{ userinfo.username }}
+                            </a-col>
+                          </a-row>
+                        </a-col>
+                      </a-row>
+                      <a-row
+                        style="margin-top: 10px"
+                        type="flex"
+                        align="middle"
+                        justify="space-between"
+                      >
+                        <a-col style="font-size: 16px">难度</a-col>
+                        <a-col style="font-size: 16px; color: #2c93d7">
+                          {{ problemcontent.difficulty }}
+                        </a-col>
+                      </a-row>
+                      <a-row
+                        style="margin-top: 15px"
+                        type="flex"
+                        align="middle"
+                        justify="space-between"
+                      >
+                        <a-col style="font-size: 16px">历史分数</a-col>
+                        <a-col style="font-size: 16px; color: #2c93d7">
+                          无
+                        </a-col>
+                      </a-row>
+                      <a-row
+                        style="margin-top: 15px"
+                        type="flex"
+                        align="middle"
+                        class="hoverable"
+                      >
+                        <a-col style="font-size: 16px">
+                          <PieChartTwoTone style="font-size: 24px"
+                        /></a-col>
+                        <a-col
+                          style="
+                            font-size: 16px;
+                            margin-left: 5px;
+                            color: #2c93d7;
+                          "
+                        >
+                          提交记录</a-col
+                        >
+                      </a-row>
+                    </a-card>
+                  </a-col>
+                </a-row>
+                <a-row style="margin-top: 20px">
+                  <a-col :span="24">
+                    <a-card>
+                      <a-row>
+                        <h5>标签</h5>
+                      </a-row>
+                      <a-row style="margin-top: 5px">
+                        <a-col :span="24">
+                          <a-tag
+                            style="font-size: 14px"
+                            v-for="algorithm in algorithm"
+                            :key="algorithm"
+                            color="green"
+                            >{{ algorithm }}</a-tag
+                          >
+                        </a-col>
+                      </a-row>
+                    </a-card>
+                  </a-col>
+                </a-row>
+              </a-col>
+            </a-row>
+          </div>
+        </a-col></a-row
+      >
+      <a-row style="margin-top:20px ;">
+        <a-col  :offset="3">
+          <codeEditorComponent :problemsample=problemSample :problemcontent=problemcontent />
+        </a-col>
+      </a-row >
+      
+       </a-col
+  ></a-row>
 </template>
 
 <script>
@@ -356,12 +395,14 @@ import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
 import { message } from "ant-design-vue";
 import { CopyTwoTone, PieChartTwoTone } from "@ant-design/icons-vue";
+import codeEditorComponent from "../code/codeEditorComponent.vue";
 
 import router from "@/router/router";
 export default {
   components: {
     CopyTwoTone,
     PieChartTwoTone,
+    codeEditorComponent,
   },
   data() {
     return {
@@ -484,6 +525,7 @@ export default {
 </script>
 
 <style scoped>
+
 .topcard {
   width: 100%;
   height: 150px;

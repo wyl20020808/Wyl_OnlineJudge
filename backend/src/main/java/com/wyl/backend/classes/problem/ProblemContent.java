@@ -29,7 +29,7 @@ public class ProblemContent {
     private int submitcount;//提交次数
     private int aceptedcount;//通过次数
     private String difficulty;//难度
-    private String havedata = "false";//是否有数据
+    private int datalength;//是否有数据
     @TableField(exist = false)
     private String special;//更新单个数据，借助它来写
     

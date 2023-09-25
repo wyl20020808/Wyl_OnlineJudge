@@ -7,7 +7,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.stream.Collectors;
-
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 /**
  * 文件读取工具类
  * (后续应当开发或使用开源的文件系统，随便啦)
@@ -109,5 +110,9 @@ public class FileUtil {
         }
 
         return tempFile;
+    }
+
+    public static void copyFile(File source, File dest) throws IOException {
+        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 }

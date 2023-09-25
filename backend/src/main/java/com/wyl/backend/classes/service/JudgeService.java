@@ -13,7 +13,7 @@ public interface JudgeService {
      * @return
      */
 //    String judgeOne(Submission push, Map<String, String> MachineToToken,Map<String, String> TokenToMachine);
-
+    public JudgeResultToUser judgeProblem2 (String submittime,int userid,long problemId, String source_code, int language_id);
     Judge0Result judgeOne(Submission push, Map<String, String> MachineToToken, Map<String, String> TokenToMachine);
     /**
      * 通过token查看一个判题结果
@@ -43,4 +43,6 @@ public interface JudgeService {
      * @return
      */
     JudgeResultToUser judgeProblem(long problemId, String source, int language_id);
+
+    Judge0Result judgeOnlyOne(String stdin, long problemId, String sourceCode, int languageId);
 }

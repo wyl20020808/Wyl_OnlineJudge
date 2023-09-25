@@ -1,5 +1,4 @@
 <template>
-
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
@@ -33,11 +32,11 @@
                 >排行榜</router-link
               >
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <router-link class="nav-link" :to="{ name: 'tissue' }"
                 >工作室</router-link
               >
-            </li>
+            </li> -->
             <li class="nav-item">
               <router-link class="nav-link" :to="{ name: 'evaluationqueue' }"
                 >评测队列</router-link

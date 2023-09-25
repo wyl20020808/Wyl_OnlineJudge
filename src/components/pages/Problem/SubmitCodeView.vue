@@ -143,7 +143,8 @@ export default {
               break;
           }
       }
-      await axios.get(`${SERVER_URL}/judge/query/alljudge`)
+      //要改成根据用户的id和问题去找最新的那个，可以在数据库端再定义一个变量 看看是不是最新的就行
+      await axios.get(`${SERVER_URL}/judge/query/alljudge`)//这里是有问题的，因为会存在多用户冲突
       .then((response) =>{
           this.judgeid = response.data[response.data.length - 1].judgeid + 1;
       } )

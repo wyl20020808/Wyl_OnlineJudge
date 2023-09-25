@@ -73,4 +73,13 @@ public class Submission {
         this.cpu_time_limit = cpu_time_limit;
         this.memory_limit = memory_limit;
     }
+    //就运行代码
+    public Submission(String source_code, Integer language_id, String stdin,  float cpu_time_limit, float memory_limit) {
+        this();
+        this.source_code = source_code;
+        this.language_id = language_id;
+        this.stdin = stdin;
+        this.cpu_time_limit = cpu_time_limit;
+        this.memory_limit = memory_limit;
+    }
 }

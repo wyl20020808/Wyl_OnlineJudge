@@ -1,46 +1,241 @@
 <template>
-  <div :style="editorStyle" ref="editor">
-    <FullscreenOutlined
-      v-if="!isFullscreen"
-      :style="iconStyle"
-      @click="toggleFullscreen"
-    />
-    <FullscreenExitOutlined
-      v-else
-      :style="iconStyle"
-      @click="toggleFullscreen"
-    />
-    <div
-      v-if="showAutocomplete && items.length > 0"
-      :style="{
-        position: 'absolute',
-        left: `${coords.left}px`,
-        top: `${coords.top + 20}px`,
-        zIndex: 1001,
-      }"
-    >
-      <select
-        v-model="selected"
-        @change="onSelect"
-        size="5"
-        style="width: 200px"
+  <a-row>
+    <a-col>
+      <a-row>
+        <a-col>
+          <div
+            style="
+              background-color: white;
+              padding: 15px;
+              width: 1140px;
+              border-bottom: 1px solid rgb(217, 216, 216);
+            "
+          >
+            <a-row style="width: 100%" type="flex" justify="space-between">
+              <a-col><h4>代码编辑器</h4></a-col
+              ><a-col
+                ><a-select
+                  ref="select"
+                  v-model:value="selectedLanguage"
+                  style="width: 200px"
+                  :options="languages"
+                  @focus="focus"
+                ></a-select
+              ></a-col>
+            </a-row>
+          </div>
+          <!-- <div  style="position: absolute;bottom: 0px;;width: 1140px;background-color: rgb(255, 255, 255);height: 5px;"></div> -->
+        </a-col>
+      </a-row>
+      <a-row
+        ><a-col>
+          <div :style="editorStyle" ref="editor">
+            <div
+              v-if="showAutocomplete && items.length > 0"
+              :style="{
+                position: 'absolute',
+                left: `${coords.left}px`,
+                top: `${coords.top + 20}px`,
+                zIndex: 1001,
+              }"
+            >
+              <select
+                v-model="selected"
+                @change="onSelect"
+                size="5"
+                style="width: 200px"
+              >
+                <option v-for="item in items" :key="item" :value="item">
+                  {{ item }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </a-col></a-row
       >
-        <option v-for="item in items" :key="item" :value="item">
-          {{ item }}
-        </option>
-      </select>
-    </div>
-  </div>
+      <a-row>
+        <a-col>
+          <div
+            style="
+              background-color: white;
+              padding: 15px;
+              width: 1140px;
+              border-bottom: 1px solid rgb(217, 216, 216);
+              border-top: 1px solid rgb(217, 216, 216);
+            "
+          >
+            <a-row style="width: 100%">
+              <a-col :offset="18">
+                <el-button
+                  @click="runCode"
+                  style="height: 40px; font-size: 16px; margin-left: 0px"
+                  round
+                  ><SendOutlined style="margin-right: 5px" />运行代码</el-button
+                >
+              </a-col>
+              <a-col>
+                <el-button
+                  style="height: 40px; font-size: 16px; margin-left: 30px"
+                  type="success"
+                  @click="submitCode"
+                  round
+                  ><CloudUploadOutlined
+                    style="margin-right: 5px"
+                  />提交代码</el-button
+                ></a-col
+              >
+            </a-row>
+          </div>
+          <!-- <div  style="position: absolute;bottom: 0px;;width: 1140px;background-color: rgb(255, 255, 255);height: 5px;"></div> -->
+        </a-col>
+      </a-row>
+      <a-row style="margin-top: 20px">
+        <a-col>
+          <div
+            style="
+              border-radius: 10px;
+              width: 1140px;
+              background-color: white;
+              color: black;
+              margin-bottom: 20px;
+              position: relative;
+            "
+          >
+            <div
+              style="
+                position: absolute;
+                top: 6px;
+                left: 0;
+                height: 60px;
+                width: 100%;
+                background-color: rgb(255, 255, 255);
+                border-bottom: 1px solid rgb(227, 226, 226);
+              "
+            ></div>
+            <a-row>
+              <a-col style="font-size: 22px; padding: 14px"
+                >代码运行状态：
+                <span v-if="codeStatus === 'upload'">uploading</span>
+                <span
+                  style="color: rgb(1, 110, 193)"
+                  v-else-if="codeStatus === 'running'"
+                >
+                  <a-spin /> Running....
+                </span>
+                <span
+                  style="color: rgb(68, 157, 0)"
+                  v-else-if="codeStatus === 'finished'"
+                  >Finished</span
+                >
+                <!-- <span v-else-if="codeStatus === 'error'">错误</span> -->
+              </a-col>
+            </a-row>
+            <a-row v-if="!submitting">
+              <a-col :span="24">
+                <a-row>
+                  <a-col
+                    :offset="1"
+                    :span="24"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      margin-top: 30px;
+                    "
+                    ><label style="font-size: 18px" for="name">输入</label>
+                    <a-textarea
+                      style="
+                        width: 90%;
+                        font-size: 16px;
+                        font-family: monospace; /* 使用等宽字体 */
+                        letter-spacing: 1px; /* 增加字母之间的间距 */
+                      "
+                      v-model:value="input"
+                      auto-size
+                  /></a-col>
+                </a-row>
+                <a-row>
+                  <a-col
+                    :offset="1"
+                    :span="24"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      margin-top: 20px;
+                      margin-bottom: 30px;
+                    "
+                    ><label style="font-size: 18px" for="name">输出</label>
+                    <a-textarea
+                      style="width: 90%; font-size: 16px"
+                      v-model:value="output"
+                      auto-size
+                      readonly
+                  /></a-col>
+                </a-row>
+                <a-row v-if="judgeData">
+                  <a-col
+                    :offset="1"
+                    style="position: relative; bottom: 20px; font-size: 16px"
+                  >
+                    运行时间：{{ judgeData.time ? judgeData.time * 1000 : "0" }}
+                    ms
+                  </a-col>
+                </a-row>
+              </a-col>
+            </a-row>
+            <!-- 提交状态 -->
+            <a-row v-else>
+              <a-col class="container">
+                <div
+                  class="box"
+                  v-for="(result, index) in judgeInfo"
+                  :key="index"
+                >
+                  <span class="tick" v-if="result.judgestate && result.judgestate === 'Accepted'"
+                    >√</span
+                  >
+                  <span class="cross" v-else-if="result.judgestate">×</span>
+                </div>
+                <!-- <div
+                  class="box"
+                  v-for="index in 10"
+                  :key="index"
+                >
+                  <span class="tick">√</span>
+    
+                </div> -->
+              </a-col>
+            </a-row>
+          </div>
+        </a-col>
+      </a-row>
+    </a-col>
+  </a-row>
 </template>
 
 <script setup>
-import { onMounted, ref, computed, nextTick, onUnmounted, watch } from "vue";
+import {
+  onMounted,
+  ref,
+  computed,
+  nextTick,
+  onUnmounted,
+  watch,
+  defineProps,
+  reactive,
+} from "vue";
 import {
   FullscreenOutlined,
   FullscreenExitOutlined,
+  CloudUploadOutlined,
+  SendOutlined,
 } from "@ant-design/icons-vue";
+import axios from "axios";
+import { getBeijingTime } from "@/js/functions/TimeAbout";
+import { useStore } from "vuex";
+import { JUDGE_URL, SERVER_URL } from "@/js/functions/config";
 import { getMatchingItems } from "@/js/Editor/autoComplete";
 import CodeMirror from "codemirror";
+import { languages } from "@/js/values/value";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/clike/clike.js";
 import "codemirror/addon/display/fullscreen.js";
@@ -55,29 +250,48 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/jump-to-line.js";
 import "codemirror/addon/selection/active-line.js";
+import { useRoute } from "vue-router";
 
+const props = defineProps({
+  problemsample: Array,
+  problemcontent: Object,
+});
+let store = useStore();
 // 用户定义的变量或函数
-
+let input = ref("");
+let output = ref("");
 const editor = ref(null);
 let cmInstance = null;
 const isFullscreen = ref(false);
 let resizeObserver = null;
-
+const route = useRoute();
 const showAutocomplete = ref(false);
 const items = ref([]);
 const selected = ref(null);
 const coords = ref({ left: 0, top: 0 });
-
 const select = ref(null);
 let isSelecting = false;
+let selectedLanguage = ref(54);
+let source_code = ref("");
 
 onMounted(async () => {
+  let isUserTyping = false;
+  let typingTimer = null;
+  const typingDelay = 500; // 500毫秒
+
+  setTimeout(() => {
+    // 这里是你想要在页面加载完1秒后执行的操作
+    input.value = props.problemsample[0].input;
+  }, 500);
   if (editor.value) {
     cmInstance = CodeMirror(editor.value, {
       lineNumbers: true,
       mode: "text/x-c++src",
       viewportMargin: Infinity,
       extraKeys: {
+        Esc: function (cm) {
+          showAutocomplete.value = false;
+        },
         Enter: function (cm) {
           if (showAutocomplete.value) {
             onSelect();
@@ -123,6 +337,11 @@ onMounted(async () => {
       styleActiveLine: true,
     });
 
+    cmInstance.on("cursorActivity", () => {
+      if (!isUserTyping) {
+        showAutocomplete.value = false;
+      }
+    });
     // 确保 DOM 已经更新
     await nextTick(); // 更新全屏图标的位置
     updateIconPosition();
@@ -132,18 +351,32 @@ onMounted(async () => {
     resizeObserver.observe(editor.value);
 
     cmInstance.on("change", () => {
+      isUserTyping = true;
       if (isSelecting) {
         isSelecting = false;
         return;
       }
+      typingTimer = setTimeout(() => {
+        isUserTyping = false;
+      }, typingDelay);
       const cursor = cmInstance.getCursor();
       const token = cmInstance.getTokenAt(cursor);
       const currentWord = token.string;
-      let allTextInEditor = cmInstance.getRange({line: 0, ch: 0}, cursor); 
+      let allTextInEditor = cmInstance.getRange({ line: 0, ch: 0 }, cursor);
       // Generate the list of matching items
       items.value = getMatchingItems(currentWord, allTextInEditor);
       // Get the cursor's coordinates
-      coords.value = cmInstance.cursorCoords(cursor, "window");
+      // Get the cursor's coordinates relative to the window
+      let cursorCoords = cmInstance.cursorCoords(cursor, "window");
+      source_code.value = cmInstance.getValue();
+      // Get the editor's coordinates
+      let editorCoords = editor.value.getBoundingClientRect();
+
+      // Adjust the cursor's coordinates
+      coords.value = {
+        left: cursorCoords.left - editorCoords.left,
+        top: cursorCoords.top - editorCoords.top,
+      };
 
       // Check if the current word fully matches all the autocomplete options
       // const isFullMatch = items.value.every((item) => item === currentWord);
@@ -191,8 +424,8 @@ const editorStyle = computed(() => {
     };
   } else {
     return {
-      width: "1000px",
-      height: "600px", // 你可以根据需要调整这个值
+      width: "1140px",
+      height: "400px", // 你可以根据需要调整这个值
     };
   }
 });
@@ -210,6 +443,240 @@ function onSelect() {
   isSelecting = true;
   showAutocomplete.value = false;
 }
+let codeStatus = ref("finished");
+const judgeData = ref();
+let submitting = ref(false); //正在提交
+const runCode = async () => {
+  output.value = "";
+  submitting.value = false;
+  codeStatus.value = "upload";
+  let formData = new FormData();
+  formData.append("source_code", source_code.value);
+  console.log(props.problemcontent.problemid, selectedLanguage.value);
+  formData.append("problemId", parseInt(props.problemcontent.problemid));
+  formData.append("languageId", parseInt(selectedLanguage.value));
+  formData.append("stdin", input.value);
+  codeStatus.value = "running";
+  await axios //提交代码给后端
+    .post(`${JUDGE_URL}/judge/judgeone`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => {
+      codeStatus.value = "finished";
+      judgeData.value = res.data;
+      output.value = judgeData.value.stdout;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const addSubmitCount = async (problemid, userid) => {
+  axios
+    .post(`${SERVER_URL}/problem/update/problemcontent/special`, {
+      problemid: problemid,
+      special: "submitcount",
+    })
+    .then((res) => {})
+    .catch((error) => {
+      console.log(error);
+    });
+  axios
+    .post(`${SERVER_URL}/userextra/update/special`, {
+      userid: userid,
+      special: "submitcount",
+    })
+    .then((res) => {})
+    .catch((error) => {
+      console.log(error);
+    });
+};
+const addAceptedCount = async (problemid, userid) => {
+  await axios
+    .post(`${SERVER_URL}/problem/update/problemcontent/special`, {
+      problemid: problemid,
+      special: "aceptedcount",
+    })
+    .then((res) => {})
+    .catch((error) => {
+      console.log(error);
+    });
+  await axios
+    .post(`${SERVER_URL}/userextra/update/special`, {
+      userid: userid,
+      special: "aceptedcount",
+    })
+    .then((res) => {})
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const saveJudgeInfo = async (judgedata, submittime) => {
+  let problemid = props.problemcontent.problemid;
+  //保存评测信息到数据库
+  addSubmitCount(problemid, JSON.parse(localStorage.getItem("user")).userid);
+  let judgeinfo = {
+    //这里为什么能用$router，是因为到这里来的肯定是提交代码的
+    problemid: problemid,
+    userid: JSON.parse(localStorage.getItem("user")).userid,
+    submittime,
+    code: source_code.value,
+    username: JSON.parse(localStorage.getItem("user")).username,
+    language: selectedLanguage.value,
+    problemname: props.problemcontent.title,
+    userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
+  };
+  const results = judgedata.data.results;
+  let runtime = 0;
+  let memory = 0;
+  let score = 0;
+  let compileoutput = "";
+  let judgestate = "Accepted";
+  for (let i = 0; i < results.length; i++) {
+    runtime = runtime + parseFloat(results[i].time) * 1000;
+    memory = Math.max(memory, parseFloat(results[i].memory));
+    if (results[i].status.description == "Accepted")
+      score = score + 100 / results.length;
+    else judgestate = results[i].status.description;
+    compileoutput =
+      results[i].compile_output === null
+        ? results[i].status.description
+        : results[i].compile_output;
+  }
+  judgeinfo.judgestate = judgestate;
+  if (judgestate === "Accepted") {
+    addAceptedCount(problemid, JSON.parse(localStorage.getItem("user")).userid);
+  }
+
+  judgeinfo.compileoutput = compileoutput;
+  judgeinfo.runtime = runtime;
+  judgeinfo.memory = memory;
+  judgeinfo.score = score >= 99 ? 100 : score;
+  judgeinfo.totaltime = runtime;
+  let type = "judge";
+  if (route.query.contestid) {
+    //gpt教的用法
+    //如果是比赛传过来的话
+    judgeinfo.contestid = route.query.contestid; //比赛id
+    judgeinfo.problemchar = route.query.problemchar; //题目对应的字母
+    type = "contest";
+  }
+  let judgeid = null;
+  console.log(judgeinfo, "ahsjda");
+  await axios
+    .post(`${SERVER_URL}/${type}/insert/judge`, judgeinfo)
+    .then((response) => {
+      console.log(response.data);
+      judgeid = response.data;
+    })
+    .catch((error) => {
+      store.dispatch("notice", {
+        title: "数据保存失败！",
+        message: "服务器异常" + error,
+        type: "error",
+      });
+    });
+
+  return;
+  // 上面是保存单个信息，下面是保存每个测试点的信息
+  let infolist = [];
+  for (let i = 0; i < results.length; i++) {
+    infolist.push({
+      judgeid: judgeid,
+      runtime: results[i].time,
+      memory: results[i].memory,
+      judgestate: results[i].status.description,
+    });
+  }
+  if (route.query.contestid) {
+    //如果是比赛传过来的话
+    for (let i = 0; i < infolist.length; i++) {
+      infolist[i].contestid = route.query.contestid;
+      infolist[i].problemchar = route.query.problemchar; //这里貌似有问题，以后再改
+    }
+  }
+  await axios
+    .post(`${SERVER_URL}/${type}/insert/judgecontent`, infolist)
+    .then((response) => {})
+    .catch((error) => {
+      store.dispatch("notice", {
+        title: "数据保存失败！",
+        message: "服务器异常" + error,
+        type: "error",
+      });
+    });
+  //
+};
+
+let judgeInfo = ref([]);
+const submitCode = async () => {
+  judgeInfo.value = [];
+  let datalength = props.problemcontent.datalength;
+  for(let i = 0 ; i < datalength;i++){
+    judgeInfo.value.push(0);
+  }
+  codeStatus.value = "upload";
+  let formData = new FormData();
+  let time = getBeijingTime();
+  formData.append("source_code", source_code.value);
+  formData.append("problemId", parseInt(props.problemcontent.problemid));
+  formData.append("languageId", parseInt(selectedLanguage.value));
+  formData.append("submittime", time); //为了同步
+  formData.append(
+    "userid",
+    parseInt(JSON.parse(localStorage.getItem("user")).userid)
+  );
+  codeStatus.value = "running";
+  submitting.value = true;
+  // 设置interval
+  let intervalId = setInterval(async () => {
+    //查询提交状态
+    let data = new FormData();
+    data.append("problemId", parseInt(props.problemcontent.problemid));
+    data.append("submittime", time); //为了同步
+    data.append(
+      "userid",
+      parseInt(JSON.parse(localStorage.getItem("user")).userid)
+    );
+    await axios //提交代码给后端
+      .post(`${JUDGE_URL}/judge/query/judgemany`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        judgeInfo.value = res.data;
+        while(judgeInfo.value.length <datalength) {
+          judgeInfo.value.push(0);
+        }
+        console.log(judgeInfo.value, "ashdja");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, 500); // 每秒执行一次
+  await axios //提交代码给后端
+    .post(`${JUDGE_URL}/judge/judgemany`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => {
+      codeStatus.value = "finished";
+      saveJudgeInfo(res.data, time);
+      setTimeout(() => {
+        // 这里是你想要在页面加载完1秒后执行的操作
+        clearInterval(intervalId); // 销毁interval
+      }, 2000);
+    })
+    .catch((err) => {
+      console.log(err);
+      clearInterval(intervalId); // 销毁interval
+    });
+};
 </script>
 
 <style>
@@ -225,5 +692,27 @@ function onSelect() {
 
 .CodeMirror-activeline-background {
   background: #e8f2ff;
+}
+
+.box {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgb(208, 208, 208);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tick {
+  color: green;
+}
+
+.cross {
+  color: red;
 }
 </style>

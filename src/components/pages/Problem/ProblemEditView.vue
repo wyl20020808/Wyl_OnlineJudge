@@ -249,16 +249,7 @@ export default {
             message: "",
             type: "success",
           });
-          //上传完之后，还要更新一下数据库题目的题目信息
-          await axios.post(`${SERVER_URL}/problem/update/problemcontent/specific`,{
-            problemid:this.problemid,
-            havedata:"true",
-          })
-          .then((response)=>{
-            
-          })
-          .catch((error) => {
-          });
+          
         })
         .catch((error) => {
           this.$store.dispatch("notice", {

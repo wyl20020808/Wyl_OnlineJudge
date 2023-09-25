@@ -2,7 +2,9 @@ package com.wyl.backend.classes.judge.controller;
 
 import com.alibaba.druid.sql.parser.Lexer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.judge.Judge;
+import com.wyl.backend.classes.judge.Judge0Result;
 import com.wyl.backend.classes.judge.JudgeContent;
 import com.wyl.backend.classes.judge.JudgeResultToUser;
 import com.wyl.backend.classes.judge.sql.JudgeContentSQL;
@@ -30,16 +32,16 @@ public class JudgeController {
     public int insertJudge(@RequestBody Judge judgeInfo){
         try {
             judgeSql.insert(judgeInfo);
-            List<Judge> query = judgeSql.selectList(null);
-            return query.get(query.size()-1).getJudgeid();
+            judgeContentSql.updateJudgeId();//更新judgecontent表中judgeid的信息
+            return 0;
         }catch (Exception e){
             return -1;
         }
     }
+
     @PostMapping("/insert/judgecontent")
     public int insertJudgeContent(@RequestBody List<JudgeContent> judgeInfo){
         try{
-
             for(int i = 0; i < judgeInfo.size(); i++)
                 judgeContentSql.insert(judgeInfo.get(i));
             return 1;
@@ -74,5 +76,26 @@ public class JudgeController {
 
         log.info("用户判题成功=>{}",problemId);
         return Result.success(judgeResultToUser);
+    }
+    @PostMapping("/judgemany")
+    public Result<JudgeResultToUser> judgeMany(String submittime,int userid,long problemId, String source_code, int languageId){
+        JudgeResultToUser judgeResultToUser = judgeService.judgeProblem2(submittime,userid,problemId, source_code, languageId);
+
+        log.info("用户判题成功=>{}",problemId);
+        return Result.success(judgeResultToUser);
+    }
+
+    @PostMapping("/judgeone")
+    public Judge0Result judgeJustone(String stdin,long problemId, String source_code, int languageId){
+        Judge0Result judgeResultToUser = judgeService.judgeOnlyOne(stdin,problemId, source_code, languageId);
+        log.info("代码运行成功=>{}",problemId);
+        return judgeResultToUser;
+    }
+
+    @PostMapping("/query/judgemany")//实时查询判题结果
+    public List<JudgeContent> QueryJudgeMany(String submittime,int userid,int problemId){
+        QueryWrapper<JudgeContent> query = new QueryWrapper<>();
+        query.eq("problemid",problemId).eq("userid",userid).eq("submittime",submittime);
+        return judgeContentSql.selectList(query);
     }
 }

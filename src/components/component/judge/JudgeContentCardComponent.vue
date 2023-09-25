@@ -156,7 +156,7 @@ export default {
           this.tableData.push({
             judgeid: i + 1,
             judgestate: this.judgeinfo.judgecontent[i].judgestate,
-            runtime: this.judgeinfo.judgecontent[i].runtime + "ms",
+            runtime: this.judgeinfo.judgecontent[i].runtime * 1000 + "ms",
             memory: this.judgeinfo.judgecontent[i].memory + "KB",
           });
         }

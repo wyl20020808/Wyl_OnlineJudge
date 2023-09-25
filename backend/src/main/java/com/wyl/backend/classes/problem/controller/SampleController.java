@@ -38,8 +38,6 @@ public class SampleController {
     public Result<Object> pushMulToJudge0Form(@RequestParam("problemId") long problemId,
                                               @RequestParam("zipFile") MultipartFile zipFile) throws IOException {
         //判断problemId对应的题目是否存在
-
-
         File file = FileUtil.convertToFile(zipFile);
         if (sampleService.uploadZipToOss(problemId, file))
             return Result.success();

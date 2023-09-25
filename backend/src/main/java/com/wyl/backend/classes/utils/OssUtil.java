@@ -73,6 +73,22 @@ public class OssUtil {
      * @return 返回文件的内容
      * @throws IOException
      */
+    public String readFileFromLocal(String filePath) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new FileNotFoundException("File not found: " + filePath);
+        }
+
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        }
+
+        return content.toString();
+    }
     public StringBuffer readFileFromOss(String url) throws IOException {
         StringBuffer res = new StringBuffer();
         boolean objectExist = ossClient.doesObjectExist(getBucketName(), url);
@@ -112,7 +128,38 @@ public class OssUtil {
         return true;
     }
 
+    public List<InAndOut> getInOutFromLocal(String path) {
+        File inDir = new File(path + "/in");
+        File outDir = new File(path + "/out");
+        File[] inFiles = inDir.listFiles();
+        File[] outFiles = outDir.listFiles();
 
+        List<String> inList = new ArrayList<>();
+        List<String> outList = new ArrayList<>();
+        List<InAndOut> res = new ArrayList<>();
+
+        if (inFiles != null && outFiles != null) {
+            for (File inFile : inFiles) {
+                String inName = inFile.getName().replace(".in", "");
+                for (File outFile : outFiles) {
+                    String outName = outFile.getName().replace(".out", "");
+                    if (inName.equals(outName)) {
+                        inList.add(inFile.getName());
+                        outList.add(outFile.getName());
+                    }
+                }
+            }
+        }
+
+        InAndOut inAndOut;
+        for (String str : inList) {
+            if (!outList.contains(str))
+                log.info("文件错乱了=>{}", path);
+            inAndOut = new InAndOut(path + "/in/" + str, path + "/out/" + str.replace(".in", ".out"));
+            res.add(inAndOut);
+        }
+        return res;
+    }
 
 
     public List<InAndOut> getInOutFromOss(String url){
