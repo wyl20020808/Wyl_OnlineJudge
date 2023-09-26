@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.auxiliary.SubstringSearch;
 import com.wyl.backend.classes.contest.*;
 import com.wyl.backend.classes.contest.SQL.*;
+import com.wyl.backend.classes.judge.JudgeResultToUser;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
+import com.wyl.backend.classes.service.JudgeService;
 import com.wyl.backend.classes.user.sql.UserOperator;
 import com.wyl.backend.classes.user.userinfo.UserInfo;
+import com.wyl.backend.classes.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +37,9 @@ public class ContestController {
     private ContestProblemSQL   contestProblemSQL;
     @Autowired
     private ContestantSQL  contestantSQL;
+
+    @Autowired
+    JudgeService judgeService;
 
     @Autowired
     private ContestJudgeContentSQL contestJudgeSQL;
@@ -153,6 +159,13 @@ public class ContestController {
         result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
         result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
         return result;
+    }
+
+    @PostMapping("/judgemany")
+    public Result<JudgeResultToUser> judgeManyContest(int contestid, String submittime, int userid, long problemId, String source_code, int languageId){
+        JudgeResultToUser judgeResultToUser = judgeService.judgeContestProblem(contestid,submittime,userid,problemId, source_code, languageId);
+        System.out.println("用户判题成功=>" + problemId);
+        return Result.success(judgeResultToUser);
     }
 
 }

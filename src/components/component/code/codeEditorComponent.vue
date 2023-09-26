@@ -308,7 +308,7 @@ onMounted(async () => {
 
   setTimeout(() => {
     // 这里是你想要在页面加载完1秒后执行的操作
-    input.value = props.problemsample[0].input;
+    if (props.problemsample[0]) input.value = props.problemsample[0].input;
   }, 500);
   if (editor.value) {
     cmInstance = CodeMirror(editor.value, {
@@ -372,11 +372,9 @@ onMounted(async () => {
     // 确保 DOM 已经更新
     await nextTick(); // 更新全屏图标的位置
     updateIconPosition();
-
     // 创建一个新的 ResizeObserver 实例并开始监听编辑器的尺寸变化
     resizeObserver = new ResizeObserver(updateIconPosition);
     resizeObserver.observe(editor.value);
-
     cmInstance.on("change", () => {
       isUserTyping = true;
       if (isSelecting) {
@@ -482,7 +480,6 @@ const editorStyle = computed(() => {
   } else {
     return {
       width: "1140px",
-      height: "400px", // 你可以根据需要调整这个值
     };
   }
 });
@@ -505,13 +502,13 @@ const judgeData = ref();
 let submitting = ref(false); //正在提交
 const runCode = async () => {
   source_code.value = source_code.value.trimEnd();
-  if(!source_code.value){
+  if (!source_code.value) {
     store.dispatch("notice", {
-        title: "编辑器里的代码不能为空！",
-        message: '',
-        type: "error",
-      });
-      return;
+      title: "编辑器里的代码不能为空！",
+      message: "",
+      type: "error",
+    });
+    return;
   }
   output.value = "";
   submitting.value = false;
@@ -598,9 +595,9 @@ const saveJudgeInfo = async (judgedata, submittime) => {
   let problemid = props.problemcontent.problemid;
   //保存评测信息到数据库
   addSubmitCount(problemid, JSON.parse(localStorage.getItem("user")).userid);
-  let language = '';
-  for(let i = 0 ; i < languages.length ;i ++){
-    if(languages[i].value === selectedLanguage.value){
+  let language = "";
+  for (let i = 0; i < languages.length; i++) {
+    if (languages[i].value === selectedLanguage.value) {
       language = languages[i].label;
       break;
     }
@@ -650,11 +647,9 @@ const saveJudgeInfo = async (judgedata, submittime) => {
     type = "contest";
   }
   let judgeid = null;
-  console.log(judgeinfo, "ahsjda");
   await axios
-    .post(`${SERVER_URL}/${type}/insert/judge`, judgeinfo)
+    .post(`${SERVER_URL}/${type}/insert/judge`, judgeinfo) //插入到不同里面
     .then((response) => {
-      console.log(response.data);
       judgeid = response.data;
     })
     .catch((error) => {
@@ -699,13 +694,13 @@ const saveJudgeInfo = async (judgedata, submittime) => {
 let judgeInfo = ref([]);
 const submitCode = async () => {
   source_code.value = source_code.value.trimEnd();
-  if(!source_code.value){
+  if (!source_code.value) {
     store.dispatch("notice", {
-        title: "编辑器里的代码不能为空！",
-        message: '',
-        type: "error",
-      });
-      return;
+      title: "编辑器里的代码不能为空！",
+      message: "",
+      type: "error",
+    });
+    return;
   }
   judgeInfo.value = [];
   let datalength = props.problemcontent.datalength;
@@ -723,6 +718,11 @@ const submitCode = async () => {
     "userid",
     parseInt(JSON.parse(localStorage.getItem("user")).userid)
   );
+  let type = "judge";
+  if (route.query.contestid) {
+    type = "contest";
+    formData.append("contestid", parseInt(route.query.contestid));
+  }
   codeStatus.value = "running";
   submitting.value = true;
   // 设置interval
@@ -734,8 +734,13 @@ const submitCode = async () => {
       "userid",
       parseInt(JSON.parse(localStorage.getItem("user")).userid)
     );
+
+    if (route.query.contestid) {
+      type = "contest";
+      data.append("contestid", parseInt(route.query.contestid));
+    }
     await axios //提交代码给后端
-      .post(`${JUDGE_URL}/judge/query/judgemany`, formData, {
+      .post(`${JUDGE_URL}/${type}/query/judgemany`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -754,7 +759,7 @@ const submitCode = async () => {
     window.scrollTo(0, document.body.scrollHeight);
   });
   await axios //提交代码给后端
-    .post(`${JUDGE_URL}/judge/judgemany`, formData, {
+    .post(`${JUDGE_URL}/${type}/judgemany`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -785,7 +790,7 @@ const submitCode = async () => {
 
 .CodeMirror {
   font-family: "Consolas", monospace;
-  height: 100%;
+  height: 400px;
 }
 
 .CodeMirror-activeline-background {

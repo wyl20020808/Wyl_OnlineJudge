@@ -31,7 +31,7 @@
           </a-col>
           <a-col style="margin-left: 40px"
             ><a-select
-            allowClear
+              allowClear
               ref="select"
               v-model:value="difficulty"
               style="width: 200px"
@@ -46,17 +46,13 @@
           </a-col>
           <a-col>
             <a-select
-            allowClear
+              allowClear
               v-model:value="algorithm"
               mode="multiple"
               show-search
               placeholder="算法"
               style="width: 200px"
               :options="algorithmsAndDataStructuresOptions"
-              :filter-option="filterOption"
-              @focus="handleFocus"
-              @blur="handleBlur"
-              @change="handleChange"
             ></a-select>
           </a-col>
         </a-row>
@@ -64,7 +60,11 @@
       <a-row>
         <a-col style="">
           <div style="margin-bottom: 20px">
-            <ProblemListViewVue :questionBank="questionBank" :algorithj="algorithm" :difficulty="difficulty" /></div
+            <ProblemListViewVue
+              :questionBank="questionBank"
+              :algorithm="algorithm"
+              :difficulty="difficulty"
+            /></div
         ></a-col>
       </a-row>
     </a-col>

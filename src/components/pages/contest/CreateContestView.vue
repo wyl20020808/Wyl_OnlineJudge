@@ -163,9 +163,11 @@
 import { SERVER_URL } from "@/js/functions/config";
 import axios from "axios";
 import { getNowTime } from "@/js/functions/TimeAbout";
+import { getBeijingTime } from "@/js/functions/TimeAbout";
 import router from "@/router/router";
 export default {
   methods: {
+    
     creatContest: async function () {
       let contestcontent = {
         userid: JSON.parse(localStorage.getItem("user")).userid,
@@ -238,16 +240,16 @@ export default {
         .then((res) => {
           const data = [];
           for (let i = 0; i < res.data.length; i++) {
-            if(type === 'problem')
-            data.push({
-              value: res.data[i].problemid,
-              label: res.data[i].problemid + " " + res.data[i].title,
-            });
-            else 
-            data.push({
-              value: res.data[i].userid,
-              label: res.data[i].userid + " " + res.data[i].nickname,
-            });
+            if (type === "problem")
+              data.push({
+                value: res.data[i].problemid,
+                label: res.data[i].problemid + " " + res.data[i].title,
+              });
+            else
+              data.push({
+                value: res.data[i].userid,
+                label: res.data[i].userid + " " + res.data[i].nickname,
+              });
           }
           callback(data);
         })
@@ -284,7 +286,7 @@ export default {
       },
       handleSearchAdmin: (val) => {
         //比赛管理员搜索
-        
+
         this.fetch(val, "user", (d) => (this.adminsdata = d));
       },
       title: "", //比赛题目

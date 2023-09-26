@@ -13,6 +13,7 @@ public interface JudgeService {
      * @return
      */
 //    String judgeOne(Submission push, Map<String, String> MachineToToken,Map<String, String> TokenToMachine);
+    public JudgeResultToUser judgeContestProblem (int contestId,String submittime,int userid,long problemId, String source_code, int language_id);
     public JudgeResultToUser judgeProblem2 (String submittime,int userid,long problemId, String source_code, int language_id);
     Judge0Result judgeOne(Submission push, Map<String, String> MachineToToken, Map<String, String> TokenToMachine);
     /**

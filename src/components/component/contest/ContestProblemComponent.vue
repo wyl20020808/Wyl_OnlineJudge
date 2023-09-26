@@ -57,7 +57,7 @@ export default defineComponent({
   methods: {
     viewProblem(problemid,problemchar) {
       router.push({
-        path: "/contest/problem",
+        path: "/problem",
         query: { problemid, contestid: this.contest.contestcontent.contestid,problemchar:problemchar },
       });
     },

@@ -128,16 +128,19 @@ export default {
     };
   },
   watch: {
+    algorithm: {
+      handler(newVal, oldVal) {
+        console.log(oldVal, newVal);
+        this.updateQuestions();
+      },
+    },
     async difficulty(newVal, oldVal) {
       this.updateQuestions(); //不用传参数，用全局的就行
     },
-    async algorithm(newVal, oldVal) {
-      this.updateQuestions();
-    },
+
     async questionBank(newVal, oldVal) {
       await this.getQuestions();
       this.updateQuestions(); //换题库的时候也要更新一下
-      this.updateQuestions();
     },
     async searchProblem(newVal, oldVal) {
       if (!newVal) {
@@ -177,16 +180,17 @@ export default {
       let question = [];
       for (let i = 0; i < this.questions.length; i++) {
         if (
-          !this.algorithm ||
+          !this.algorithm || this.algorithm.length === 0 || 
           (this.algorithm &&
-            this.algorithm.include(this.questions[i].algorithm))
+          this.algorithm.some(item => this.questions[i].algorithm.trimEnd().split(" ").includes(item))
+          )
         ) {
           if (
             !this.difficulty ||
             (this.difficulty &&
               this.questions[i].difficulty === this.difficulty)
           ) {
-            question.push(this.questions[i]);//层层筛选
+            question.push(this.questions[i]); //层层筛选
           }
         }
       }

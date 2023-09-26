@@ -69,6 +69,8 @@ export default {
       userinfo: new Map(), //记录通过数和罚时
       userlist: new Set(), //记录有哪些用户
       username: new Map(), //记录每个用户的用户名
+      firstAC: new Map(), //记录每个题的第一次AC时间
+      firstACId: new Map(), //记录每个题的第一次AC的人
       columns: [
         {
           title: "名次",
@@ -117,13 +119,18 @@ export default {
         justifyContent: "center",
         alignItems: "center",
       };
-
       if (index === 3) {
         baseStyle.borderRight = "1px solid rgb(220, 220, 220)"; // 添加右边框
       }
       if (index > 3 && this.userActime.get(record.userid).get(column.title)) {
+        //已经AC
         // 添加额外的样式
-        baseStyle.backgroundColor = "#eff9f7";
+        let problemchar = column.title;
+        if (this.firstACId.get(problemchar) === record.userid) {
+          baseStyle.backgroundColor = "rgb(191,230,222)";
+        } else {
+          baseStyle.backgroundColor = "#eff9f7";
+        }
       } else if (
         index > 3 &&
         this.usersubmit.get(record.userid).get(column.title)
@@ -135,15 +142,12 @@ export default {
     },
     updateTableData() {
       let data = []; //为了最后排序后计算rank
-      console.log(this.userActime);
       for (let userid of this.userlist) {
         let temp = {
           username: this.username.get(userid),
           passedcountd: this.userinfo.get(userid).get("passedcount"),
           punishtime: this.userinfo.get(userid).get("punishtime"),
           userid,
-          // acMap: new Map(),
-          // submitMap: new Map(),
         };
         //再存一个map呗
         for (let i = 0; i < this.contest.contestproblem.length; i++) {
@@ -160,7 +164,6 @@ export default {
           } else if (this.usersubmit.get(userid).get(problemchar)) {
           }
         }
-
         data.push(temp);
       }
       console.log(data);
@@ -169,7 +172,6 @@ export default {
         if (a.passedcountd !== b.passedcountd) {
           return b.passedcountd - a.passedcountd;
         }
-
         // 如果passedcount相同，那么比较punishtime，小的在前
         return a.punishtime - b.punishtime;
       });
@@ -237,6 +239,21 @@ export default {
 
           this.usersubmit.get(userid).set(problemchar, submitcount + 1); //提交次数+1
         } else if (state === "Accepted") {
+          if (!this.firstAC.get(problemchar)) {
+            this.firstAC.set(problemchar, data[i].submittime);
+            this.firstACId.set(problemchar, data[i].userid);
+          } else {
+            if (
+              this.diffMinutes(
+                data[i].submittime,
+                this.firstAC.get(problemchar)
+              ) < 0
+            ) {
+              this.firstAC.set(problemchar, data[i].submittime);
+              this.firstACId.set(problemchar, data[i].userid);
+            }
+          }
+
           if (!this.userActime.get(userid).get(problemchar)) {
             //如果这题是第一次AC的话，就+1
             if (!this.userinfo.get(userid).get("passedcount"))
@@ -291,7 +308,25 @@ export default {
 
       // console.log(this.usersubmit, this.userActime, this.userinfo);
     },
+    toBeiJingTime(dateStr1) {
+      // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
+      let isoDateStr1 = String(dateStr1).replace(" ", "T") + "+08:00";
+      let date1 = new Date(isoDateStr1);
+      const formatter = new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai", // 设置时区为北京时间
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+      // 使用formatter来格式化当前的日期和时间
+      const beijingTime = formatter.format(date1);
+      return beijingTime;
+    },
     diffMinutes(dateStr1, dateStr2) {
+      //目前比赛的起止时间还是有点抽象
       // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
       let isoDateStr1 = dateStr1.replace(" ", "T") + "+08:00";
 
@@ -301,7 +336,6 @@ export default {
       let diffMilliseconds = date1.getTime() - date2.getTime();
       let diffMinutes = diffMilliseconds / 1000 / 60;
       // clearImmediateonsole.log(date1, diffMinutes);
-      console.log(dateStr1, dateStr2);
       return diffMinutes;
     },
   },

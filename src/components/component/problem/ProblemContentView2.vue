@@ -1,7 +1,7 @@
 <template>
   <!-- <v-md-editor v-model="text" height="400px"></v-md-editor>
     -->
-  <a-row  style="width: 100%"
+  <a-row style="width: 100%"
     ><a-col :span="24">
       <a-row style="width: 100%"
         ><a-col :span="24">
@@ -13,24 +13,37 @@
               >
                 <a-breadcrumb style="color: white">
                   <a-breadcrumb-item
-                    class="hoverable"
+                    class="hoverable2"
                     @click="jump('/')"
                     style="color: white"
                     >主页</a-breadcrumb-item
                   >
                   <a-breadcrumb-item
+                    v-if="$route.query.contestid"
                     class="hoverable"
+                    @click="back"
+                    style="color: white"
+                    >比赛</a-breadcrumb-item
+                  >
+                  <a-breadcrumb-item
+                    v-else
+                    class="hoverable2"
                     @click="jump('/problems')"
                     style="color: white"
                     >题库</a-breadcrumb-item
                   >
-                  <a-breadcrumb-item style="color: white">{{
+                  <a-breadcrumb-item
+                    v-if="$route.query.contestid"
+                    style="color: white"
+                    >{{ $route.query.problemchar }}</a-breadcrumb-item
+                  >
+                  <a-breadcrumb-item v-else style="color: white">{{
                     problemcontent.title
                   }}</a-breadcrumb-item>
                 </a-breadcrumb></a-col
               >
             </a-row>
-            <a-row style="">
+            <a-row v-if="!$route.query.contestid" style="">
               <a-col
                 :offset="3"
                 style="
@@ -42,6 +55,18 @@
                 >P{{ problemcontent.problemid }} {{ problemcontent.title }}
               </a-col>
             </a-row>
+            <a-row v-else style="">
+              <a-col
+                :offset="3"
+                style="
+                  color: white;
+                  font-size: 30px;
+                  font-weight: bold;
+                  margin-top: 10px;
+                "
+                >[{{$route.query.problemchar }}] {{ problemcontent.title }}
+              </a-col>
+            </a-row>
             <a-row class="nowrap-row" style="margin-top: 20px">
               <a-col :offset="3">
                 <a-button
@@ -51,7 +76,7 @@
                   >提交答案</a-button
                 >
               </a-col>
-              <a-col>
+              <a-col >
                 <a-button
                   @click="editProblem"
                   style="color: white; margin-left: 10px"
@@ -59,7 +84,7 @@
                   >编辑题目</a-button
                 >
               </a-col>
-              <a-col
+              <a-col v-if="!$route.query.contestid"
                 style="
                   display: flex;
                   flex-direction: column;
@@ -75,13 +100,15 @@
                   problemcontent.submitcount
                 }}</span>
               </a-col>
-              <a-col>
+              <a-col v-else :offset="12"></a-col>
+              <a-col v-if="!$route.query.contestid">
                 <a-divider
                   type="vertical"
                   style="height: 44px; background-color: white"
                 />
               </a-col>
               <a-col
+              v-if="!$route.query.contestid"
                 style="
                   display: flex;
                   flex-direction: column;
@@ -97,8 +124,10 @@
                   problemcontent.aceptedcount
                 }}</span>
               </a-col>
+              <a-col v-else style="margin-right: 40px;"></a-col>
               <a-col>
                 <a-divider
+                v-if="!$route.query.contestid"
                   type="vertical"
                   style="height: 44px; background-color: white"
                 />
@@ -235,7 +264,7 @@
                             </template>
                             <CopyTwoTone
                               @click="copyText(sample.input)"
-                              class="hoverable"
+                              class="hoverable2"
                             /> </a-tooltip
                         ></a-col>
                       </a-row>
@@ -257,7 +286,7 @@
                             </template>
                             <CopyTwoTone
                               @click="copyText(sample.output)"
-                              class="hoverable"
+                              class="hoverable2"
                             /> </a-tooltip
                         ></a-col>
                       </a-row>
@@ -288,7 +317,7 @@
                         <a-col style="font-size: 16px">题目来源</a-col>
                         <a-col :span="8">
                           <a-row
-                            class="hoverable"
+                            class="hoverable2"
                             type="flex"
                             align="middle"
                             justify="space-between"
@@ -324,29 +353,40 @@
                         align="middle"
                         justify="space-between"
                       >
-                        <a-col style="font-size: 16px">历史分数</a-col>
-                        <a-col style="font-size: 16px; color: #2c93d7">
-                          无
+                        <a-col v-if="!$route.query.contestid" style="font-size: 16px">历史分数</a-col>
+                        <a-col v-else style="font-size: 16px">本场比赛分数</a-col>
+                        <a-col
+                          class="hoverable2"
+                          @click="goToJudgeContent(history.judgeid)"
+                          style="font-size: 16px; font-weight: bold"
+                          :style="{ color: getColor(history.score) }"
+                        >
+                          {{ history.score }}
                         </a-col>
                       </a-row>
-                      <a-row
-                        style="margin-top: 15px"
-                        type="flex"
-                        align="middle"
-                        class="hoverable"
-                      >
-                        <a-col style="font-size: 16px">
-                          <PieChartTwoTone style="font-size: 24px"
-                        /></a-col>
-                        <a-col
-                          style="
-                            font-size: 16px;
-                            margin-left: 5px;
-                            color: #2c93d7;
-                          "
-                        >
-                          提交记录</a-col
-                        >
+                      <a-row style="margin-top: 15px">
+                        <a-col>
+                          <a-row
+                            @click="jumpToQueue"
+                            type="flex"
+                            align="middle"
+                            class="hoverable2"
+                          >
+                            <a-col style="font-size: 16px">
+                              <PieChartTwoTone style="font-size: 24px"
+                            /></a-col>
+                            <a-col
+                              style="
+                                margin-top: 3px;
+                                font-size: 16px;
+                                margin-left: 5px;
+                                color: #2c93d7;
+                              "
+                            >
+                              提交记录</a-col
+                            >
+                          </a-row>
+                        </a-col>
                       </a-row>
                     </a-card>
                   </a-col>
@@ -376,13 +416,15 @@
           </div>
         </a-col></a-row
       >
-      <a-row style="margin-top:20px ;">
-        <a-col  :offset="3">
-          <codeEditorComponent ref="editor" :problemsample="problemSample" :problemcontent="problemcontent" />
+      <a-row style="margin-top: 20px">
+        <a-col :offset="3">
+          <codeEditorComponent
+            ref="editor"
+            :problemsample="problemSample"
+            :problemcontent="problemcontent"
+          />
         </a-col>
-      </a-row >
-      
-       </a-col
+      </a-row> </a-col
   ></a-row>
 </template>
 
@@ -392,7 +434,7 @@ import "markdown-it-texmath/css/texmath.css";
 import mk from "markdown-it-katex";
 import "katex/dist/katex.min.css";
 import axios from "axios";
-import { SERVER_URL } from "@/js/functions/config";
+import { SERVER, SERVER_URL } from "@/js/functions/config";
 import { message } from "ant-design-vue";
 import { CopyTwoTone, PieChartTwoTone } from "@ant-design/icons-vue";
 import codeEditorComponent from "../code/codeEditorComponent.vue";
@@ -413,9 +455,25 @@ export default {
       md: new MarkdownIt({ html: true }).use(mk),
       userinfo: {},
       algorithm: [],
+      history: {
+        judgeid: -1,
+        score: "无",
+      },
+      isContest: this.$route.query.contestid !== undefined,
     };
   },
   methods: {
+    back() {
+      router.go(-1);
+    },
+    getColor(score) {
+      if (score === 100) {
+        return "rgb(82,196,26)";
+      } else if (score === "无") {
+        return "#2c93d7";
+      }
+      return "red";
+    },
     editProblem() {
       router.push({
         name: "problemedit",
@@ -429,6 +487,15 @@ export default {
       router.push({
         name: "userhome",
         query: { userid: this.userinfo.userid },
+      });
+    },
+    goToJudgeContent(judgeid) {
+      if (judgeid < 0) return;
+      router.push({
+        name: "judgecontent",
+        query: {
+          judgeid: judgeid,
+        },
       });
     },
     copyText(text) {
@@ -459,6 +526,14 @@ export default {
     },
     parsedDescription(content) {
       return this.md.render(String(content));
+    },
+    jumpToQueue() {
+      router.push({
+        name: "evaluationqueue",
+        query: {
+          problemid: this.problemcontent.problemid,
+        },
+      });
     },
     formattedText(text) {
       return text;
@@ -520,13 +595,42 @@ export default {
       .catch((error) => {
         console.log(error);
       });
+    let type = 'judge';
+    let params = {
+      userid: JSON.parse(localStorage.getItem("user")).userid,
+      problemid: this.problemcontent.problemid,
+    }
+    if(this.$route.query.contestid){
+      type = 'contest';
+      params.contestid = this.$route.query.contestid;
+    }
+    
+    await axios
+      .get(`${SERVER_URL}/${type}/query/userproblem`, {
+        params: params,
+      })
+      .then((res) => {
+        let data = res.data;
+        if (data.length > 0) {
+          let maxv = 0;
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].score >= data[maxv].score)
+              //最新的
+              maxv = i;
+          }
+          this.history.score = data[maxv].score;
+          this.history.judgeid = data[maxv].judgeid;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   // ...
 };
 </script>
 
 <style scoped>
-
 .topcard {
   width: 100%;
   height: 150px;
@@ -553,12 +657,12 @@ p {
 /* div br {
   line-height: 1em;
 } */
-.hoverable {
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+.hoverable2 {
+  transition: color 0.3s ease;
   cursor: pointer;
 }
 
-.hoverable:hover {
+.hoverable2:hover {
   filter: brightness(1.3);
 }
 

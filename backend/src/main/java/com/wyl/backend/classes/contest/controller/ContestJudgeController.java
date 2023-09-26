@@ -5,6 +5,8 @@ import com.wyl.backend.classes.contest.ContestJudge;
 import com.wyl.backend.classes.contest.ContestJudgeContent;
 import com.wyl.backend.classes.contest.SQL.ContestJudgeContentSQL;
 import com.wyl.backend.classes.contest.SQL.ContestJudgeSQL;
+import com.wyl.backend.classes.judge.Judge;
+import com.wyl.backend.classes.judge.JudgeContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +24,9 @@ public class ContestJudgeController {
     public int insertJudge(@RequestBody ContestJudge judgeInfo){
         try {
             judgeSql.insert(judgeInfo);
-            List<ContestJudge> query = judgeSql.selectList(null);
-            return query.get(query.size()-1).getJudgeid();
+            judgeContentSql.updateJudgeId();
+            judgeContentSql.updateJudgeProblemChar();
+            return 1;
         }catch (Exception e){
             return -1;
         }
@@ -40,7 +43,14 @@ public class ContestJudgeController {
             return -1;
         }
     }
+    @GetMapping("/query/userproblem")
+    public List<ContestJudge> queryJudgeByUseridAndProblemid(@RequestParam int problemid, @RequestParam int userid,@RequestParam int contestid){
+        QueryWrapper<ContestJudge> query = new QueryWrapper<>();
+        query.eq("problemid",problemid).eq("userid",userid)
+                .eq("contestid",contestid);
 
+        return judgeSql.selectList(query);
+    }
     @GetMapping("/query/judgebyid")
     public ContestJudge queryJudge(@RequestParam int judgeid){
         QueryWrapper<ContestJudge> query = new QueryWrapper<>();
@@ -59,5 +69,13 @@ public class ContestJudgeController {
         QueryWrapper<ContestJudge> query = new QueryWrapper<>();
         query.eq("contestid",contestid);
         return judgeSql.selectList(query);
+    }
+
+    @PostMapping("/query/judgemany")//实时查询判题结果
+    public List<ContestJudgeContent> QueryJudgeMany(int contestid,String submittime, int userid, int problemId){
+        QueryWrapper<ContestJudgeContent> query = new QueryWrapper<>();
+        query.eq("problemid",problemId).eq("userid",userid).eq("submittime",submittime)
+                .eq("contestid",contestid);
+        return judgeContentSql.selectList(query);
     }
 }

@@ -2,6 +2,8 @@ package com.wyl.backend.classes.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wyl.backend.classes.contest.ContestJudgeContent;
+import com.wyl.backend.classes.contest.SQL.ContestJudgeContentSQL;
 import com.wyl.backend.classes.judge.*;
 import com.wyl.backend.classes.judge.controller.Judge0Controller;
 import com.wyl.backend.classes.judge.sql.JudgeContentSQL;
@@ -41,6 +43,8 @@ public class JudgeServiceImpl implements JudgeService {
     Judge0Controller judge0Controller;
     @Autowired
     private JudgeContentSQL judgeContentSql;
+    @Autowired
+    private ContestJudgeContentSQL  contestJudgeContentSql;
     Set<String> free = new HashSet<>();
     Set<String> busy = new HashSet<>();
     public String PUSH_ONE_SUBMISSION_API = "submissions/?base64_encoded=true&wait=true";
@@ -168,6 +172,7 @@ public class JudgeServiceImpl implements JudgeService {
          * @param submissions
          * @return
          */
+        //这个函数是用来运行代码的
         public Judge0Result judgeOnlyOne (String stdin,long problemId, String source_code, int language_id){
             Map<String, String> MachineToToken = new ConcurrentHashMap<>();
             Map<String, String> TokenToMachine = new ConcurrentHashMap<>();
@@ -188,7 +193,99 @@ public class JudgeServiceImpl implements JudgeService {
            result = judgeOne(submission, MachineToToken, TokenToMachine);
             return result;
         }
+    public JudgeResultToUser judgeContestProblem (int contestId,String submittime,int userid,long problemId, String source_code, int language_id){
+        Map<String, String> MachineToToken = new ConcurrentHashMap<>();
+        Map<String, String> TokenToMachine = new ConcurrentHashMap<>();
+        List<Judge0> judge0s = judge0Controller.queryJugde0();//这里得初始化，不然会出现同步错误
+        int machineCount = judge0s.size();
 
+        int timelimit;
+        int memorylimit;
+        //        用来存储已经判题完成的题目结果
+        List<Judge0Result> finishedSubmissions = new LinkedList<>();
+        //        判题状态，>2表示判题结束
+        int statusId;
+        //        用户通过的示例的数量
+        int rightCount = 0;
+        //        用户未通过的示例的数量
+        int errCount = 0;
+        //        用来存放预期输出，key为题目的token，val为预期输出
+        Map<String, String> expectOuts = new HashMap<>();
+
+        //将源码转为base64
+        source_code = Base64Util.encode(source_code);
+
+        //        获取题目限制（运行时间限制、地址空间限制）
+//        ProblemContent problemContent = getLimitByProblemId(problemId);
+//        timelimit = problemContent.getTimelimit();
+//        memorylimit = problemContent.getMemorylimit();
+        timelimit = 1;
+        memorylimit = 128000;
+        //        根据题目id查询出题目全部样例的输入输出
+//        String path = "oj/" + problemId;
+//        List<InAndOut> inOutFromOss = ossUtil.getInOutFromOss(path);
+        String projectPath = System.getProperty("user.dir");
+        String absolutePath = projectPath + File.separator + "dataSouce" + File.separator;
+        String localPath = absolutePath + problemId ;
+        List<InAndOut> inOutFromOss = ossUtil.getInOutFromLocal(localPath);
+        ExecutorService executorService = Executors.newFixedThreadPool(machineCount * 2);//创建和服务器数量相同的线程
+        int taskCount = inOutFromOss.size(); // 任务数量
+        CountDownLatch latch = new CountDownLatch(taskCount);
+
+        for (InAndOut s : inOutFromOss) {
+            //从oss里面读取文件
+            String finalSource_code = source_code;
+            executorService.submit(() -> {
+                //从oss里面读取文件
+                try {
+                    String stdIn = String.valueOf(ossUtil.readFileFromLocal(s.getIn()));
+                    String stdOut = String.valueOf(ossUtil.readFileFromLocal(s.getOut()));
+                    stdIn = Base64Util.encode(stdIn);
+                    stdOut = Base64Util.encode(stdOut);
+                    Submission submission = new Submission(finalSource_code, language_id, stdIn, stdOut, timelimit, memorylimit);
+                    Judge0Result temp = judgeOne(submission, MachineToToken, TokenToMachine);
+                    finishedSubmissions.add(temp);
+                    ContestJudgeContent judgeContent = new ContestJudgeContent();
+                    judgeContent.setJudgestate(temp.getStatus().getDescription());
+                    judgeContent.setMemory(String.valueOf(temp.getMemory()));
+                    judgeContent.setJudgeid(-1);
+                    judgeContent.setProblemchar("x");
+                    judgeContent.setRuntime(temp.getTime());
+                    judgeContent.setUserid(userid);
+                    judgeContent.setSubmittime(submittime);
+                    judgeContent.setProblemid((int)problemId);
+                    judgeContent.setContestid(contestId);
+                    System.out.println(judgeContent + " here");
+                    contestJudgeContentSql.insert(judgeContent);//插入进去
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    latch.countDown(); // 任务完成后调用countDown()
+                }
+            });
+        }
+        executorService.shutdown();
+
+        try {
+            latch.await(); // 等待所有任务完成
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //        统计答题情况并合并预期输出
+        for (Judge0Result res : finishedSubmissions) {
+            statusId = res.getStatus().getId();
+            if (statusId == 3) {
+                rightCount++;
+            } else {
+                errCount++;
+            }
+            //  设置预期输出
+            res.setExpectOut(expectOuts.get(res.getToken()));
+        }
+
+        //        记录答题情况
+        return new JudgeResultToUser(rightCount + errCount, rightCount, errCount, errCount == 0, finishedSubmissions);
+    }
 
     public JudgeResultToUser judgeProblem2 (String submittime,int userid,long problemId, String source_code, int language_id){
         Map<String, String> MachineToToken = new ConcurrentHashMap<>();
@@ -198,10 +295,6 @@ public class JudgeServiceImpl implements JudgeService {
 
         int timelimit;
         int memorylimit;
-        Submissions submissions = null;
-        LinkedList<Submission> arrayList = new LinkedList<Submission>();
-
-        Judge0MulResult judgeResults = null;
         //        用来存储已经判题完成的题目结果
         List<Judge0Result> finishedSubmissions = new LinkedList<>();
         //        判题状态，>2表示判题结束
@@ -247,7 +340,6 @@ public class JudgeServiceImpl implements JudgeService {
                     Submission submission = new Submission(finalSource_code, language_id, stdIn, stdOut, timelimit, memorylimit);
                     Judge0Result temp = judgeOne(submission, MachineToToken, TokenToMachine);
                     finishedSubmissions.add(temp);
-
                     JudgeContent judgeContent = new JudgeContent();
                     judgeContent.setJudgestate(temp.getStatus().getDescription());
                     judgeContent.setMemory(String.valueOf(temp.getMemory()));
