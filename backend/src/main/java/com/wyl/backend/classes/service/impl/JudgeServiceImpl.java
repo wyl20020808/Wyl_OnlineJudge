@@ -10,6 +10,7 @@ import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
 import com.wyl.backend.classes.problem.sql.SampleMapper;
 import com.wyl.backend.classes.properties.Judge0Properties;
 import com.wyl.backend.classes.service.JudgeService;
+import com.wyl.backend.classes.utils.Base64Util;
 import com.wyl.backend.classes.utils.HttpClientUtil;
 import com.wyl.backend.classes.utils.JsonUtil;
 import com.wyl.backend.classes.utils.OssUtil;
@@ -42,7 +43,7 @@ public class JudgeServiceImpl implements JudgeService {
     private JudgeContentSQL judgeContentSql;
     Set<String> free = new HashSet<>();
     Set<String> busy = new HashSet<>();
-    public String PUSH_ONE_SUBMISSION_API = "submissions/?base64_encoded=false&wait=true";
+    public String PUSH_ONE_SUBMISSION_API = "submissions/?base64_encoded=true&wait=true";
     public String GET_API = "submissions/";
 
     public int last = 0;
@@ -115,6 +116,7 @@ public class JudgeServiceImpl implements JudgeService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(result + "hsajdhj");;
         Judge0Result judge0Result = null;
         try {
             judge0Result = JsonUtil.jsonToObject(result, Judge0Result.class);
@@ -172,14 +174,16 @@ public class JudgeServiceImpl implements JudgeService {
             int timelimit;
             int memorylimit;
             Judge0Result result = null;
+            stdin = Base64Util.encode(stdin);
             //        用来存储已经判题完成的题目结果
             //        获取题目限制（运行时间限制、地址空间限制）
 //        ProblemContent problemContent = getLimitByProblemId(problemId);
 //        timelimit = problemContent.getTimelimit();
 //        memorylimit = problemContent.getMemorylimit();
+            source_code = Base64Util.encode(source_code);
             timelimit = 1;
             memorylimit = 128000;
-           Submission submission = new Submission(source_code, language_id, stdin, "3", timelimit, memorylimit);
+           Submission submission = new Submission(source_code, language_id, stdin, "", timelimit, memorylimit);
             System.out.println(source_code + " " + stdin + "opq") ;
            result = judgeOne(submission, MachineToToken, TokenToMachine);
             return result;
@@ -210,7 +214,7 @@ public class JudgeServiceImpl implements JudgeService {
         Map<String, String> expectOuts = new HashMap<>();
 
         //将源码转为base64
-//        source_code = Base64Util.encode(source_code);
+        source_code = Base64Util.encode(source_code);
 
         //        获取题目限制（运行时间限制、地址空间限制）
 //        ProblemContent problemContent = getLimitByProblemId(problemId);
@@ -228,7 +232,7 @@ public class JudgeServiceImpl implements JudgeService {
         ExecutorService executorService = Executors.newFixedThreadPool(machineCount * 2);//创建和服务器数量相同的线程
         int taskCount = inOutFromOss.size(); // 任务数量
         CountDownLatch latch = new CountDownLatch(taskCount);
-        System.out.println(inOutFromOss + " " + "dxy" + " " + localPath);
+
         for (InAndOut s : inOutFromOss) {
             //从oss里面读取文件
             String finalSource_code = source_code;
@@ -237,10 +241,13 @@ public class JudgeServiceImpl implements JudgeService {
                 try {
                     String stdIn = String.valueOf(ossUtil.readFileFromLocal(s.getIn()));
                     String stdOut = String.valueOf(ossUtil.readFileFromLocal(s.getOut()));
-
+                                        stdIn = Base64Util.encode(stdIn);
+                    stdOut = Base64Util.encode(stdOut);
+                    System.out.println(stdIn +" " + stdOut + " " +"klj");
                     Submission submission = new Submission(finalSource_code, language_id, stdIn, stdOut, timelimit, memorylimit);
                     Judge0Result temp = judgeOne(submission, MachineToToken, TokenToMachine);
                     finishedSubmissions.add(temp);
+
                     JudgeContent judgeContent = new JudgeContent();
                     judgeContent.setJudgestate(temp.getStatus().getDescription());
                     judgeContent.setMemory(String.valueOf(temp.getMemory()));

@@ -127,10 +127,19 @@
                   v-else-if="codeStatus === 'finished'"
                   >Finished</span
                 >
+                <span :style="{ color: getColor(codeStatus) }" v-else>{{
+                  codeStatus
+                }}</span>
                 <!-- <span v-else-if="codeStatus === 'error'">错误</span> -->
               </a-col>
             </a-row>
-            <a-row v-if="!submitting">
+            <a-row
+              v-if="
+                !submitting &&
+                codeStatus !== 'Compilation Error' &&
+                codeStatus !== 'running'
+              "
+            >
               <a-col :span="24">
                 <a-row>
                   <a-col
@@ -183,26 +192,44 @@
               </a-col>
             </a-row>
             <!-- 提交状态 -->
-            <a-row v-else>
-              <a-col class="container">
+            <a-row v-if="submitting">
+              <a-col style="margin-left: 25px" class="container">
                 <div
                   class="box"
                   v-for="(result, index) in judgeInfo"
                   :key="index"
                 >
-                  <span class="tick" v-if="result.judgestate && result.judgestate === 'Accepted'"
+                  <span
+                    style="font-size: 30px; position: relative; bottom: 0px"
+                    class="tick"
+                    v-if="result.judgestate && result.judgestate === 'Accepted'"
                     >√</span
                   >
-                  <span class="cross" v-else-if="result.judgestate">×</span>
+                  <span
+                    style="font-size: 50px; position: relative; bottom: 5px"
+                    class="cross"
+                    v-else-if="result.judgestate"
+                    >×</span
+                  >
                 </div>
-                <!-- <div
-                  class="box"
-                  v-for="index in 10"
-                  :key="index"
-                >
-                  <span class="tick">√</span>
-    
-                </div> -->
+              </a-col>
+            </a-row>
+            <a-row v-if="codeStatus === 'Compilation Error'">
+              <a-col
+                :offset="1"
+                :span="22"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  margin-top: 10px;
+                  margin-bottom: 20px;
+                "
+                ><label style="font-size: 18px" for="name">编译器输出</label>
+                <a-typography-paragraph>
+                  <pre style="font-size: 14px">{{
+                    decodeBase64(compileoutput)
+                  }}</pre>
+                </a-typography-paragraph>
               </a-col>
             </a-row>
           </div>
@@ -392,6 +419,36 @@ onMounted(async () => {
   }
 });
 
+function decodeBase64(input) {
+  const state = [
+    "Accepted",
+    "Time Limit Exceeded",
+    "Wrong Answer",
+    "Runtime Error",
+    "Memory Limit Exceeded",
+  ];
+  if (!input) {
+    return "";
+  }
+  if (state.includes(input)) {
+    return input;
+  }
+  try {
+    const raw = atob(input);
+    const rawLength = raw.length;
+    const array = new Uint8Array(new ArrayBuffer(rawLength));
+
+    for (let i = 0; i < rawLength; i++) {
+      array[i] = raw.charCodeAt(i);
+    }
+
+    const textDecoder = new TextDecoder("utf-8");
+    return textDecoder.decode(array);
+  } catch (e) {
+    console.error(e);
+    return input;
+  }
+}
 onUnmounted(() => {
   // 停止监听编辑器的尺寸变化
   if (resizeObserver) {
@@ -447,6 +504,15 @@ let codeStatus = ref("finished");
 const judgeData = ref();
 let submitting = ref(false); //正在提交
 const runCode = async () => {
+  source_code.value = source_code.value.trimEnd();
+  if(!source_code.value){
+    store.dispatch("notice", {
+        title: "编辑器里的代码不能为空！",
+        message: '',
+        type: "error",
+      });
+      return;
+  }
   output.value = "";
   submitting.value = false;
   codeStatus.value = "upload";
@@ -464,15 +530,27 @@ const runCode = async () => {
       },
     })
     .then((res) => {
-      codeStatus.value = "finished";
+      if (res.data.status.description === "Compilation Error") {
+        codeStatus.value = res.data.status.description;
+        compileoutput = res.data.compile_output;
+      } else codeStatus.value = "finished";
       judgeData.value = res.data;
-      output.value = judgeData.value.stdout;
+
+      console.log(res.data);
+      output.value = decodeBase64(judgeData.value.stdout);
+      nextTick(function () {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
     })
     .catch((err) => {
       console.log(err);
     });
 };
-
+function getColor(judgestate) {
+  if (judgestate === "Accepted") return "#25ad40";
+  else if (judgestate === "Compilation Error") return "orange";
+  else return "red";
+}
 const addSubmitCount = async (problemid, userid) => {
   axios
     .post(`${SERVER_URL}/problem/update/problemcontent/special`, {
@@ -513,19 +591,27 @@ const addAceptedCount = async (problemid, userid) => {
       console.log(error);
     });
 };
-
+let judgestate = "Accepted";
+let compileoutput = "";
 const saveJudgeInfo = async (judgedata, submittime) => {
+  judgestate = "Accepted";
   let problemid = props.problemcontent.problemid;
   //保存评测信息到数据库
   addSubmitCount(problemid, JSON.parse(localStorage.getItem("user")).userid);
+  let language = '';
+  for(let i = 0 ; i < languages.length ;i ++){
+    if(languages[i].value === selectedLanguage.value){
+      language = languages[i].label;
+      break;
+    }
+  }
   let judgeinfo = {
-    //这里为什么能用$router，是因为到这里来的肯定是提交代码的
     problemid: problemid,
     userid: JSON.parse(localStorage.getItem("user")).userid,
     submittime,
     code: source_code.value,
     username: JSON.parse(localStorage.getItem("user")).username,
-    language: selectedLanguage.value,
+    language: language,
     problemname: props.problemcontent.title,
     userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
   };
@@ -533,8 +619,7 @@ const saveJudgeInfo = async (judgedata, submittime) => {
   let runtime = 0;
   let memory = 0;
   let score = 0;
-  let compileoutput = "";
-  let judgestate = "Accepted";
+
   for (let i = 0; i < results.length; i++) {
     runtime = runtime + parseFloat(results[i].time) * 1000;
     memory = Math.max(memory, parseFloat(results[i].memory));
@@ -613,9 +698,18 @@ const saveJudgeInfo = async (judgedata, submittime) => {
 
 let judgeInfo = ref([]);
 const submitCode = async () => {
+  source_code.value = source_code.value.trimEnd();
+  if(!source_code.value){
+    store.dispatch("notice", {
+        title: "编辑器里的代码不能为空！",
+        message: '',
+        type: "error",
+      });
+      return;
+  }
   judgeInfo.value = [];
   let datalength = props.problemcontent.datalength;
-  for(let i = 0 ; i < datalength;i++){
+  for (let i = 0; i < datalength; i++) {
     judgeInfo.value.push(0);
   }
   codeStatus.value = "upload";
@@ -633,7 +727,6 @@ const submitCode = async () => {
   submitting.value = true;
   // 设置interval
   let intervalId = setInterval(async () => {
-    //查询提交状态
     let data = new FormData();
     data.append("problemId", parseInt(props.problemcontent.problemid));
     data.append("submittime", time); //为了同步
@@ -649,28 +742,33 @@ const submitCode = async () => {
       })
       .then((res) => {
         judgeInfo.value = res.data;
-        while(judgeInfo.value.length <datalength) {
+        while (judgeInfo.value.length < datalength) {
           judgeInfo.value.push(0);
         }
-        console.log(judgeInfo.value, "ashdja");
       })
       .catch((err) => {
         console.log(err);
       });
   }, 500); // 每秒执行一次
+  nextTick(function () {
+    window.scrollTo(0, document.body.scrollHeight);
+  });
   await axios //提交代码给后端
     .post(`${JUDGE_URL}/judge/judgemany`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     })
-    .then((res) => {
-      codeStatus.value = "finished";
-      saveJudgeInfo(res.data, time);
+    .then(async (res) => {
+      await saveJudgeInfo(res.data, time);
+      codeStatus.value = judgestate;
       setTimeout(() => {
         // 这里是你想要在页面加载完1秒后执行的操作
         clearInterval(intervalId); // 销毁interval
       }, 2000);
+      nextTick(function () {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -699,8 +797,8 @@ const submitCode = async () => {
   height: 30px;
   border: 1px solid rgb(208, 208, 208);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   margin: 5px;
 }
 .container {

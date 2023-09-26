@@ -31,6 +31,7 @@
           </a-col>
           <a-col style="margin-left: 40px"
             ><a-select
+            allowClear
               ref="select"
               v-model:value="difficulty"
               style="width: 200px"
@@ -45,6 +46,7 @@
           </a-col>
           <a-col>
             <a-select
+            allowClear
               v-model:value="algorithm"
               mode="multiple"
               show-search
@@ -62,7 +64,7 @@
       <a-row>
         <a-col style="">
           <div style="margin-bottom: 20px">
-            <ProblemListViewVue :questionBank="questionBank" /></div
+            <ProblemListViewVue :questionBank="questionBank" :algorithj="algorithm" :difficulty="difficulty" /></div
         ></a-col>
       </a-row>
     </a-col>
@@ -98,10 +100,6 @@ export default {
   },
   data() {
     const difficultys = [
-      {
-        value: "无",
-        label: "无",
-      },
       {
         value: "暂无评定",
         label: "暂无评定",
@@ -142,7 +140,7 @@ export default {
       questionBank: "loj",
       centerDialogVisible: false,
       difficultys,
-      difficulty: "无",
+      difficulty: "",
       algorithm: [],
       algorithmsAndDataStructuresOptions,
     };

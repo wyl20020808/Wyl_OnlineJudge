@@ -2,10 +2,10 @@
   <div class="card main">
     <div :style="{ color: statusColor }">
       <div v-if="loading" class="loading">
-        <div class="loader" :class="{ fast: fast }"></div>
+        <!-- <div class="loader" :class="{ fast: fast }"></div>
         <div class="notice">
           {{ statusText }} ({{ elapsedTime }} seconds elapsed)
-        </div>
+        </div> -->
       </div>
       <div v-else>
         <div class="ok">

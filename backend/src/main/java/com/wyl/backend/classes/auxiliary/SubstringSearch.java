@@ -9,7 +9,7 @@ public class SubstringSearch {
         this.words = words;
     }
 
-    private boolean containsInOrder(String word, String query) {
+    private int containsInOrder(String word, String query) {
         int i = 0, j = 0;
         while (i < word.length() && j < query.length()) {
             if (word.charAt(i) == query.charAt(j)) {
@@ -17,16 +17,32 @@ public class SubstringSearch {
             }
             i++;
         }
-        return j == query.length();
+        if (j == query.length()) {
+            if (word.equals(query)) {
+                return 3;
+            } else if (word.startsWith(query)) {
+                return 2;
+            } else {
+                return 1;
+            }
+        }
+        return 0;
     }
 
     public List<String> search(String query) {
         List<String> result = new ArrayList<>();
+        Map<String, Integer> matchDegree = new HashMap<>();
         for (String word : words) {
-            if (containsInOrder(word, query)) {
+            int degree = containsInOrder(word, query);
+            if (degree > 0) {
                 result.add(word);
+                matchDegree.put(word, degree);
             }
         }
+
+        // 使用自定义的比较器对结果进行排序
+        result.sort((a, b) -> matchDegree.get(b) - matchDegree.get(a));
+
         return result;
     }
 

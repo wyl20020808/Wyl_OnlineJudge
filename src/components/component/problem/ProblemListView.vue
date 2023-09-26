@@ -1,19 +1,19 @@
 <template>
   <a-row>
     <a-col>
-      <div class="search" style="display: flex;align-items: center;">
+      <div class="search" style="display: flex; align-items: center">
         <a-input
-        size="large"
+          size="large"
           v-model:value="searchProblem"
           placeholder="输入题目名称或ID"
           style="width: 1200px"
         />
-        <el-button  :icon="Search" circle @click="handleSearch"></el-button>
+        <el-button :icon="Search" circle @click="handleSearch"></el-button>
       </div>
       <div class="card card1" style="">
         <el-pagination
-        style="margin: 10px;"
-        background
+          style="margin: 10px"
+          background
           class="pagination-container"
           @current-change="handlePageChange"
           :current-page="currentPage"
@@ -76,8 +76,8 @@
           ></el-table-column>
         </el-table>
         <el-pagination
-        style="margin: 10px;"
-        background
+          style="margin: 10px"
+          background
           class="pagination-container"
           @current-change="handlePageChange"
           :current-page="currentPage"
@@ -87,10 +87,7 @@
         ></el-pagination>
       </div>
     </a-col>
-    
   </a-row>
-
-
 </template>
 
 <script>
@@ -100,10 +97,8 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 
 export default {
-  props: ["questionBank"],
-  components: {
-
-  },
+  props: ["questionBank", "difficulty", "algorithm"],
+  components: {},
   setup() {
     const router = useRouter();
     const push_to_problemcontent = (problemid) => {
@@ -133,8 +128,16 @@ export default {
     };
   },
   watch: {
+    async difficulty(newVal, oldVal) {
+      this.updateQuestions(); //不用传参数，用全局的就行
+    },
+    async algorithm(newVal, oldVal) {
+      this.updateQuestions();
+    },
     async questionBank(newVal, oldVal) {
       await this.getQuestions();
+      this.updateQuestions(); //换题库的时候也要更新一下
+      this.updateQuestions();
     },
     async searchProblem(newVal, oldVal) {
       if (!newVal) {
@@ -142,14 +145,8 @@ export default {
         await this.getQuestions();
       } else {
         await this.fetch(newVal, "problem", null);
-        let temp = [];
-        for (let i = 0; i < this.questions.length; i++) {
-          if (this.searchResult.includes(this.questions[i].problemid)) {
-            temp.push(this.questions[i]);
-          }
-        }
         this.currentPage = 1;
-        this.updateDisplayedQuestions(temp);
+        this.updateDisplayedQuestions(this.searchResult);
       }
     },
   },
@@ -159,7 +156,6 @@ export default {
     await this.getQuestions();
   },
   methods: {
-    
     fetch: async function (value, type, callback) {
       await axios
         .post(`${SERVER_URL}/contest/query/${type}`, {
@@ -167,16 +163,34 @@ export default {
           special: value, //有可能因为不是string类型出错
         })
         .then((res) => {
-          this.searchResult = [];
-          for (let key in res.data) {
-            this.searchResult.push(res.data[key]);
-          }
+          this.searchResult = res.data;
+
           // console.log(this.searchMap);
           // callback();
         })
         .catch((err) => {
           console.log(err, "ahsjdhas");
         });
+    },
+    updateQuestions() {
+      //更新算法和难度筛选
+      let question = [];
+      for (let i = 0; i < this.questions.length; i++) {
+        if (
+          !this.algorithm ||
+          (this.algorithm &&
+            this.algorithm.include(this.questions[i].algorithm))
+        ) {
+          if (
+            !this.difficulty ||
+            (this.difficulty &&
+              this.questions[i].difficulty === this.difficulty)
+          ) {
+            question.push(this.questions[i]);//层层筛选
+          }
+        }
+      }
+      this.updateDisplayedQuestions(question);
     },
     async getQuestions() {
       await axios

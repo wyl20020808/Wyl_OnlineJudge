@@ -153,8 +153,9 @@ public class OssUtil {
 
         InAndOut inAndOut;
         for (String str : inList) {
-            if (!outList.contains(str))
-                log.info("文件错乱了=>{}", path);
+            String temp = str.replace(".out", "");
+            if (!outList.contains(temp))
+                log.info("文件错乱了=>{}", path);;
             inAndOut = new InAndOut(path + "/in/" + str, path + "/out/" + str.replace(".in", ".out"));
             res.add(inAndOut);
         }

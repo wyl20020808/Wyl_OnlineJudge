@@ -1,152 +1,178 @@
 <template>
-  
-  <a-row style="justify-content: center;align-items: center;margin-top: 20px">
+  <a-row style="justify-content: center; align-items: center; margin-top: 20px">
     <a-col>
-    <a-row >
-      <a-card style="width: 1200px;">
-        <a-row >
-          <el-button type="primary" class="button1" @click="resetFilters"
-            >重置所有筛选</el-button
-          >
-        </a-row>
-        <a-row style="margin-top: 20px">
-          <a-col style="margin-right: 50px"
-            ><el-input
-              style="width: 295px"
-              v-model="problemidinput"
-              placeholder="输入题目的id或者名称"
-              clearable
-          /></a-col>
+      <a-row>
+        <a-card style="width: 1200px">
+          <a-row>
+            <el-button type="primary" class="button1" @click="resetFilters"
+              >重置所有筛选</el-button
+            >
+          </a-row>
+          <a-row style="margin-top: 20px">
+            <a-col style="margin-right: 50px" class="input-container">
+              <label style="font-size: 16px; color: gray" for="name"
+                >题目或ID</label
+              >
+              <a-select
+                v-model:value="problems"
+                show-search
+                placeholder="输入题目名称、ID进行搜索"
+                style="width: 295px"
+                :default-active-first-option="false"
+                :show-arrow="false"
+                :filter-option="false"
+                :not-found-content="null"
+                :options="problemsdata"
+                @search="handleSearch"
+                @change="handleChange"
+              ></a-select>
+            </a-col>
 
-          <a-col style="margin-right: 50px"
-            ><el-input
-              style="width: 295px"
-              v-model="useridinput"
-              placeholder="输入用户的id或者名称"
-              clearable
-          /></a-col>
-          <a-col style="margin-right: 50px"
-            ><el-select v-model="judgevalue" clearable placeholder="状态">
-              <el-option
-                v-for="item in judgestates"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              /> </el-select
-          ></a-col>
+            <a-col style="margin-right: 50px" class="input-container">
+              <label style="font-size: 16px; color: gray" for="name"
+                >用户名或ID</label
+              >
+              <a-select
+                v-model:value="administrators"
+                show-search
+                placeholder="输入管理员名称、ID进行搜索"
+                style="width: 295px"
+                :default-active-first-option="false"
+                :show-arrow="false"
+                :filter-option="false"
+                :not-found-content="null"
+                :options="adminsdata"
+                @search="handleSearchAdmin"
+                @change="handleChangeAdmin"
+              ></a-select>
+            </a-col>
+            <a-col style="margin-right: 50px" class="input-container">
+              <label style="font-size: 16px; color: gray" for="name">状态</label
+              ><el-select v-model="judgevalue" clearable placeholder="状态">
+                <el-option
+                  v-for="item in judgestates"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                /> </el-select
+            ></a-col>
 
-          <a-col
-            ><el-select v-model="languagevalue" clearable placeholder="语言">
-              <el-option
-                v-for="item in languages"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              /> </el-select
-          ></a-col>
-        </a-row>
-      </a-card>
-    </a-row>
-    
-    <a-row style="margin-top: 20px">
-      <a-col>
-        <a-card style="width: 1200px;">
-        <a-row
-          style="
-            padding: 10px;
-            border-bottom: 1px solid rgb(227, 227, 227);
-            background-color: white;
-          "
-          v-for="judgeinfo in tableData"
-          :key="judgeinfo.judgeid"
-        >
-          <a-col>
-            <a-row class="hoverable2"
-                  @click="jumpToUserInfo(judgeinfo.userid)" style="display: flex; align-items: center">
+            <a-col style="" class="input-container">
+              <label style="font-size: 16px; color: gray" for="name">语言</label
+              ><el-select v-model="languagevalue" clearable placeholder="语言">
+                <el-option
+                  v-for="item in languages"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                /> </el-select
+            ></a-col>
+          </a-row>
+        </a-card>
+      </a-row>
+
+      <a-row style="margin-top: 20px">
+        <a-col>
+          <a-card style="width: 1200px">
+            <a-row
+              style="
+                padding: 10px;
+                border-bottom: 1px solid rgb(227, 227, 227);
+                background-color: white;
+              "
+              v-for="judgeinfo in tableData"
+              :key="judgeinfo.judgeid"
+            >
               <a-col>
-                <img
-                  style="width: 50px; height: 50px; border-radius: 50%"
-                  :src="judgeinfo.userpicture"
-                  alt=""
-                />
-              </a-col>
-              <a-col  style="margin-left: 10px">
                 <a-row
-                  style="font-size: 18px; color: #3498db"
-                  
-                  >{{ judgeinfo.username }}</a-row
+                  class="hoverable2"
+                  @click="jumpToUserInfo(judgeinfo.userid)"
+                  style="display: flex; align-items: center"
                 >
-                <a-row>{{ judgeinfo.submittime }}</a-row>
+                  <a-col>
+                    <img
+                      style="width: 50px; height: 50px; border-radius: 50%"
+                      :src="judgeinfo.userpicture"
+                      alt=""
+                    />
+                  </a-col>
+                  <a-col style="margin-left: 10px">
+                    <a-row style="font-size: 18px; color: #3498db">{{
+                      judgeinfo.username
+                    }}</a-row>
+                    <a-row>{{ judgeinfo.submittime }}</a-row>
+                  </a-col>
+                </a-row>
+              </a-col>
+
+              <a-col
+                @click="goToJudgeContent(judgeinfo.judgeid)"
+                class="hoverable2"
+                style="margin-left: 100px"
+              >
+                <div
+                  :style="{
+                    backgroundColor: getJudgeStateColor(judgeinfo.judgestate),
+                  }"
+                  style="color: white; padding: 2px; border-radius: 4px"
+                >
+                  {{ judgeinfo.judgestate }}
+                </div>
+                <div
+                  :style="{
+                    color: getJudgeStateColor(judgeinfo.judgestate),
+                  }"
+                  style="font-weight: bold"
+                >
+                  {{ judgeinfo.score }}
+                </div>
+              </a-col>
+              <a-col style="position: absolute; margin-top: 10px; left: 577px">
+                <div
+                  style="font-size: 16px; color: #3498db"
+                  class="hoverable2"
+                  @click="goToProblem(judgeinfo.problemid)"
+                >
+                  P{{ judgeinfo.problemid }} {{ judgeinfo.problemname }}
+                </div>
+              </a-col>
+              <a-col
+                style="
+                  color: gray;
+                  position: absolute;
+                  margin-top: 10px;
+                  left: 900px;
+                "
+              >
+                <div style="display: flex; align-items: center">
+                  <ClockCircleOutlined /> {{ judgeinfo.totaltime }} /
+                  <DatabaseOutlined /> {{ judgeinfo.memory }} /
+                  <CodeOutlined />{{ judgeinfo.language }}
+                </div>
               </a-col>
             </a-row>
-          </a-col>
-
-          <a-col
-            @click="goToJudgeContent(judgeinfo.judgeid)"
-            class="hoverable2"
-            style="margin-left: 100px"
-          >
-            <div
-              :style="{
-                backgroundColor: getJudgeStateColor(judgeinfo.judgestate),
-              }"
-              style="color: white; padding: 2px; border-radius: 4px"
+            <a-row
+              style="
+                margin-top: 20px;
+                justify-content: center;
+                align-items: center;
+              "
             >
-              {{ judgeinfo.judgestate }}
-            </div>
-            <div
-              :style="{
-                color: getJudgeStateColor(judgeinfo.judgestate),
-              }"
-              style="font-weight: bold"
-            >
-              {{ judgeinfo.score }}
-            </div>
-          </a-col>
-          <a-col style="position: absolute;margin-top: 10px; left: 577px;">
-            <div
-              style="font-size: 16px; color: #3498db"
-              class="hoverable2"
-              @click="goToProblem(judgeinfo.problemid)"
-            >
-              P{{ judgeinfo.problemid }} {{ judgeinfo.problemname }}
-            </div>
-          </a-col>
-          <a-col
-            style="
-              color: gray;
-              position: absolute;margin-top: 10px; left: 900px;
-            "
-          >
-            <div style="display: flex;align-items: center;">
-            <ClockCircleOutlined /> {{ judgeinfo.totaltime }} /
-            <DatabaseOutlined /> {{ judgeinfo.memory }} / <CodeOutlined />{{
-              judgeinfo.language
-            }}
-            </div>
-          </a-col>
-        </a-row>
-        <a-row style="margin-top: 20px;justify-content: center;align-items: center;">
-      <a-col
-     style=""
-      >
-        <el-pagination
-          background
-          @current-change="handlePageChange"
-          :current-page="currentPage"
-          :page-size="pageSize"
-          layout="prev, pager, next"
-          :total="judge.length"
-        ></el-pagination>
-      </a-col>
-    </a-row>
-      </a-card>
-      </a-col></a-row
-    >
-  </a-col>
+              <a-col style="">
+                <el-pagination
+                  background
+                  @current-change="handlePageChange"
+                  :current-page="currentPage"
+                  :page-size="pageSize"
+                  layout="prev, pager, next"
+                  :total="judge.length"
+                ></el-pagination>
+              </a-col>
+            </a-row>
+          </a-card> </a-col
+      ></a-row>
+    </a-col>
   </a-row>
-
-  
 </template>
 
 <script>
@@ -164,6 +190,20 @@ export default {
     ClockCircleOutlined,
     DatabaseOutlined,
     CodeOutlined,
+  },
+  watch: {
+    async administrators(newVal, oldVal) {
+      this.updateJudgeDate();
+    },
+    async problems(newVal, oldVal) {
+      this.updateJudgeDate();
+    },
+    async languagevalue(newVal, oldVal) {
+      this.updateJudgeDate();
+    },
+    async judgevalue(newVal, oldVal) {
+      this.updateJudgeDate();
+    },
   },
   data() {
     const judgestates = [
@@ -203,7 +243,7 @@ export default {
       { value: 49, label: "C (GCC 8.3.0)", is_archived: false },
       { value: 53, label: "C++ (GCC 8.3.0)", is_archived: false },
       { value: 50, label: "C (GCC 9.2.0)", is_archived: false },
-      { value: "54", label: "C++ (GCC 9.2.0)", is_archived: false },
+      { value: 54, label: "C++ (GCC 9.2.0)", is_archived: false },
       { value: 86, label: "Clojure (1.10.1)", is_archived: false },
       { value: 51, label: "C# (Mono 6.6.0.161)", is_archived: false },
       { value: 77, label: "COBOL (GnuCOBOL 2.2)", is_archived: false },
@@ -257,16 +297,43 @@ export default {
         label: "Visual Basic.Net (vbnc 0.0.0.5943)",
         is_archived: false,
       },
-    ];
+    ].map((item) => ({
+      ...item,
+      value: item.label,
+    }));
+
+    console.log(languages);
     const tableData = [];
 
     return {
+      handleChange: (val) => {
+        //比赛题目改变
+        console.log(val);
+        this.problems = val;
+        this.handleSearch("");
+      },
+      handleSearch: (val) => {
+        //搜索比赛题目
+        this.fetch(val, "problem", (d) => (this.problemsdata = d));
+      },
+      handleChangeAdmin: (val) => {
+        //比赛管理员改变
+        console.log(val);
+        this.administrators = val;
+        this.handleSearch("");
+      },
+      handleSearchAdmin: (val) => {
+        //比赛管理员搜索
+        this.fetch(val, "user", (d) => (this.adminsdata = d));
+      },
+      problemsdata: [],
+      adminsdata: [],
+      administrators: null,
+      problems: null,
       judgevalue: "",
       judgestates,
       languages,
       languagevalue: "",
-      problemidinput: "",
-      useridinput: "",
       tableData,
       judge: [],
       currentPage: 1,
@@ -282,6 +349,63 @@ export default {
     };
   },
   methods: {
+    updateJudgeDate() {
+      let temp = [];
+      for (let i = 0; i < this.originalJudge.length; i++) {
+        //judgevalue languagevalue problems administrators
+
+        if (
+          !this.judgevalue ||
+          this.judgevalue === this.originalJudge[i].judgestate
+        ) {
+          if (
+            !this.languagevalue ||
+            this.languagevalue === this.originalJudge[i].language
+          ) {
+            if (
+              !this.problems ||
+              this.problems === this.originalJudge[i].problemid
+            ) {
+              if (
+                !this.administrators ||
+                this.administrators === this.originalJudge[i].userid
+              ) {
+                temp.push(this.originalJudge[i]);
+              }
+            }
+          }
+        }
+      }
+      this.judge = temp;
+      this.updateTableData();
+    },
+    fetch: async function (value, type, callback) {
+      this.currentValue = value;
+      await axios
+        .post(`${SERVER_URL}/contest/query/${type}`, {
+          //查询不同类型的数据
+          special: value, //有可能因为不是string类型出错
+        })
+        .then((res) => {
+          const data = [];
+          for (let i = 0; i < res.data.length; i++) {
+            if (type === "problem")
+              data.push({
+                value: res.data[i].problemid,
+                label: res.data[i].problemid + " " + res.data[i].title,
+              });
+            else
+              data.push({
+                value: res.data[i].userid,
+                label: res.data[i].userid + " " + res.data[i].nickname,
+              });
+          }
+          callback(data);
+        })
+        .catch((err) => {
+          console.log(err, "ahsjdhas");
+        });
+    },
     jumpToUserInfo(userid) {
       router.push({
         name: "userhome",
@@ -289,28 +413,18 @@ export default {
       });
     },
     resetFilters() {
-      this.$refs.tableRef.clearFilter();
       this.judge = [...this.originalJudge];
+      this.currentPage = 1;
+      //judgevalue languagevalue problems administrators
+      this.judgevalue =
+        this.languagevalue =
+        this.problems =
+        this.administrators =
+          null;
       this.updateTableData();
     },
-    filterHandler(value, row, column) {
-      const property = column["property"];
-
-      if (value) {
-        this.judge = this.originalJudge.filter(
-          (item) => item[property] === value
-        );
-        this.updateTableData();
-      }
-    },
-    handleFilterChange(filters) {
-      if (Object.keys(filters).every((key) => filters[key] === undefined)) {
-        // 如果所有的筛选都被重置，恢复到原始的judge数组
-        this.judge = [...this.originalJudge];
-        this.updateTableData();
-      }
-    },
     updateTableData() {
+      //根据judge的值来更新显示的数据
       this.tableData = [];
       const start = (this.currentPage - 1) * this.pageSize;
       const end = Math.min(this.currentPage * this.pageSize, this.judge.length); // 添加了Math.min
@@ -376,7 +490,7 @@ export default {
 
 <style scoped>
 .hoverable {
-  transition: color 0.3s ease ;
+  transition: color 0.3s ease;
   cursor: pointer;
 }
 
@@ -384,7 +498,7 @@ export default {
   filter: brightness(1.3);
 }
 .hoverable2 {
-  transition: color 0.3s ease ;
+  transition: color 0.3s ease;
   cursor: pointer;
 }
 
@@ -407,5 +521,9 @@ export default {
   width: 100px;
   color: white;
   position: relative;
+}
+.input-container {
+  display: flex;
+  flex-direction: column;
 }
 </style>

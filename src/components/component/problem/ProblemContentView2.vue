@@ -378,7 +378,7 @@
       >
       <a-row style="margin-top:20px ;">
         <a-col  :offset="3">
-          <codeEditorComponent :problemsample=problemSample :problemcontent=problemcontent />
+          <codeEditorComponent ref="editor" :problemsample="problemSample" :problemcontent="problemcontent" />
         </a-col>
       </a-row >
       
@@ -470,13 +470,14 @@ export default {
     },
     submitProblem() {
       // console.log(this.problemcontent.title)
-      router.push({
-        name: "submitcode",
-        query: {
-          problemid: this.problemcontent.problemid,
-          problemname: this.problemcontent.title,
-        },
-      });
+      this.$refs.editor.$el.scrollIntoView();
+      // router.push({
+      //   name: "submitcode",
+      //   query: {
+      //     problemid: this.problemcontent.problemid,
+      //     problemname: this.problemcontent.title,
+      //   },
+      // });
     },
   },
   computed: {

@@ -306,7 +306,7 @@ export default {
     );
     return {
       algorithmsAndDataStructuresOptions,
-      difficulty: "easy",
+      difficulty: "简单",
       difficultys,
       algorithm: [],
       source: "",

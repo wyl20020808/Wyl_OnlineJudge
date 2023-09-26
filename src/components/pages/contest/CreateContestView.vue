@@ -2,7 +2,7 @@
   <div class="card main1">
     <a-row style="margin-top: 20px">
       <a-col :offset="1" :span="24">
-        <div style="font-size: 36px;">比赛信息</div>
+        <div style="font-size: 36px">比赛信息</div>
       </a-col>
     </a-row>
     <a-row style="margin-top: 20px">
@@ -71,7 +71,7 @@
     </a-row>
     <a-row style="margin-top: 20px">
       <a-col :offset="1" :span="24">
-        <div style="font-size: 36px;">比赛权限</div>
+        <div style="font-size: 36px">比赛权限</div>
       </a-col>
     </a-row>
     <a-row style="margin-top: 20px">
@@ -146,7 +146,14 @@
         <a-button @click="creatContest" type="primary">确认创建</a-button>
       </a-col>
       <a-col style="color: black" :offset="1" :span="2">
-        <a-button @click="()=>{this.$router.push({path:'/competition'});}">取消</a-button>
+        <a-button
+          @click="
+            () => {
+              this.$router.push({ path: '/competition' });
+            }
+          "
+          >取消</a-button
+        >
       </a-col>
     </a-row>
   </div>
@@ -170,37 +177,40 @@ export default {
         rated: this.rated,
         blockedlist: this.blockedlist,
         createtime: getNowTime(),
-        contestpassword:this.contestpassword,
+        contestpassword: this.contestpassword,
       };
       let contestadmin = [];
-      for(let admin in this.administrators){
+      for (let admin in this.administrators) {
         contestadmin.push({
           userid: this.administrators[admin],
-        })
+        });
       }
       let contestproblem = [];
-      for(let i = 0 ;i < this.problems.length;i++){
+      for (let i = 0; i < this.problems.length; i++) {
         contestproblem.push({
           problemid: this.problems[i],
-          problemchar:String.fromCharCode("A".charCodeAt(0) + i),
-        })
+          problemchar: String.fromCharCode("A".charCodeAt(0) + i),
+        });
       }
       let contest = {
-        contestcontent:contestcontent,
-        contestadmin:contestadmin,
-        contestproblem:contestproblem,
-      }
+        contestcontent: contestcontent,
+        contestadmin: contestadmin,
+        contestproblem: contestproblem,
+      };
       //name和contestid在后端去计算
       let allFieldsFilled = Object.values(contestcontent).every(
         (x) => x !== null && x !== "" && x !== undefined
       );
-      allFieldsFilled = allFieldsFilled && this.administrators.length > 0 && this.problems.length > 0;
+      allFieldsFilled =
+        allFieldsFilled &&
+        this.administrators.length > 0 &&
+        this.problems.length > 0;
       if (!allFieldsFilled) {
         this.$store.dispatch("notice", {
-              title: "比赛信息不完整",
-              message: "",
-              type: "error",
-            });
+          title: "比赛信息不完整",
+          message: "",
+          type: "error",
+        });
       } else {
         await axios
           .post(`${SERVER_URL}/contest/create`, contest)
@@ -211,8 +221,7 @@ export default {
               type: "success",
             });
 
-            router.push({path:"/competition"});
-            
+            router.push({ path: "/competition" });
           })
           .catch((err) => {
             console.log(err);
@@ -220,32 +229,31 @@ export default {
       }
     },
     fetch: async function (value, type, callback) {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
-      }
       this.currentValue = value;
-      const fake = async () => {
-        await axios
-          .post(`${SERVER_URL}/contest/query/${type}`, {
-            //查询不同类型的数据
-            special: value, //有可能因为不是string类型出错
-          })
-          .then((res) => {
-            const data = [];
-            for (let key in res.data) {
-              data.push({
-                value: res.data[key],
-                label: key,
-              });
-            }
-            callback(data);
-          })
-          .catch((err) => {
-            console.log(err, "ahsjdhas");
-          });
-      };
-      this.timeout = setTimeout(fake, 300);
+      await axios
+        .post(`${SERVER_URL}/contest/query/${type}`, {
+          //查询不同类型的数据
+          special: value, //有可能因为不是string类型出错
+        })
+        .then((res) => {
+          const data = [];
+          for (let i = 0; i < res.data.length; i++) {
+            if(type === 'problem')
+            data.push({
+              value: res.data[i].problemid,
+              label: res.data[i].problemid + " " + res.data[i].title,
+            });
+            else 
+            data.push({
+              value: res.data[i].userid,
+              label: res.data[i].userid + " " + res.data[i].nickname,
+            });
+          }
+          callback(data);
+        })
+        .catch((err) => {
+          console.log(err, "ahsjdhas");
+        });
     },
   },
   data() {
@@ -276,6 +284,7 @@ export default {
       },
       handleSearchAdmin: (val) => {
         //比赛管理员搜索
+        
         this.fetch(val, "user", (d) => (this.adminsdata = d));
       },
       title: "", //比赛题目
@@ -290,8 +299,8 @@ export default {
       contestlimit: "公开", //比赛限制
       rated: false, //是否积分
       blockedlist: false, //是否封榜
-      contestpassword:"wyloj.com",//比赛密码
-      contestdescription:  `【比赛规范】
+      contestpassword: "wyloj.com", //比赛密码
+      contestdescription: `【比赛规范】
 为保证比赛公平公正，营造健康积极的竞赛环境，我们采取以下措施：
 1.赛后对代码系统查重+人工查重，不同账号相似度100%的提交直接算作弊处理，不区分提交先后。某些简单的签到题视情况处理。相似度80%以上进行人工核对。赛后提交代码全部公开，接受用户投诉。（相似度非文本比较）
 2.同一用户使用多账号提交相同代码也按违规处理。

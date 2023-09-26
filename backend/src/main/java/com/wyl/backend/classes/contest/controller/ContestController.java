@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.auxiliary.SubstringSearch;
 import com.wyl.backend.classes.contest.*;
 import com.wyl.backend.classes.contest.SQL.*;
-import com.wyl.backend.classes.contest.auxiliaryclass.Trie;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
 import com.wyl.backend.classes.user.sql.UserOperator;
@@ -40,48 +39,42 @@ public class ContestController {
     private ContestJudgeContentSQL contestJudgeSQL;
     // 获取用户信息
     @PostMapping("/query/user")
-    public Map<String, Integer> queryUser(@RequestBody UserInfo info) {
-        Map<String, Integer> result = new HashMap<>();
-        Map<String, Integer> map = new HashMap<>();
+    public List<UserInfo> queryUser(@RequestBody UserInfo info) {
+        Map<Integer,UserInfo> getUserinfo = new HashMap<>();
         List<UserInfo> userinfo = userOperator.select();//查找出用户信息
         ArrayList<String> words = new ArrayList<>();
         for (UserInfo userInfo : userinfo) {//放入名称,用的是nickname
+            getUserinfo.put(userInfo.getUserid(), userInfo);
             words.add(String.valueOf(userInfo.getUserid()) + " " + userInfo.getNickname());
-            map.put(String.valueOf(userInfo.getUserid()) + " " + userInfo.getNickname(), userInfo.getUserid());
         }
         SubstringSearch search = new SubstringSearch(words);
-//        Trie trie = new Trie(words);//用trie树来加速查找
-//        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
         List<String> results = search.search(info.getSpecial());
+        List<UserInfo> Results = new ArrayList<>();
         for(String result1 : results){
-            result.put(result1, map.get(result1));
+            Results.add(getUserinfo.get(Integer.parseInt(result1.split(" ")[0])));
         }
-        return result;//返回查找到的结果
+        return Results;//返回查找到的结果
     }
 
     @PostMapping("/query/problem")
-    public Map<String, Integer> queryProblem(@RequestBody ProblemContent info) {//暂定查询所有问题信息，查询的消耗会比较大，考虑后续优化，新建一个表优化
-        Map<String, Integer> result = new HashMap<>();
-        Map<String, Integer> map = new HashMap<>();
+    public List<ProblemContent> queryProblem(@RequestBody ProblemContent info) {//暂定查询所有问题信息，查询的消耗会比较大，考虑后续优化，新建一个表优化
+        Map<Integer,ProblemContent> getProblem = new HashMap<>();
         List<ProblemContent> problems = problemContentSQL.selectList(null);//查找出用户信息
         ArrayList<String> words = new ArrayList<>();
-        //存在的问题：如果题目名称前面有很多空格，就要处理，目前处理了
-        for (ProblemContent probleminfo: problems) {//放入名称,用的是nickname
-            System.out.println(probleminfo.getTitle() + " " + probleminfo.getProblemid() + "abcdefg");
+        //存在的问题：如果题目名称前面有很多空格，就要处理，目前简单处理了
+        for (ProblemContent probleminfo: problems) {
             String title = probleminfo.getTitle();
             while(title.charAt(0) == ' ') title = title.substring(1);//去掉前置空格
+            getProblem.put(probleminfo.getProblemid(), probleminfo);
             words.add(String.valueOf(probleminfo.getProblemid()) + " " + title);
-            map.put(String.valueOf(probleminfo.getProblemid()) + " " + title, probleminfo.getProblemid());
         }
-//        System.out.println(words);
         SubstringSearch search = new SubstringSearch(words);
-//        Trie trie = new Trie(words);//用trie树来加速查找
-//        List<String> results = trie.findWordsWithPrefix(info.getSpecial());
+        List<ProblemContent> Results = new ArrayList<>();
         List<String> results = search.search(info.getSpecial());
-        for(String result1 : results){
-            result.put(result1, map.get(result1));
+        for (String word: results) {
+            Results.add(getProblem.get(Integer.parseInt(word.split(" ")[0])));
         }
-        return result;//返回查找到的结果
+        return Results;//返回查找到的结果
     }
 
 
