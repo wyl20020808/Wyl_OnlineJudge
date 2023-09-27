@@ -8,7 +8,7 @@
     >
       <template v-slot="{ record }">
         <div
-          class="hoverable"
+          class="hoverable2"
           @click="
             goToJudge(record.judgeid, record.contestid, record.problemchar,record.problemname)
           "
@@ -24,7 +24,7 @@
       align="center"
     >
       <template v-slot="{ record }">
-        <div class="hoverable">
+        <div @click="goToUser(record.userid)" class="hoverable2">
           {{ record.username }}
         </div>
       </template>
@@ -37,7 +37,7 @@
     >
       <template v-slot="{ record }">
         <div
-          class="hoverable"
+          class="hoverable2"
           @click="
             goToProblem(record.problemid, record.contestid, record.problemchar)
           "
@@ -54,7 +54,10 @@
     >
     <template v-slot="{ record }">
         <div
-          class="hoverable"
+          class="hoverable2"
+          @click="
+            goToJudge(record.judgeid, record.contestid, record.problemchar,record.problemname)
+          "
           :style="{ color: getJudgeStateColor(record.judgestate) }"
         >
           {{ record.judgestate }}
@@ -205,6 +208,14 @@ export default {
         },
       });
     },
+    goToUser(userid) {
+      router.push({
+        name: "userhome",
+        query: {
+          userid: userid,
+        },
+      });
+    },
   },
   async created() {
     console.log(this.contest);
@@ -220,6 +231,7 @@ export default {
         for (let i = 0; i < data.length; i++) {
           this.tableData.push({
             problemchar: data[i].problemchar,
+            userid:data[i].userid,
             username: data[i].username,
             judgeid: data[i].judgeid,
             submittime: data[i].submittime,
@@ -242,14 +254,13 @@ export default {
 </script>
 
 <style scoped>
-.hoverable {
+.hoverable2 {
   color: #3498db;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: color 0.3s ease;
   cursor: pointer;
 }
 
-.hoverable:hover {
+.hoverable2:hover {
   filter: brightness(1.3);
-  text-decoration: underline;
 }
 </style>

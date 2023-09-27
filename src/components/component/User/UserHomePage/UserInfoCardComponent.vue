@@ -262,7 +262,7 @@
 <script>
 import { SERVER_URL } from "../../../../js/functions/config";
 import axios from "axios";
-
+import { getNowTime } from "@/js/functions/TimeAbout";
 import { MessageTwoTone } from "@ant-design/icons-vue";
 import router from '@/router/router';
 export default {
@@ -292,32 +292,13 @@ export default {
         target: this.userid,
         belongname: this.myinfo.username,
         targetname: this.userinfo.nickname,
-        connecttime:this.getBeijingTime(),
-        latestconnecttime:this.getBeijingTime(),
+        connecttime:this.getNowTime(),
+        latestconnecttime:this.getNowTime(),
         targetpicture:this.userinfo.userpicture,
       });
       router.push({ path: "/message"})
     },
-    getBeijingTime() {
-      // 创建一个Date对象，表示当前的日期和时间
-      const now = new Date();
-
-      // 创建一个Intl.DateTimeFormat对象，用于格式化日期和时间
-      const formatter = new Intl.DateTimeFormat("zh-CN", {
-        timeZone: "Asia/Shanghai", // 设置时区为北京时间
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-
-      // 使用formatter来格式化当前的日期和时间
-      const beijingTime = formatter.format(now);
-
-      return beijingTime;
-    },
+   
     async cancelFans() {
       await axios
         .get(`${SERVER_URL}/userfans/delete/fans`, {

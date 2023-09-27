@@ -50,7 +50,7 @@
               v-model:value="algorithm"
               mode="multiple"
               show-search
-              placeholder="算法"
+              placeholder="支持搜索功能"
               style="width: 200px"
               :options="algorithmsAndDataStructuresOptions"
             ></a-select>

@@ -1,160 +1,177 @@
 <template>
-  <div class="card main1">
-    <a-row style="margin-top: 20px">
-      <a-col :offset="1" :span="24">
-        <div style="font-size: 36px">比赛信息</div>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1" :span="6">
-        <label for="name">赛制：</label>
-        <a-select
-          ref="select"
-          v-model:value="contestformat"
-          style="width: 200px"
-          :options="contestFormat"
-          @focus="focus"
-        ></a-select>
-      </a-col>
-      <a-col class="input-container" :span="14">
-        <label for="name">标题：</label>
-        <a-textarea
-          v-model:value="title"
-          placeholder="输入比赛的标题"
-          auto-size
-        />
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1">
-        <label for="name">比赛时间：</label>
-        <a-space direction="vertical" :size="20">
-          <a-range-picker
-            style="width: 500px"
-            v-model:value="contestdate"
-            show-time
-          />
-        </a-space>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1">
-        <label for="name">比赛题目：</label>
-        <a-select
-          v-model:value="problems"
-          show-search
-          mode="multiple"
-          placeholder="输入题目名称、ID进行搜索"
-          style="width: 700px"
-          :default-active-first-option="false"
-          :show-arrow="false"
-          :filter-option="false"
-          :not-found-content="null"
-          :options="problemsdata"
-          @search="handleSearch"
-          @change="handleChange"
-        ></a-select>
-      </a-col>
-    </a-row>
+  <div style="margin-bottom: 20px">
+    <a-row style="justify-content: center">
+      <div class="card main1">
+        <a-row style="margin-top: 20px">
+          <a-col :offset="1" :span="24">
+            <div style="font-size: 36px">比赛信息</div>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1" :span="6">
+            <label for="name">赛制：</label>
+            <a-select
+              ref="select"
+              v-model:value="contestformat"
+              style="width: 200px"
+              :options="contestFormat"
+              @focus="focus"
+            ></a-select>
+          </a-col>
+          <a-col class="input-container" :span="14">
+            <label for="name">标题：</label>
+            <a-textarea
+              v-model:value="title"
+              placeholder="输入比赛的标题"
+              auto-size
+            />
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1">
+            <label for="name">比赛时间：</label>
+            <a-space direction="vertical" :size="20">
+              <a-range-picker
+                style="width: 500px"
+                v-model:value="contestdate"
+                show-time
+              />
+            </a-space>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1">
+            <label for="name">比赛题目：</label>
+            <a-select
+              v-model:value="problems"
+              show-search
+              mode="multiple"
+              placeholder="输入题目名称、ID进行搜索"
+              style="width: 700px"
+              :default-active-first-option="false"
+              :show-arrow="false"
+              :filter-option="false"
+              :not-found-content="null"
+              :options="problemsdata"
+              @search="handleSearch"
+              @change="handleChange"
+            ></a-select>
+          </a-col>
+        </a-row>
 
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1" :span="20">
-        <label for="name">比赛说明：</label>
-        <a-textarea
-          v-model:value="contestdescription"
-          placeholder="输入比赛说明"
-          :auto-size="{ minRows: 14, maxRows: 30 }"
-          show-count
-          :maxlength="114514"
-        />
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col :offset="1" :span="24">
-        <div style="font-size: 36px">比赛权限</div>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1">
-        <label for="name">管理员：</label>
-        <a-select
-          v-model:value="administrators"
-          show-search
-          mode="multiple"
-          placeholder="输入管理员名称、ID进行搜索"
-          style="width: 700px"
-          :default-active-first-option="false"
-          :show-arrow="false"
-          :filter-option="false"
-          :not-found-content="null"
-          :options="adminsdata"
-          @search="handleSearchAdmin"
-          @change="handleChangeAdmin"
-        ></a-select>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col class="input-container" :offset="1" :span="6">
-        <label for="name">权限：</label>
-        <a-select
-          ref="select"
-          v-model:value="contestlimit"
-          style="width: 200px"
-          :options="[
-            {
-              value: '公开',
-              label: '公开',
-            },
-            {
-              value: '私密(需要密码)',
-              label: '私密(需要密码)',
-            },
-          ]"
-          @focus="focus"
-        ></a-select>
-      </a-col>
-      <a-col
-        v-if="contestlimit === '私密(需要密码)'"
-        class="input-container"
-        :span="10"
-      >
-        <label for="name">密码：</label>
-        <a-textarea
-          v-model:value="contestpassword"
-          placeholder="输入比赛的密码"
-          auto-size
-        />
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col :offset="1" :span="24">
-        <h2>比赛设置</h2>
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px">
-      <a-col :offset="1" :span="2">
-        <label for="name">Rated</label>
-        <a-switch v-model:checked="rated" />
-      </a-col>
-      <a-col :offset="1" :span="2">
-        <label for="name">赛时封榜</label>
-        <a-switch v-model:checked="blockedlist" />
-      </a-col>
-    </a-row>
-    <a-row style="margin-top: 20px; color: white">
-      <a-col :offset="1" :span="2">
-        <a-button @click="creatContest" type="primary">确认创建</a-button>
-      </a-col>
-      <a-col style="color: black" :offset="1" :span="2">
-        <a-button
-          @click="
-            () => {
-              this.$router.push({ path: '/competition' });
-            }
-          "
-          >取消</a-button
-        >
-      </a-col>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1" :span="20">
+            <label for="name">比赛说明：</label>
+            <a-textarea
+              v-model:value="contestdescription"
+              placeholder="输入比赛说明"
+              :auto-size="{ minRows: 14, maxRows: 30 }"
+              show-count
+              :maxlength="114514"
+            />
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col :offset="1" :span="24">
+            <div style="font-size: 36px">比赛权限</div>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1">
+            <label for="name">管理员：</label>
+            <a-select
+              v-model:value="administrators"
+              show-search
+              mode="multiple"
+              placeholder="输入管理员名称、ID进行搜索"
+              style="width: 700px"
+              :default-active-first-option="false"
+              :show-arrow="false"
+              :filter-option="false"
+              :not-found-content="null"
+              :options="adminsdata"
+              @search="handleSearchAdmin"
+              @change="handleChangeAdmin"
+            ></a-select>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col class="input-container" :offset="1" :span="6">
+            <label for="name">权限：</label>
+            <a-select
+              ref="select"
+              v-model:value="contestlimit"
+              style="width: 200px"
+              :options="[
+                {
+                  value: '公开',
+                  label: '公开',
+                },
+                {
+                  value: '私密(需要密码)',
+                  label: '私密(需要密码)',
+                },
+              ]"
+              @focus="focus"
+            ></a-select>
+          </a-col>
+          <a-col
+            v-if="contestlimit === '私密(需要密码)'"
+            class="input-container"
+            :span="10"
+          >
+            <label for="name">密码：</label>
+            <a-textarea
+              v-model:value="contestpassword"
+              placeholder="输入比赛的密码"
+              auto-size
+            />
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col :offset="1" :span="24">
+            <h2>比赛设置</h2>
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px">
+          <a-col :offset="1" :span="2">
+            <label for="name">Rated</label>
+            <a-switch v-model:checked="rated" />
+          </a-col>
+          <a-col :offset="1" :span="2">
+            <label for="name">赛时封榜</label>
+            <a-switch v-model:checked="blockedlist" />
+          </a-col>
+        </a-row>
+        <a-row style="margin-top: 20px; color: white">
+          <a-col :offset="1" :span="2">
+            <a-button
+            v-if="!$route.query.contestid"
+              @click="creatContest"
+              style="margin-bottom: 10px"
+              type="primary"
+              >创建</a-button
+            >
+            <a-button
+              v-else
+              @click="saveContest"
+              style="margin-bottom: 10px"
+              type="primary"
+              >保存</a-button
+            >
+          </a-col>
+          <a-col style="color: black" :offset="1" :span="2">
+            <a-button
+              @click="
+                () => {
+                  this.$router.push({ path: '/competition' });
+                }
+              "
+              >取消</a-button
+            >
+          </a-col>
+        </a-row>
+      </div>
     </a-row>
   </div>
 </template>
@@ -167,7 +184,9 @@ import { getBeijingTime } from "@/js/functions/TimeAbout";
 import router from "@/router/router";
 export default {
   methods: {
-    
+    async saveContest(contest) {
+      
+    },
     creatContest: async function () {
       let contestcontent = {
         userid: JSON.parse(localStorage.getItem("user")).userid,
@@ -222,7 +241,6 @@ export default {
               message: "",
               type: "success",
             });
-
             router.push({ path: "/competition" });
           })
           .catch((err) => {
@@ -314,6 +332,20 @@ export default {
 第二次违规：封停账号`, //比赛描述
     };
   },
+  async created() {
+    if (this.$route.query.contestid) {
+      await axios
+        .get(`${SERVER_URL}/contest/query/contest`, {
+          params: {
+            contestid: this.$route.query.contestid,
+          },
+        })
+        .then((res) => {
+          let data = res.data;
+          console.log(data);
+        });
+    }
+  },
 };
 </script>
 
@@ -323,8 +355,7 @@ export default {
   /* border: black; */
   width: 1000px;
   position: relative;
-  left: 200px;
-  top: 30px;
+  top: 10px;
 }
 
 .input-container {

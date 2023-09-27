@@ -120,7 +120,7 @@ import { ref, onMounted, nextTick } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
-import { getBeijingTime } from "@/js/functions/TimeAbout";
+import { getNowTime } from "@/js/functions/TimeAbout";
 let scrollbar = ref(null);
 let isHovered = ref(false);
 let messageInput = ref("");
@@ -213,7 +213,7 @@ const sendMessage = async () => {
     // 如果按下了Ctrl键，不发送消息
     return;
   }
-  let now = getBeijingTime();
+  let now = getNowTime();
   let senderpicture = userinfo.value.userpicture;
 
   let target = data.value[getIndex.value.get(chooseTarget.value)].userid;

@@ -5,9 +5,25 @@
         <th
           v-for="(column, index) in columns"
           :key="index"
+          :class="getClass(index)"
+          @click="
+            goToProblem(column.problemid, column.contestid, column.title, index)
+          "
           class="centered-header"
         >
-          {{ column.title }}
+          <div
+            style="display: flex; flex-direction: column; align-items: center"
+          >
+            <div style="position: relative;top:8px;">
+              {{ column.title }}
+            </div>
+            <div  style="font-weight: lighter;color: rgb(50, 202, 153)" v-if="index > 3">
+              {{ problemAC.get(column.title) }}
+            </div>
+            <div  style="position: relative;bottom:8px;font-weight: lighter;color: rgb(153, 153, 153)" v-if="index > 3">
+              {{ problemSubmit.get(column.title) }}
+            </div>
+          </div>
         </th>
       </tr>
     </thead>
@@ -23,12 +39,13 @@
           }"
         >
           <div
-            class="hoverable"
+            :class="getClass(columnIndex)"
             :style="{
               height: getHeight(),
               ...getStyle(columnIndex, row, column),
             }"
             style="border-bottom: 1px dashed #ddd"
+            @click="handleClick(columnIndex, row, column)"
           >
             {{ row[column.dataIndex] }}
             <div
@@ -71,6 +88,9 @@ export default {
       username: new Map(), //记录每个用户的用户名
       firstAC: new Map(), //记录每个题的第一次AC时间
       firstACId: new Map(), //记录每个题的第一次AC的人
+      judgeId: new Map(), //记录，每个人的提交记录
+      problemSubmit: new Map(),
+      problemAC: new Map(),
       columns: [
         {
           title: "名次",
@@ -110,7 +130,7 @@ export default {
       let remainingWidth = tableWidth - fixedWidth;
       let columnCount = this.columns.length - 4; // 减去前4列
       let cellWidth = remainingWidth / columnCount;
-      return cellWidth + "px";
+      return Math.min(cellWidth, 100) + "px";
     },
     getStyle(index, record, column) {
       let baseStyle = {
@@ -142,6 +162,7 @@ export default {
     },
     updateTableData() {
       let data = []; //为了最后排序后计算rank
+      console.log(this.userinfo);
       for (let userid of this.userlist) {
         let temp = {
           username: this.username.get(userid),
@@ -149,6 +170,7 @@ export default {
           punishtime: this.userinfo.get(userid).get("punishtime"),
           userid,
         };
+
         //再存一个map呗
         for (let i = 0; i < this.contest.contestproblem.length; i++) {
           //存每道题的通过时间
@@ -166,7 +188,6 @@ export default {
         }
         data.push(temp);
       }
-      console.log(data);
       data.sort((a, b) => {
         // 首先比较passedcount，大的在前
         if (a.passedcountd !== b.passedcountd) {
@@ -201,7 +222,8 @@ export default {
         },
       });
     },
-    goToProblem(problemid, contestid, problemchar) {
+    goToProblem(problemid, contestid, problemchar, index) {
+      if (index <= 3) return;
       router.push({
         path: "/contest/problem",
         query: {
@@ -211,12 +233,34 @@ export default {
         },
       });
     },
+
     initMap(data) {
       for (let i = 0; i < data.length; i++) {
         let userid = data[i].userid;
         this.usersubmit.set(userid, new Map()); //为每个用户建立一个map
         this.userActime.set(userid, new Map());
         this.userinfo.set(userid, new Map());
+        this.judgeId.set(userid, new Map());
+      }
+    },
+    goToUser(userid) {
+      router.push({
+        name: "userhome",
+        query: {
+          userid: userid,
+        },
+      });
+    },
+    handleClick(columnIndex, row, column) {
+      if (columnIndex === 1) {
+        this.goToUser(row.userid);
+      } else if (columnIndex > 3) {
+        this.goToJudge(
+          this.judgeId.get(row.userid).get(column.title),
+          column.contestid,
+          column.title,
+          column.problemname
+        );
       }
     },
     getInfo(data) {
@@ -224,19 +268,40 @@ export default {
         this.userlist.add(data[i].userid);
         this.username.set(data[i].userid, data[i].username);
         let state = data[i].judgestate;
+        let judgeid = data[i].judgeid;
         if (state === "Compilation Error") continue; //编译错误直接忽略
         let userid = data[i].userid;
         let problemchar = data[i].problemchar;
+
+        if (!this.usersubmit.get(userid).get(problemchar))
+          this.usersubmit.get(userid).set(problemchar, 0); //初始化
+        if (!this.userinfo.get(userid).get("passedcount"))
+          this.userinfo.get(userid).set("passedcount", 0); //初始化通过数量
+        if (!this.userinfo.get(userid).get("punishtime"))
+          this.userinfo.get(userid).set("punishtime", 0); //初始化罚时
+        if (!this.judgeId.get(userid).get(problemchar))
+          this.judgeId.get(userid).set(problemchar, judgeid); //初始化judgeid
+        if (!this.problemAC.get(problemchar))
+          this.problemAC.set(problemchar, 0);
+        if (!this.problemSubmit.get(problemchar))
+          this.problemSubmit.set(problemchar, 0);
+        else if (state === "Accepted")
+          this.judgeId.get(userid).set(problemchar, judgeid);
+        //下面是计算每个题提交数和通过数
+        this.problemSubmit.set(
+            problemchar,
+            this.problemSubmit.get(problemchar) + 1
+          );
+        if (state === "Accepted") {
+          this.problemAC.set(problemchar, this.problemAC.get(problemchar) + 1);
+        } 
         if (
           !this.userActime.get(userid).get(problemchar) &&
           state !== "Accepted"
         ) {
           //如果这道题到现在还没AC
-          if (!this.usersubmit.get(userid).get(problemchar))
-            this.usersubmit.get(userid).set(problemchar, 0); //初始化
-
           let submitcount = this.usersubmit.get(userid).get(problemchar);
-
+          this.judgeId.get(userid).set(problemchar, judgeid);
           this.usersubmit.get(userid).set(problemchar, submitcount + 1); //提交次数+1
         } else if (state === "Accepted") {
           if (!this.firstAC.get(problemchar)) {
@@ -253,17 +318,12 @@ export default {
               this.firstACId.set(problemchar, data[i].userid);
             }
           }
-
           if (!this.userActime.get(userid).get(problemchar)) {
             //如果这题是第一次AC的话，就+1
-            if (!this.userinfo.get(userid).get("passedcount"))
-              this.userinfo.get(userid).set("passedcount", 0); //初始化通过数量
+
             let passedcount = this.userinfo.get(userid).get("passedcount");
 
             this.userinfo.get(userid).set("passedcount", passedcount + 1);
-
-            if (!this.userinfo.get(userid).get("punishtime"))
-              this.userinfo.get(userid).set("punishtime", 0); //初始化
 
             let time = this.userinfo.get(userid).get("punishtime");
             this.userinfo
@@ -275,6 +335,10 @@ export default {
                   this.contest.contestcontent.startdate
                 ) + time
               ); //累计罚时
+            console.log(
+              data[i].submittime,
+              this.contest.contestcontent.startdate
+            );
             this.userActime
               .get(userid)
               .set(
@@ -325,6 +389,13 @@ export default {
       const beijingTime = formatter.format(date1);
       return beijingTime;
     },
+    getClass(columnIndex) {
+      if (columnIndex === 1 || columnIndex > 3) {
+        return "hoverable2";
+      } else {
+        return "";
+      }
+    },
     diffMinutes(dateStr1, dateStr2) {
       //目前比赛的起止时间还是有点抽象
       // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
@@ -348,7 +419,15 @@ export default {
         key: this.contest.contestproblem[i].problemchar,
         align: "center",
         width: 100, //这里可能会有问题
+        problemid: this.contest.contestproblem[i].problemid,
+        contestid: this.contest.contestproblem[i].contestid,
+        problemname: this.contest.contestproblem[i].problemname,
       });
+      let problemchar = this.contest.contestproblem[i].problemchar;
+      if (!this.problemAC.get(problemchar))
+          this.problemAC.set(problemchar, 0);
+        if (!this.problemSubmit.get(problemchar))
+          this.problemSubmit.set(problemchar, 0);
     }
     await axios
       .get(`${SERVER_URL}/contest/query/alljudge`, {
@@ -371,15 +450,14 @@ export default {
 </script>
 
 <style scoped>
-.hoverable {
+.hoverable2 {
   /* color: #3498db; */
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: color 0.3s ease;
   cursor: pointer;
 }
 
-.hoverable:hover {
+.hoverable2:hover {
   filter: brightness(1.3);
-  text-decoration: underline;
 }
 table {
   width: 100%; /* 设置表格的宽度 */
@@ -392,9 +470,6 @@ td {
   /* border: 1px solid #ddd; 设置单元格的边框 */
 }
 
-.hoverable {
-  /* 你的其他样式 */
-}
 th {
   text-align: center;
 }

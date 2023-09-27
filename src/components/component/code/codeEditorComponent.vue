@@ -257,7 +257,7 @@ import {
   SendOutlined,
 } from "@ant-design/icons-vue";
 import axios from "axios";
-import { getBeijingTime } from "@/js/functions/TimeAbout";
+import { getNowTime } from "@/js/functions/TimeAbout";
 import { useStore } from "vuex";
 import { JUDGE_URL, SERVER_URL } from "@/js/functions/config";
 import { getMatchingItems } from "@/js/Editor/autoComplete";
@@ -435,7 +435,6 @@ function decodeBase64(input) {
     const raw = atob(input);
     const rawLength = raw.length;
     const array = new Uint8Array(new ArrayBuffer(rawLength));
-
     for (let i = 0; i < rawLength; i++) {
       array[i] = raw.charCodeAt(i);
     }
@@ -709,7 +708,7 @@ const submitCode = async () => {
   }
   codeStatus.value = "upload";
   let formData = new FormData();
-  let time = getBeijingTime();
+  let time = getNowTime();
   formData.append("source_code", source_code.value);
   formData.append("problemId", parseInt(props.problemcontent.problemid));
   formData.append("languageId", parseInt(selectedLanguage.value));

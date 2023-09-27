@@ -1,13 +1,8 @@
 <template>
   <div class="card main">
     <div :style="{ color: statusColor }">
-      <div v-if="loading" class="loading">
-        <!-- <div class="loader" :class="{ fast: fast }"></div>
-        <div class="notice">
-          {{ statusText }} ({{ elapsedTime }} seconds elapsed)
-        </div> -->
-      </div>
-      <div v-else>
+  
+      <div>
         <div class="ok">
           <span v-if="score === 100"
             ><el-icon><Check /></el-icon
@@ -18,15 +13,23 @@
           ></span>
           <!-- 显示 "×" -->
           {{ judgestate }} {{ score }}
-          <div class="compileoutput">
-            <span
-              >编译器输出：<br />{{
+          <div
+            v-if="judgestate === 'Compilation Error'"
+            class="compileoutput"
+          >
+            <a-typography-paragraph>
+              <pre>编译器输出：<br />{{
                 decodeBase64(judgeinfo.judge.compileoutput)
-              }}</span
-            >
+              }}</pre>
+            </a-typography-paragraph>
+
+            
           </div>
         </div>
-        <div class="state" v-if="tableData.length > 0">
+        <div
+          class="state"
+          v-if="tableData.length > 0 && judgestate !== 'Compilation Error'"
+        >
           <el-table
             class="table1"
             :data="tableData"
@@ -47,9 +50,7 @@
               label="状态"
             >
               <template v-slot:default="{ row }">
-                <div
-                  :style="{ color: getJudgeStateColor(row.judgestate) }"
-                >
+                <div :style="{ color: getJudgeStateColor(row.judgestate) }">
                   <span v-if="row.judgestate === 'Accepted'"
                     ><el-icon><Check /></el-icon
                   ></span>
@@ -205,7 +206,8 @@ export default {
 .state {
   position: relative;
   color: gray;
-  margin-top: 90px;
+  margin-top: 0px;
+ 
 }
 .compileoutput {
   color: gray;
@@ -217,6 +219,7 @@ export default {
 .table1 {
   width: 780px;
   font-size: 16px;
+ 
 }
 .icon-check {
   color: #25ad40;
@@ -228,46 +231,28 @@ export default {
 .main {
   width: 800px;
   position: relative;
-  min-height: 90px;
+  min-height: 20px;
   height: auto;
-}
-.loader {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s linear infinite;
-  position: relative;
+  margin-bottom: 20px;
 }
 .loading {
   position: absolute;
   top: 20px;
   left: 20px;
+  
 }
-.notice {
-  position: relative;
-  left: 60px;
-  bottom: 33px;
-}
+
 .loader.fast {
   animation: spin 1s linear infinite;
 }
 .ok {
+  padding: 20px;
   position: relative;
   font-size: 24px;
-  left: 20px;
-  top: 20px;
+
 }
 .column1 {
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+
 </style>

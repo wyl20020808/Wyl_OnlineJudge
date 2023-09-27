@@ -77,7 +77,7 @@ export default {
 
       if (!this.$route.query.contestid) {
         this.titleinfo =
-          `测评详情 - U` +
+          `U` +
           this.judgeid +
           ` - P` +
           this.problemid +

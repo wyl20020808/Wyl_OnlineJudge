@@ -8,8 +8,11 @@
     </div>
     <div class="problem1">
       题目：
-      <div style=" color: #5f9fd6;" @click="push_to_problemcontent(judgeinfo.judge.problemid)" class="hoverable">
+      <div v-if="!$route.query.contestid" style=" color: #5f9fd6;" @click="push_to_problemcontent(judgeinfo.judge.problemid)" class="hoverable">
         P{{ judgeinfo.judge.problemid }} - {{ judgeinfo.judge.problemname }}
+      </div>
+      <div v-else style=" color: #5f9fd6;" @click="push_to_problemcontent(judgeinfo.judge.problemid)" class="hoverable">
+        [{{ $route.query.problemchar }}] - {{ judgeinfo.judge.problemname }}
       </div>
     </div>
     <div class="language1">语言：{{ judgeinfo.judge.language }}</div>
@@ -42,11 +45,16 @@ export default {
       });
     },
     push_to_problemcontent(problemid) {
+      let data = {
+          problemid: problemid,
+        }
+      if(this.$route.query.contestid){
+        data.contestid = this.$route.query.contestid;
+        data.problemchar = this.$route.query.problemchar;
+      }
       router.push({
         path: "/problem",
-        query: {
-          problemid: problemid,
-        },
+        query: data,
       });
     },
     getColor(judgestate) {

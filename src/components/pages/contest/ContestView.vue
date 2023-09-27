@@ -1,78 +1,91 @@
 <template>
-  <a-row style="justify-content: center;align-items: center;">
-    <a-card style="width: 1015px;  margin-top: 20px">
-      <a-row class="row1">
-        <a-col>
-          <a-row style="display: flex; align-items: center">
-            <el-icon
-              size="40"
-              color="rgb(24, 144, 255)"
-              style="margin-right: 8px"
-              ><Trophy
-            /></el-icon>
-            <div style="font-size: 36px;">{{ contest.contestcontent?.contestname }}</div>
-          </a-row>
-          <a-row style="margin-top: 20px; display: flex; align-items: center">
-            <NotificationTwoTone style="margin-right: 3px" />
-            <a-col style="font-size: 18px; margin-right: 40px"
-              >比赛时间：{{
-                toBeijingTime(contest.contestcontent?.startdate)
-              }}
-              ~ {{ toBeijingTime(contest.contestcontent?.enddate) }}</a-col
+  <a-row style="justify-content: center">
+    <a-col>
+      <a-card style="width: 1015px; margin-top: 20px">
+        <a-row class="row1">
+          <a-col>
+            <a-row style="display: flex; align-items: center">
+              <el-icon
+                size="40"
+                color="rgb(24, 144, 255)"
+                style="margin-right: 8px"
+                ><Trophy
+              /></el-icon>
+              <div style="font-size: 36px">
+                {{ contest.contestcontent?.contestname }}
+              </div>
+            </a-row>
+            <a-row style="margin-top: 20px; display: flex; align-items: center">
+              <NotificationTwoTone style="margin-right: 3px" />
+              <a-col style="font-size: 18px; margin-right: 40px"
+                >比赛时间：{{
+                  toBeijingTime(contest.contestcontent?.startdate)
+                }}
+                ~ {{ toBeijingTime(contest.contestcontent?.enddate) }}</a-col
+              >
+              <el-icon size="20" color="rgb(24, 144, 255)"><Timer /></el-icon>
+              <a-col style="font-size: 18px"
+                >时长：{{
+                  getTimeDifference(
+                    contest.contestcontent?.startdate,
+                    contest.contestcontent?.enddate
+                  )
+                }}</a-col
+              >
+            </a-row>
+            <a-row
+              style="
+                margin-top: 20px;
+                display: flex;
+                align-items: center;
+                position: relative;
+                right: 3px;
+              "
             >
-            <el-icon size="20" color="rgb(24, 144, 255)"><Timer /></el-icon>
-            <a-col style="font-size: 18px"
-              >时长：{{
-                getTimeDifference(
-                  contest.contestcontent?.startdate,
-                  contest.contestcontent?.enddate
-                )
-              }}</a-col
-            >
-          </a-row>
-          <a-row
-            style="
-              margin-top: 20px;
-              display: flex;
-              align-items: center;
-              position: relative;
-              right: 3px;
-            "
-          >
-            <el-icon style="" size="20" color="rgb(24, 144, 255)"
-              ><User
-            /></el-icon>
-            <a-col style="font-size: 18px"
-              >参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col
-            >
-          </a-row>
-        </a-col>
-      </a-row>
-    </a-card>
-    <a-card style="margin-top: 20px; width: 1015px;margin-bottom: 20px;">
-      <a-row>
-        <a-col style="">
-          <a-tabs class="my-tabs" v-model:activeKey="activeKey">
-            <a-tab-pane style="width:950px ;" key="1" tab="比赛说明"
-              ><ContestDescriptionComponent :contest="contest"
-            /></a-tab-pane>
-            <a-tab-pane style="width:950px ;" key="2" tab="题目" force-render
-              ><ContestProblemComponent :contest="contest"
-            /></a-tab-pane >
-            <a-tab-pane style="width:950px ;" key="3" tab="提交"
-              ><ContestSubmitComponent :contest="contest"
-            /></a-tab-pane>
-            <a-tab-pane style="width:950px ;" key="4" tab="排名"
-              ><ContestRankComponent :contest="contest"
-            /></a-tab-pane> </a-tabs
-        ></a-col>
-      </a-row>
-    </a-card>
+              <el-icon style="" size="20" color="rgb(24, 144, 255)"
+                ><User
+              /></el-icon>
+              <a-col style="font-size: 18px"
+                >参赛人数：{{ contest.contestcontent?.joinpeople }}</a-col
+              >
+            </a-row>
+          </a-col>
+        </a-row>
+      </a-card>
+      <a-card style="margin-top: 20px; width: 1015px; margin-bottom: 20px">
+        <a-row>
+          <a-col style="">
+            <a-tabs class="my-tabs" v-model:activeKey="activeKey">
+              <a-tab-pane style="width: 950px" key="1" tab="比赛说明"
+                ><ContestDescriptionComponent :contest="contest"
+              /></a-tab-pane>
+              <a-tab-pane style="width: 950px" key="2" tab="题目" force-render
+                ><ContestProblemComponent :contest="contest"
+              /></a-tab-pane>
+              <a-tab-pane style="width: 950px" key="3" tab="提交"
+                ><ContestSubmitComponent :contest="contest"
+              /></a-tab-pane>
+              <a-tab-pane style="width: 950px" key="4" tab="排名"
+                ><ContestRankComponent :contest="contest"
+              /></a-tab-pane> </a-tabs
+          ></a-col>
+        </a-row>
+      </a-card>
+    </a-col>
+    <a-col style="margin-top: 20px; margin-left: 20px">
+      <a-button @click="editCompetition" style="display: flex; align-items: center"
+        ><EditOutlined />编辑比赛</a-button
+      >
+    </a-col>
   </a-row>
 </template>
 
 <script>
-import { NotificationTwoTone, HomeTwoTone } from "@ant-design/icons-vue";
+import {
+  NotificationTwoTone,
+  HomeTwoTone,
+  EditOutlined,
+} from "@ant-design/icons-vue";
 import { User, Timer, Flag, Trophy } from "@element-plus/icons-vue";
 import ContestDescriptionComponent from "@/components/component/contest/ContestDescriptionComponent.vue";
 import ContestProblemComponent from "@/components/component/contest/ContestProblemComponent.vue";
@@ -80,6 +93,7 @@ import ContestSubmitComponent from "@/components/component/contest/ContestSubmit
 import ContestRankComponent from "@/components/component/contest/ContestRankComponent.vue";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
+import router from "@/router/router";
 export default {
   components: {
     NotificationTwoTone,
@@ -91,6 +105,7 @@ export default {
     Timer,
     Flag,
     Trophy,
+    EditOutlined,
   },
   data() {
     return {
@@ -126,6 +141,14 @@ export default {
       });
   },
   methods: {
+    editCompetition(){
+      router.push({
+        path:'/contest/create',
+        query:{
+          contestid:this.$route.query.contestid
+        }
+      })
+    },
     toBeijingTime(value) {
       let date = new Date(value);
       let beijingTime = date.toLocaleString("zh-CN", {
