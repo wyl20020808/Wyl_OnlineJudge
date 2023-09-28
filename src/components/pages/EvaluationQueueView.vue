@@ -116,7 +116,7 @@
                   :style="{
                     backgroundColor: getJudgeStateColor(judgeinfo.judgestate),
                   }"
-                  style="color: white; padding: 2px; border-radius: 4px"
+                  style="color: white; padding: 6px; border-radius: 4px"
                 >
                   {{ judgeinfo.judgestate }}
                 </div>

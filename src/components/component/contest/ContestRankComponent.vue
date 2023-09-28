@@ -14,13 +14,24 @@
           <div
             style="display: flex; flex-direction: column; align-items: center"
           >
-            <div style="position: relative;top:8px;">
+            <div style="position: relative; top: 8px">
               {{ column.title }}
             </div>
-            <div  style="font-weight: lighter;color: rgb(50, 202, 153)" v-if="index > 3">
+            <div
+              style="font-weight: lighter; color: rgb(50, 202, 153)"
+              v-if="index > 3"
+            >
               {{ problemAC.get(column.title) }}
             </div>
-            <div  style="position: relative;bottom:8px;font-weight: lighter;color: rgb(153, 153, 153)" v-if="index > 3">
+            <div
+              style="
+                position: relative;
+                bottom: 8px;
+                font-weight: lighter;
+                color: rgb(153, 153, 153);
+              "
+              v-if="index > 3"
+            >
               {{ problemSubmit.get(column.title) }}
             </div>
           </div>
@@ -66,6 +77,7 @@
 import axios from "axios";
 import { SERVER_URL } from "../../../js/functions/config.js";
 import router from "@/router/router";
+import moment from "moment";
 export default {
   props: {
     contest: {
@@ -289,12 +301,12 @@ export default {
           this.judgeId.get(userid).set(problemchar, judgeid);
         //下面是计算每个题提交数和通过数
         this.problemSubmit.set(
-            problemchar,
-            this.problemSubmit.get(problemchar) + 1
-          );
+          problemchar,
+          this.problemSubmit.get(problemchar) + 1
+        );
         if (state === "Accepted") {
           this.problemAC.set(problemchar, this.problemAC.get(problemchar) + 1);
-        } 
+        }
         if (
           !this.userActime.get(userid).get(problemchar) &&
           state !== "Accepted"
@@ -310,8 +322,8 @@ export default {
           } else {
             if (
               this.diffMinutes(
-                data[i].submittime,
-                this.firstAC.get(problemchar)
+                this.firstAC.get(problemchar),
+                data[i].submittime
               ) < 0
             ) {
               this.firstAC.set(problemchar, data[i].submittime);
@@ -331,8 +343,8 @@ export default {
               .set(
                 "punishtime",
                 this.diffMinutes(
-                  data[i].submittime,
-                  this.contest.contestcontent.startdate
+                  this.contest.contestcontent.startdate,
+                  data[i].submittime
                 ) + time
               ); //累计罚时
             console.log(
@@ -344,8 +356,8 @@ export default {
               .set(
                 problemchar,
                 this.diffMinutes(
-                  data[i].submittime,
-                  this.contest.contestcontent.startdate
+                  this.contest.contestcontent.startdate,
+                  data[i].submittime
                 )
               ); //记录每道题是否AC
           }
@@ -372,23 +384,6 @@ export default {
 
       // console.log(this.usersubmit, this.userActime, this.userinfo);
     },
-    toBeiJingTime(dateStr1) {
-      // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
-      let isoDateStr1 = String(dateStr1).replace(" ", "T") + "+08:00";
-      let date1 = new Date(isoDateStr1);
-      const formatter = new Intl.DateTimeFormat("zh-CN", {
-        timeZone: "Asia/Shanghai", // 设置时区为北京时间
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-      // 使用formatter来格式化当前的日期和时间
-      const beijingTime = formatter.format(date1);
-      return beijingTime;
-    },
     getClass(columnIndex) {
       if (columnIndex === 1 || columnIndex > 3) {
         return "hoverable2";
@@ -396,18 +391,11 @@ export default {
         return "";
       }
     },
-    diffMinutes(dateStr1, dateStr2) {
-      //目前比赛的起止时间还是有点抽象
-      // 将第一个日期字符串的格式转换为ISO 8601格式，并添加时区偏移量
-      let isoDateStr1 = dateStr1.replace(" ", "T") + "+08:00";
-
-      let date1 = new Date(isoDateStr1);
-      let date2 = new Date(dateStr2);
-
-      let diffMilliseconds = date1.getTime() - date2.getTime();
-      let diffMinutes = diffMilliseconds / 1000 / 60;
-      // clearImmediateonsole.log(date1, diffMinutes);
-      return diffMinutes;
+    diffMinutes(startDateStr, endDateStr) {
+      const startDate = moment(startDateStr, "YYYY-MM-DD HH:mm:ss");
+      const endDate = moment(endDateStr, "YYYY-MM-DD HH:mm:ss");
+      const diffInMinutes = endDate.diff(startDate, "minutes");
+      return diffInMinutes;
     },
   },
   async created() {
@@ -424,10 +412,9 @@ export default {
         problemname: this.contest.contestproblem[i].problemname,
       });
       let problemchar = this.contest.contestproblem[i].problemchar;
-      if (!this.problemAC.get(problemchar))
-          this.problemAC.set(problemchar, 0);
-        if (!this.problemSubmit.get(problemchar))
-          this.problemSubmit.set(problemchar, 0);
+      if (!this.problemAC.get(problemchar)) this.problemAC.set(problemchar, 0);
+      if (!this.problemSubmit.get(problemchar))
+        this.problemSubmit.set(problemchar, 0);
     }
     await axios
       .get(`${SERVER_URL}/contest/query/alljudge`, {

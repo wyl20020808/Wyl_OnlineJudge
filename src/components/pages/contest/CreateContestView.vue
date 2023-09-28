@@ -31,10 +31,13 @@
           <a-col class="input-container" :offset="1">
             <label for="name">比赛时间：</label>
             <a-space direction="vertical" :size="20">
-              <a-range-picker
-                style="width: 500px"
-                v-model:value="contestdate"
-                show-time
+              <el-date-picker
+                v-model="contestdate"
+                type="datetimerange"
+                :shortcuts="shortcuts"
+                range-separator="To"
+                start-placeholder="Start date"
+                end-placeholder="End date"
               />
             </a-space>
           </a-col>
@@ -146,7 +149,7 @@
         <a-row style="margin-top: 20px; color: white">
           <a-col :offset="1" :span="2">
             <a-button
-            v-if="!$route.query.contestid"
+              v-if="!$route.query.contestid"
               @click="creatContest"
               style="margin-bottom: 10px"
               type="primary"
@@ -154,7 +157,7 @@
             >
             <a-button
               v-else
-              @click="saveContest"
+              @click="creatContest"
               style="margin-bottom: 10px"
               type="primary"
               >保存</a-button
@@ -179,39 +182,106 @@
 <script>
 import { SERVER_URL } from "@/js/functions/config";
 import axios from "axios";
-import { getNowTime } from "@/js/functions/TimeAbout";
-import { getBeijingTime } from "@/js/functions/TimeAbout";
+import { getNowTime, sleep } from "@/js/functions/TimeAbout";
 import router from "@/router/router";
+import moment from "moment";
 export default {
   methods: {
     async saveContest(contest) {
-      
+      if (this.$route.query.contestid) {
+        await axios
+          .post(`${SERVER_URL}/contest/update`, contest)
+          .then((res) => {
+            this.$store.dispatch("notice", {
+              title: "保存成功！",
+              message: "",
+              type: "success",
+            });
+            sleep(500);
+            router.push({
+              path: "/contest/content",
+              query: { contestid: this.$route.query.contestid },
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        return;
+      }
+      await axios
+        .post(`${SERVER_URL}/contest/create`, contest)
+        .then((res) => {
+          this.$store.dispatch("notice", {
+            title: "比赛创建成功！",
+            message: "",
+            type: "success",
+          });
+          sleep(500);
+          router.push({ path: "/competition" });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     creatContest: async function () {
       let contestcontent = {
         userid: JSON.parse(localStorage.getItem("user")).userid,
         contestname: this.title,
-        startdate: this.contestdate[0],
-        enddate: this.contestdate[1],
+        startdate:  moment(this.contestdate[0]).utcOffset(8).format('YYYY-MM-DD HH:mm:ss'),
+        enddate: moment(this.contestdate[1]).utcOffset(8).format('YYYY-MM-DD HH:mm:ss'),
         contestformat: this.contestformat,
         contestlimit: this.contestlimit,
         rated: this.rated,
         blockedlist: this.blockedlist,
         createtime: getNowTime(),
         contestpassword: this.contestpassword,
+        description: this.contestdescription,
       };
+      if (this.$route.query.contestid) {
+        //更新
+        contestcontent.contestid = this.$route.query.contestid;
+        contestcontent.username = this.contest.contestcontent.username;
+        contestcontent.joinpeople = this.contest.contestcontent.joinpeople;
+      }
       let contestadmin = [];
       for (let admin in this.administrators) {
-        contestadmin.push({
+        let data = {
           userid: this.administrators[admin],
-        });
+        };
+        if (this.$route.query.contestid)
+          data.contestid = this.$route.query.contestid;
+
+        contestadmin.push(data);
+      }
+      //提交数和通过数需要去备份
+      if (this.$route.query.contestid) {
+        //更新
+        for (let i = 0; i < this.contest.contestproblem.length; i++) {
+          this.backCount.set(
+            this.contest.contestproblem[i].problemid,
+            this.contest.contestproblem[i].submitcount
+          );
+          this.backCount.set(
+            this.contest.contestproblem[i].problemid + "x",
+            this.contest.contestproblem[i].acceptedcount
+          );
+        }
       }
       let contestproblem = [];
       for (let i = 0; i < this.problems.length; i++) {
-        contestproblem.push({
+        let data = {
           problemid: this.problems[i],
           problemchar: String.fromCharCode("A".charCodeAt(0) + i),
-        });
+        };
+        if (this.$route.query.contestid) {
+          data.contestid = this.$route.query.contestid;
+          if (this.backCount.has(this.problems[i])) {
+            //如果有这个题，就要恢复
+            data.submitcount = this.backCount.get(this.problems[i]);
+            data.acceptedcount = this.backCount.get(this.problems[i] + "x");
+          }
+        }
+        contestproblem.push(data);
       }
       let contest = {
         contestcontent: contestcontent,
@@ -233,19 +303,7 @@ export default {
           type: "error",
         });
       } else {
-        await axios
-          .post(`${SERVER_URL}/contest/create`, contest)
-          .then((res) => {
-            this.$store.dispatch("notice", {
-              title: "比赛创建成功！",
-              message: "",
-              type: "success",
-            });
-            router.push({ path: "/competition" });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        this.saveContest(contest);
       }
     },
     fetch: async function (value, type, callback) {
@@ -274,6 +332,28 @@ export default {
         .catch((err) => {
           console.log(err, "ahsjdhas");
         });
+    },
+    initData() {
+      this.title = this.contest.contestcontent.contestname;
+      this.contestdate = [
+        moment(this.contest.contestcontent.startdate, "YYYY-MM-DD HH:mm:ss"),
+        moment(this.contest.contestcontent.enddate, "YYYY-MM-DD HH:mm:ss"),
+      ];
+      this.contestformat = this.contest.contestcontent.contestformat;
+      this.contestlimit = this.contest.contestcontent.contestlimit;
+      this.rated = this.contest.contestcontent.rated;
+      this.blockedlist = this.contest.contestcontent.blockedlist;
+      this.contestpassword = this.contest.contestcontent.contestpassword;
+      this.problems = [];
+      // console.log(this.contest.contestproblem,'aa')
+      for (let i = 0; i < this.contest.contestproblem.length; i++) {
+        this.problems.push(this.contest.contestproblem[i].problemid);
+      }
+      this.administrators = [];
+      for (let i = 0; i < this.contest.contestadmin.length; i++) {
+        this.administrators.push(this.contest.contestadmin[i].userid);
+      }
+      this.contestdescription = this.contest.contestcontent.description;
     },
   },
   data() {
@@ -318,7 +398,7 @@ export default {
       currentValue: "",
       contestlimit: "公开", //比赛限制
       rated: false, //是否积分
-      blockedlist: false, //是否封榜
+      blockedlist: true, //是否封榜
       contestpassword: "wyloj.com", //比赛密码
       contestdescription: `【比赛规范】
 为保证比赛公平公正，营造健康积极的竞赛环境，我们采取以下措施：
@@ -330,6 +410,8 @@ export default {
 对于违规用户：
 第一次违规：取消本场比赛获得奖品的资格，扣除rating200分，公开违规用户名单在比赛说明页面。
 第二次违规：封停账号`, //比赛描述
+      contest: {},
+      backCount: new Map(),
     };
   },
   async created() {
@@ -342,7 +424,9 @@ export default {
         })
         .then((res) => {
           let data = res.data;
+          this.contest = data;
           console.log(data);
+          this.initData();
         });
     }
   },

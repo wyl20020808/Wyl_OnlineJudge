@@ -11,7 +11,6 @@ public class ContestProblem {
     private int id;
     private int contestid;
     private int problemid;
-
     private String problemname;
 
     private int submitcount;

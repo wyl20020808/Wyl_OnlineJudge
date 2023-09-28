@@ -2,6 +2,7 @@ package com.wyl.backend.classes.contest.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.mysql.cj.jdbc.result.UpdatableResultSet;
 import com.wyl.backend.classes.auxiliary.SubstringSearch;
 import com.wyl.backend.classes.contest.*;
 import com.wyl.backend.classes.contest.SQL.*;
@@ -82,16 +83,32 @@ public class ContestController {
         }
         return Results;//返回查找到的结果
     }
+    @PostMapping("/update")
+    public void updateContest(@RequestBody Contest info){
+        //前端传过来的数据是包含主键的，所以应该可以通过主键直接更新
+        contestContentSQL.updateById(info.getContestcontent());
+        UpdateWrapper<ContestAdmin> contestAdminUpdateWrapper = new UpdateWrapper<>();
+        contestAdminUpdateWrapper.eq("contestid",info.getContestcontent().getContestid());
+        contestAdminSQL.delete(contestAdminUpdateWrapper);
+        for(ContestAdmin admin: info.getContestadmin()){
+            admin.setUsername(String.valueOf(userOperator.selectById(admin.getUserid()).getUsername()));
+            contestAdminSQL.insert(admin);
+        }
+        //先删除原来的
+
+        System.out.println(info.getContestcontent().getRated() + " ceshi");
+        UpdateWrapper<ContestProblem> contestAdminUpdateWrapper2 = new UpdateWrapper<>();
+        contestAdminUpdateWrapper2.eq("contestid",info.getContestcontent().getContestid());
+        contestProblemSQL.delete(contestAdminUpdateWrapper2);
+        for(ContestProblem problem: info.getContestproblem()){
+            problem.setProblemname(String.valueOf(problemContentSQL.selectById(problem.getProblemid()).getTitle()));
+            contestProblemSQL.insert(problem);
+        }
+    }
 
 
     @PostMapping("/create")//这里还处理了前端传过来的数据，获取了contestid和各自的名字
     public void createContest(@RequestBody Contest info){
-        try{
-            System.out.println(info.getContestadmin());
-            System.out.println("info.getContestcontent()");
-        }catch(Exception e){
-            System.out.println(e);
-        }
         info.getContestcontent().setUsername(String.valueOf(userOperator.selectById(info.getContestcontent().getUserid()).getUsername()));
         contestContentSQL.insert(info.getContestcontent());
         List<ContestContent> contenstcontent = contestContentSQL.selectList(null);
