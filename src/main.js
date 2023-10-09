@@ -20,7 +20,6 @@ import hljs from 'highlight.js/lib/core';
 import json from 'highlight.js/lib/languages/json';
 import cpp from 'highlight.js/lib/languages/cpp';
 import javascript from 'highlight.js/lib/languages/javascript';
-
 import VMdEditor from '@kangc/v-md-editor/lib/codemirror-editor';
 import '@kangc/v-md-editor/lib/style/codemirror-editor.css';
 import Codemirror from 'codemirror';
@@ -60,10 +59,14 @@ import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 
 
+//2023年10月9日09:47:17
+import VueCodemirror from 'vue-codemirror'
+import 'codemirror/mode/javascript/javascript.js'
+import 'codemirror/theme/base16-dark.css'
 
-hljs.registerLanguage('json', json);
-hljs.registerLanguage('cpp', cpp);
-hljs.registerLanguage('cpp', javascript);
+// hljs.registerLanguage('json', json);
+// hljs.registerLanguage('cpp', cpp);
+// hljs.registerLanguage('cpp', javascript);
 VMdEditor.Codemirror = Codemirror;
 VMdEditor.use(githubTheme, {
   Hljs: hljs,
@@ -94,5 +97,9 @@ app.directive('focus', {
       })
     }
   })
+  
 app.use(router).use(ElementPlus).use(store).use(Antd).mount('#app')
 app.use(VMdEditor).use(VMdPreview)
+
+//2023年10月9日09:59:18
+app.use(VueCodemirror)

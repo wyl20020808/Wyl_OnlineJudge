@@ -13,8 +13,17 @@
           >
             <a-row style="width: 100%" type="flex" justify="space-between">
               <a-col><h4>代码编辑器</h4></a-col
-              ><a-col
-                ><a-select
+              ><a-col>
+                <a-select
+                  ref="select2"
+                  v-model:value="selectedTheme"
+                  @change="changeTheme"
+                  :options="themes"
+                  @focus="focus"
+                  style="width: 200px;margin-right: 20px;"
+                >
+                </a-select>
+                <a-select
                   ref="select"
                   v-model:value="selectedLanguage"
                   style="width: 200px"
@@ -277,6 +286,57 @@ import "codemirror/addon/dialog/dialog.css";
 import "codemirror/addon/search/searchcursor.js";
 import "codemirror/addon/search/jump-to-line.js";
 import "codemirror/addon/selection/active-line.js";
+
+import "codemirror/theme/3024-day.css";
+import "codemirror/theme/3024-night.css";
+import "codemirror/theme/abcdef.css";
+import "codemirror/theme/ambiance.css";
+import "codemirror/theme/base16-dark.css";
+import "codemirror/theme/bespin.css";
+import "codemirror/theme/base16-light.css";
+import "codemirror/theme/blackboard.css";
+import "codemirror/theme/cobalt.css";
+import "codemirror/theme/colorforth.css";
+import "codemirror/theme/dracula.css";
+import "codemirror/theme/duotone-dark.css";
+import "codemirror/theme/duotone-light.css";
+import "codemirror/theme/eclipse.css";
+import "codemirror/theme/elegant.css";
+import "codemirror/theme/erlang-dark.css";
+import "codemirror/theme/gruvbox-dark.css";
+import "codemirror/theme/hopscotch.css";
+import "codemirror/theme/icecoder.css";
+import "codemirror/theme/isotope.css";
+import "codemirror/theme/lesser-dark.css";
+import "codemirror/theme/liquibyte.css";
+import "codemirror/theme/lucario.css";
+import "codemirror/theme/material.css";
+import "codemirror/theme/mbo.css";
+import "codemirror/theme/mdn-like.css";
+import "codemirror/theme/midnight.css";
+import "codemirror/theme/monokai.css";
+import "codemirror/theme/neat.css";
+import "codemirror/theme/neo.css";
+import "codemirror/theme/night.css";
+import "codemirror/theme/panda-syntax.css";
+import "codemirror/theme/paraiso-dark.css";
+import "codemirror/theme/paraiso-light.css";
+import "codemirror/theme/pastel-on-dark.css";
+import "codemirror/theme/railscasts.css";
+import "codemirror/theme/rubyblue.css";
+import "codemirror/theme/seti.css";
+import "codemirror/theme/solarized.css";
+import "codemirror/theme/the-matrix.css";
+import "codemirror/theme/tomorrow-night-bright.css";
+import "codemirror/theme/tomorrow-night-eighties.css";
+import "codemirror/theme/twilight.css";
+import "codemirror/theme/vibrant-ink.css";
+import "codemirror/theme/xq-dark.css";
+import "codemirror/theme/xq-light.css";
+import "codemirror/theme/yeti.css";
+import "codemirror/theme/yonce.css";
+import "codemirror/theme/zenburn.css";
+
 import { useRoute } from "vue-router";
 
 const props = defineProps({
@@ -297,9 +357,63 @@ const items = ref([]);
 const selected = ref(null);
 const coords = ref({ left: 0, top: 0 });
 const select = ref(null);
+const select2 = ref(null);
 let isSelecting = false;
 let selectedLanguage = ref(54);
 let source_code = ref("");
+let selectedTheme = ref("default");
+let themes = [
+  "default",
+  "3024-day",
+  "3024-night",
+  "abcdef",
+  "ambiance",
+  "base16-dark",
+  "bespin",
+  "base16-light",
+  "blackboard",
+  "cobalt",
+  "colorforth",
+  "dracula",
+  "duotone-dark",
+  "duotone-light",
+  "eclipse",
+  "elegant",
+  "erlang-dark",
+  "gruvbox-dark",
+  "hopscotch",
+  "icecoder",
+  "isotope",
+  "lesser-dark",
+  "liquibyte",
+  "lucario",
+  "material",
+  "mbo",
+  "mdn-like",
+  "midnight",
+  "monokai",
+  "neat",
+  "neo",
+  "night",
+  "panda-syntax",
+  "paraiso-dark",
+  "paraiso-light",
+  "pastel-on-dark",
+  "railscasts",
+  "rubyblue",
+  "seti",
+  "solarized",
+  "the-matrix",
+  "tomorrow-night-bright",
+  "tomorrow-night-eighties",
+  "twilight",
+  "vibrant-ink",
+  "xq-dark",
+  "xq-light",
+  "yeti",
+  "yonce",
+  "zenburn",
+].map((theme) => ({ label: theme, value: theme }));
 
 onMounted(async () => {
   let isUserTyping = false;
@@ -363,7 +477,7 @@ onMounted(async () => {
       autoCloseBrackets: true,
       styleActiveLine: true,
     });
-
+    cmInstance.setOption("theme", "neat");
     cmInstance.on("cursorActivity", () => {
       if (!isUserTyping) {
         showAutocomplete.value = false;
@@ -375,6 +489,7 @@ onMounted(async () => {
     // 创建一个新的 ResizeObserver 实例并开始监听编辑器的尺寸变化
     resizeObserver = new ResizeObserver(updateIconPosition);
     resizeObserver.observe(editor.value);
+
     cmInstance.on("change", () => {
       isUserTyping = true;
       if (isSelecting) {
@@ -406,7 +521,6 @@ onMounted(async () => {
       // Check if the current word fully matches all the autocomplete options
       // const isFullMatch = items.value.every((item) => item === currentWord);
       const isFullMatch = false;
-      // Show the autocomplete list and select the first item
       if (items.value.length > 0 && !isFullMatch) {
         showAutocomplete.value = true;
         selected.value = items.value[0];
@@ -778,6 +892,10 @@ const submitCode = async () => {
       console.log(err);
       clearInterval(intervalId); // 销毁interval
     });
+};
+
+let changeTheme = function () {
+  cmInstance.setOption("theme", selectedTheme.value);
 };
 </script>
 

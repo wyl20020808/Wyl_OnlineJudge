@@ -40,6 +40,7 @@
     "prismjs": "^1.29.0",
     "semantic-ui-vue": "^0.11.0",
     "vue": "^3.2.13",
+    "vue-codemirror": "^6.1.1",
     "vue-markdown": "^2.2.4",
     "vue-router": "^4.2.4",
     "vue-showdown": "^4.2.0",
