@@ -12,7 +12,14 @@
             "
           >
             <a-row style="width: 100%" type="flex" justify="space-between">
-              <a-col><h4>代码编辑器</h4></a-col
+              <a-col style="display: flex; align-items: center">
+                <h4>代码编辑器</h4>
+                <div
+                  style="color: gray; margin-left: 10px"
+                  v-if="lasteditortime"
+                >
+                  Last edited on: {{ lasteditortime }}
+                </div></a-col
               ><a-col>
                 <a-select
                   ref="select2"
@@ -20,7 +27,7 @@
                   @change="changeTheme"
                   :options="themes"
                   @focus="focus"
-                  style="width: 200px;margin-right: 20px;"
+                  style="width: 200px; margin-right: 20px"
                 >
                 </a-select>
                 <a-select
@@ -414,12 +421,16 @@ let themes = [
   "yonce",
   "zenburn",
 ].map((theme) => ({ label: theme, value: theme }));
-
+let saveTimer = null;
+let lasteditortime = ref(null);
+let typingTimer = ref(null);
+let modifyed = ref(false);
+let isUserTyping = false;
+const typingDelay = 500; // 500毫秒
+watch(props, async (newValue, oldValue) => {
+  await queryProblemCode();
+});
 onMounted(async () => {
-  let isUserTyping = false;
-  let typingTimer = null;
-  const typingDelay = 500; // 500毫秒
-
   setTimeout(() => {
     // 这里是你想要在页面加载完1秒后执行的操作
     if (props.problemsample[0]) input.value = props.problemsample[0].input;
@@ -429,7 +440,7 @@ onMounted(async () => {
       lineNumbers: true,
       mode: "text/x-c++src",
       viewportMargin: Infinity,
-      indentUnit: 4,  // 设置缩进单位为4个空格
+      indentUnit: 4, // 设置缩进单位为4个空格
       extraKeys: {
         Esc: function (cm) {
           showAutocomplete.value = false;
@@ -478,6 +489,7 @@ onMounted(async () => {
       autoCloseBrackets: true,
       styleActiveLine: true,
     });
+
     cmInstance.on("cursorActivity", () => {
       if (!isUserTyping) {
         showAutocomplete.value = false;
@@ -489,48 +501,116 @@ onMounted(async () => {
     // 创建一个新的 ResizeObserver 实例并开始监听编辑器的尺寸变化
     resizeObserver = new ResizeObserver(updateIconPosition);
     resizeObserver.observe(editor.value);
-
-    cmInstance.on("change", () => {
-      isUserTyping = true;
-      if (isSelecting) {
-        isSelecting = false;
-        return;
-      }
-      typingTimer = setTimeout(() => {
-        isUserTyping = false;
-      }, typingDelay);
-      const cursor = cmInstance.getCursor();
-      const token = cmInstance.getTokenAt(cursor);
-      const currentWord = token.string;
-      let allTextInEditor = cmInstance.getRange({ line: 0, ch: 0 }, cursor);
-      // Generate the list of matching items
-      items.value = getMatchingItems(currentWord, allTextInEditor);
-      // Get the cursor's coordinates
-      // Get the cursor's coordinates relative to the window
-      let cursorCoords = cmInstance.cursorCoords(cursor, "window");
-      source_code.value = cmInstance.getValue();
-      // Get the editor's coordinates
-      let editorCoords = editor.value.getBoundingClientRect();
-
-      // Adjust the cursor's coordinates
-      coords.value = {
-        left: cursorCoords.left - editorCoords.left,
-        top: cursorCoords.top - editorCoords.top,
-      };
-
-      // Check if the current word fully matches all the autocomplete options
-      // const isFullMatch = items.value.every((item) => item === currentWord);
-      const isFullMatch = false;
-      if (items.value.length > 0 && !isFullMatch) {
-        showAutocomplete.value = true;
-        selected.value = items.value[0];
-      } else {
-        showAutocomplete.value = false;
-      }
-    });
+    cmInstance.on("change", handleEditorChange);
   }
+  await getEditorStyle();
 });
+async function handleEditorChange() {
+  modifyed.value = true;
+  isUserTyping = true;
+  if (isSelecting) {
+    isSelecting = false;
+    return;
+  }
+  typingTimer = setTimeout(() => {
+    isUserTyping = false;
+  }, typingDelay);
+  const cursor = cmInstance.getCursor();
+  const token = cmInstance.getTokenAt(cursor);
+  const currentWord = token.string;
+  let allTextInEditor = cmInstance.getRange({ line: 0, ch: 0 }, cursor);
+  // Generate the list of matching items
+  items.value = getMatchingItems(currentWord, allTextInEditor);
+  // Get the cursor's coordinates
+  // Get the cursor's coordinates relative to the window
+  let cursorCoords = cmInstance.cursorCoords(cursor, "window");
+  source_code.value = cmInstance.getValue();
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+  }
 
+  // 设置新的定时器
+  saveTimer = setTimeout(() => {
+    const code = cmInstance.getValue();
+    saveProblemCode(code);
+  }, 10000); // 10秒后执行
+  // Get the editor's coordinates
+  let editorCoords = editor.value.getBoundingClientRect();
+
+  // Adjust the cursor's coordinates
+  coords.value = {
+    left: cursorCoords.left - editorCoords.left,
+    top: cursorCoords.top - editorCoords.top,
+  };
+
+  // Check if the current word fully matches all the autocomplete options
+  // const isFullMatch = items.value.every((item) => item === currentWord);
+  const isFullMatch = false;
+  if (items.value.length > 0 && !isFullMatch) {
+    showAutocomplete.value = true;
+    selected.value = items.value[0];
+  } else {
+    showAutocomplete.value = false;
+  }
+}
+async function getEditorStyle() {
+  await axios
+    .get(`${SERVER_URL}/userextra/query/id`, {
+      params: {
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+      },
+    })
+    .then((res) => {
+      selectedTheme.value = res.data.editorstyle; //使用用户选择的风格
+      cmInstance.setOption("theme", selectedTheme.value);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+async function saveProblemCode(code) {
+  //保存上次更新的代码
+  let time = getNowTime();
+  if (modifyed.value === false) {
+    //如果没有修改代码
+    return;
+   
+  }
+  let problemcode = {
+    userid: JSON.parse(localStorage.getItem("user")).userid,
+    code: code,
+    problemid: props.problemcontent.problemid,
+    lasteditortime: time,
+  };
+  await axios
+    .post(`${SERVER_URL}/problem/update/problemcode`, problemcode)
+    .then((res) => {})
+    .catch((err) => {
+      console.log(err);
+    });
+}
+async function queryProblemCode() {
+  //保存上次更新的代码
+  await axios
+    .get(`${SERVER_URL}/problem/query/problemcode`, {
+      params: {
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+        problemid: props.problemcontent.problemid,
+      },
+    })
+    .then((res) => {
+      cmInstance.off("change", handleEditorChange);
+      // 改变内容
+      cmInstance.setValue(res.data.code);
+      // 添加回监听器
+      cmInstance.on("change", handleEditorChange);
+      source_code.value = res.data.code;
+      lasteditortime.value = res.data.lasteditortime;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 function decodeBase64(input) {
   const state = [
     "Accepted",
@@ -562,9 +642,14 @@ function decodeBase64(input) {
 }
 onUnmounted(() => {
   // 停止监听编辑器的尺寸变化
+  saveProblemCode(source_code.value);
   if (resizeObserver) {
     resizeObserver.disconnect();
   }
+});
+
+window.addEventListener("beforeunload", (event) => {
+  saveProblemCode(source_code.value);
 });
 
 const toggleFullscreen = () => {
@@ -894,8 +979,19 @@ const submitCode = async () => {
     });
 };
 
-let changeTheme = function () {
+let changeTheme = async function () {
   cmInstance.setOption("theme", selectedTheme.value);
+  let userextra = {
+    userid: JSON.parse(localStorage.getItem("user")).userid,
+    editorstyle: selectedTheme.value,
+    special: "editorstyle",
+  };
+  await axios
+    .post(`${SERVER_URL}/userextra/update/special`, userextra)
+    .then((res) => {})
+    .catch((err) => {
+      console.log(err);
+    });
 };
 </script>
 
@@ -907,7 +1003,7 @@ let changeTheme = function () {
 
 .CodeMirror {
   font-family: "Consolas", monospace;
-  height: 400px;
+  height: 500px;
 }
 
 .CodeMirror-activeline-background {

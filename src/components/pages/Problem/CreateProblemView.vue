@@ -463,7 +463,12 @@ export default {
             message: "",
             type: "success",
           });
-          this.problemcontent.algorithm = algorithm.trim().split(" ");
+          
+          this.problemcontent.algorithm = algorithm.trim().split(" ");//恢复
+          this.backup = {
+            ...this.problemcontent,
+            ...this.examples,
+          }
         })
         .catch((error) => {
           this.$store.dispatch("notice", {

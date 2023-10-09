@@ -1,7 +1,6 @@
 <template>
   <div class="card main">
     <div :style="{ color: statusColor }">
-  
       <div>
         <div class="ok">
           <span v-if="score === 100"
@@ -13,17 +12,12 @@
           ></span>
           <!-- 显示 "×" -->
           {{ judgestate }} {{ score }}
-          <div
-            v-if="judgestate === 'Compilation Error'"
-            class="compileoutput"
-          >
+          <div v-if="judgestate === 'Compilation Error'" class="compileoutput">
             <a-typography-paragraph>
               <pre>编译器输出：<br />{{
                 decodeBase64(judgeinfo.judge.compileoutput)
               }}</pre>
             </a-typography-paragraph>
-
-            
           </div>
         </div>
         <div
@@ -207,7 +201,6 @@ export default {
   position: relative;
   color: gray;
   margin-top: 0px;
- 
 }
 .compileoutput {
   color: gray;
@@ -219,7 +212,6 @@ export default {
 .table1 {
   width: 780px;
   font-size: 16px;
- 
 }
 .icon-check {
   color: #25ad40;
@@ -239,7 +231,6 @@ export default {
   position: absolute;
   top: 20px;
   left: 20px;
-  
 }
 
 .loader.fast {
@@ -249,10 +240,7 @@ export default {
   padding: 20px;
   position: relative;
   font-size: 24px;
-
 }
 .column1 {
 }
-
-
 </style>

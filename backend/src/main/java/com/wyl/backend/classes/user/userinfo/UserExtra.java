@@ -19,6 +19,7 @@ public class UserExtra {
     private int concern;
     private int rating;
     private int ranking;
+    private String editorstyle;
     @TableField(exist = false)
     private String special;
 

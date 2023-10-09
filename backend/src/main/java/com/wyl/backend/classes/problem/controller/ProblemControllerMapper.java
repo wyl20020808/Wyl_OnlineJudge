@@ -1,10 +1,13 @@
 package com.wyl.backend.classes.problem.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.problem.Problem;
+import com.wyl.backend.classes.problem.ProblemCode;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.ProblemSample;
 import com.wyl.backend.classes.problem.sql.CreateProblemContent;
+import com.wyl.backend.classes.problem.sql.ProblemCodeSQL;
 import com.wyl.backend.classes.problem.sql.ProblemContentSQL;
 import com.wyl.backend.classes.problem.sql.ProblemSampleSQL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,32 @@ public class ProblemControllerMapper {
     private ProblemContentSQL problemContentSQL;
     @Autowired
     private ProblemSampleSQL problemSampleSQL;
+    @Autowired
+    private ProblemCodeSQL   problemCodeSQL;
+
+    //2023年10月9日20:49:11
+    @PostMapping("/update/problemcode")
+    public void  updateProblemCode(@RequestBody ProblemCode problemCode) {
+    //在这个例子中，updateById方法会尝试更新记录，如果更新成功，rows将会是更新的记录数，
+        // 否则rows将会是0。如果rows是0，那么就执行insert方法来插入记录。
+        //注意，这个操作并不是原子的，如果有其他线程在这两个操作之间修改了数据，
+        // 可能会导致问题。如果你需要原子性操作，你可能需要在数据库层面实现upsert操作
+        // ，这通常需要使用特定数据库的SQL语法。
+        UpdateWrapper<ProblemCode> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("userid",problemCode.getUserid()).eq("problemid", problemCode.getProblemid());
+        int rows = problemCodeSQL.update(problemCode, updateWrapper);
+        if (rows == 0) {
+            problemCodeSQL.insert(problemCode);
+        }
+    }
+
+    @GetMapping("/query/problemcode")
+    public ProblemCode  queryProblemCode(@RequestParam("userid") int userid,
+                                         @RequestParam("problemid") int problemid) {
+        QueryWrapper<ProblemCode> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid",userid).eq("problemid",problemid);
+        return  problemCodeSQL.selectOne(queryWrapper);
+    }
 
     //    @PostMapping("/update/problemcontent")
     public String updateProblemContent(ProblemContent problemContent) {//更新单个题目所有信息，根据id

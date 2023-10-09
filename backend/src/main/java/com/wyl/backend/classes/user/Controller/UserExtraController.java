@@ -1,6 +1,7 @@
 package com.wyl.backend.classes.user.Controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wyl.backend.classes.user.sql.UserExtraOperator;
@@ -29,11 +30,17 @@ public class UserExtraController {
     private UserOperator userOperator;
     @PostMapping("/update/special")
     public void updateSpecial(@RequestBody UserExtra userExtra){
+        System.out.println(userExtra.toString());
          if(userExtra.getSpecial().equals("submitcount"))
              userExtraOperator.incrementSubmitCount(userExtra.getUserid());
          else if(userExtra.getSpecial().equals("aceptedcount"))
              userExtraOperator.incrementAceptedcountCount(userExtra.getUserid());
-
+         else {
+             UpdateWrapper
+                     update = new UpdateWrapper<>();
+             update.eq("userid",userExtra.getUserid());
+             userExtraOperator.update(userExtra,update);
+         }
     }
     @GetMapping("/query/id")
     public UserExtra queryById(@RequestParam("userid") int userid){
