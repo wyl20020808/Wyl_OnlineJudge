@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <div style="font-size: 36px;"  class="title">新建题目</div>
+    <div style="font-size: 36px" class="title">{{ stateMent }}</div>
     <el-form label-position="left" label-width="100px">
       <el-form-item label="题目名称">
         <el-input
           :autosize="{ minRows: 1, maxRows: 5 }"
-          v-model="title"
+          v-model="problemcontent.title"
           type="textarea"
           placeholder="请输入题目名称"
           class="input"
@@ -14,14 +14,14 @@
       <el-form-item label="题目背景">
         <v-md-editor
           placeholder="题目背景"
-          v-model="background"
+          v-model="problemcontent.background"
           height="400px"
         ></v-md-editor>
       </el-form-item>
       <el-form-item label="题目描述">
         <v-md-editor
           placeholder="题目描述"
-          v-model="description"
+          v-model="problemcontent.description"
           height="300px"
         ></v-md-editor>
         <!-- <el-input v-model="description" type="textarea" placeholder="请输入题目描述" class="input"></el-input> -->
@@ -29,7 +29,7 @@
       <el-form-item label="输入格式">
         <v-md-editor
           placeholder="输入格式"
-          v-model="inputFormat"
+          v-model="problemcontent.inputformat"
           height="300px"
         ></v-md-editor>
         <!-- <el-input v-model="inputFormat" type="textarea" placeholder="请输入输入格式" class="input"></el-input> -->
@@ -37,7 +37,7 @@
       <el-form-item label="输出格式">
         <v-md-editor
           placeholder="输出格式"
-          v-model="outputFormat"
+          v-model="problemcontent.outputformat"
           height="300px"
         ></v-md-editor>
         <!-- <el-input v-model="outputFormat" type="textarea" placeholder="请输入输出格式" class="input"></el-input> -->
@@ -85,72 +85,128 @@
       <el-form-item label="数据范围">
         <v-md-editor
           placeholder="提示/数据范围"
-          v-model="hint"
+          v-model="problemcontent.hint"
           height="300px"
         ></v-md-editor>
         <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
       </el-form-item>
-      <el-form-item label="时间限制">
-        <a-select
-          ref="select"
-          v-model:value="selectedTime"
-          style="width: 200px"
-          :options="timeoptions"
-          @focus="focus"
-        ></a-select>
-        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
-      </el-form-item>
-      <el-form-item label="空间限制">
-        <a-select
-          ref="select"
-          v-model:value="selectedMemory"
-          style="width: 200px"
-          :options="memoryoptions"
-          @focus="focus"
-        ></a-select>
-        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
-      </el-form-item>
-      <el-form-item label="难度">
-        <a-select
-          ref="select"
-          v-model:value="difficulty"
-          style="width: 200px"
-          :options="difficultys"
-          @focus="focus"
-        ></a-select>
-      </el-form-item>
-      <el-form-item label="算法">
-        <a-select
-          v-model:value="algorithm"
-          mode="multiple"
-          show-search
-          placeholder="算法"
-          style="width: 200px"
-          :options="algorithmsAndDataStructuresOptions"
-          :filter-option="filterOption"
-          @focus="handleFocus"
-          @blur="handleBlur"
-          @change="handleChange"
-        ></a-select>
-      </el-form-item>
-      <el-form-item label="所属题库">
-        <a-select
-          ref="select"
-          v-model:value="questionbank"
-          style="width: 200px"
-          :options="questionbanks"
-          @focus="focus"
-        ></a-select>
-        <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
-      </el-form-item>
     </el-form>
-    <el-button
-      style="color: aliceblue; width: 80px"
-      type="primary"
-      @click="save"
-      class="save-button"
-      >保存</el-button
-    >
+
+    <el-form label-position="left" >
+      <a-row>
+        <a-col
+          ><el-form-item label="时间限制" >
+            <a-select
+            
+              ref="select"
+              v-model:value="problemcontent.timelimit"
+              style="width: 100px;margin-left: 30px;"
+              :options="timeoptions"
+              @focus="focus"
+            ></a-select>
+            <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+          </el-form-item></a-col
+        >
+        <a-col style="margin-left: 100px;"
+          ><el-form-item label="空间限制" >
+            <a-select
+              ref="select"
+              v-model:value="problemcontent.memorylimit"
+              style="width: 100px;"
+              :options="memoryoptions"
+              @focus="focus"
+            ></a-select>
+            <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+          </el-form-item></a-col
+        >
+        <a-col style="margin-left: 100px;">
+          <el-form-item label="难度">
+            <a-select
+              ref="select"
+              v-model:value="problemcontent.difficulty"
+              style="width: 100px"
+              :options="difficultys"
+              @focus="focus"
+            ></a-select>
+          </el-form-item>
+        </a-col>
+        <a-col style="margin-left: 100px;"
+          ><el-form-item label="算法">
+            <a-select
+              v-model:value="problemcontent.algorithm"
+              mode="multiple"
+              show-search
+              placeholder="算法"
+              style="width: 430px"
+              :options="algorithmsAndDataStructuresOptions"
+              :filter-option="filterOption"
+              @focus="handleFocus"
+              @blur="handleBlur"
+              @change="handleChange"
+            ></a-select> </el-form-item
+        ></a-col>
+        <a-col
+          ><el-form-item label="所属题库">
+            <a-select
+              ref="select"
+              v-model:value="problemcontent.questionbank"
+              style="width: 200px;margin-left: 30px;"
+              :options="questionbanks"
+              @focus="focus"
+            ></a-select>
+            <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
+          </el-form-item></a-col
+        >
+      </a-row>
+    </el-form>
+    <a-row style="width: 100%;" justify="space-between">
+      <a-col>
+        <el-button
+          style="color: aliceblue; width: 80px"
+          type="primary"
+          @click="save"
+          class="save-button"
+          >保存</el-button
+        >
+     
+        <el-button
+          v-if="problemid"
+          type="primary"
+          style="color: white; width: 100px; margin-left: 20px"
+          @click="backQuestion"
+          >返回题目</el-button
+        >
+        <el-button
+          v-else
+          type="primary"
+          style="color: rgb(255, 252, 252);width: 80px; margin-left: 20px"
+          @click="backQuestion"
+          >取消</el-button
+        >
+      </a-col>
+      <a-col  v-if="problemid">
+        <el-button
+          type="danger"
+          style="color: white; width: 100px; margin-left: 20px"
+          @click="deleteQuestion"
+          >删除题目</el-button
+        >
+    
+        <input
+          style="margin-left: 20px;width: 200px;"
+          type="file"
+          accept=".zip"
+          @change="handleFileUpload($event)"
+        />
+        <el-button
+          type="primary"
+          style="color: white; width: 100px"
+          @click="upload"
+          >上传数据</el-button
+        >
+      </a-col>
+    </a-row>
+
   </div>
 </template>
 
@@ -159,6 +215,8 @@ import { CloseOutlined } from "@ant-design/icons-vue";
 import axios from "axios";
 import { SERVER_URL } from "../../../js/functions/config";
 import { sleep } from "@/js/functions/TimeAbout";
+import router from "@/router/router";
+import _ from "lodash";
 export default {
   components: {
     CloseOutlined,
@@ -173,7 +231,7 @@ export default {
     }
     const memoryoptions = [];
     const difficultys = [
-     {
+      {
         value: "暂无评定",
         label: "暂无评定",
       },
@@ -306,27 +364,142 @@ export default {
     );
     return {
       algorithmsAndDataStructuresOptions,
-      difficulty: "简单",
+      problemcontent: {
+        difficulty: "简单",
+        algorithm: [],
+        title: "",
+        background: "",
+        description: "",
+        inputformat: "",
+        outputformat: "",
+        timelimit: 1000,
+        memorylimit: 64,
+        hint: "",
+        questionbank: "jxust",
+      },
+      file: null,
       difficultys,
-      algorithm: [],
-      source: "",
       timeoptions,
       memoryoptions,
-      title: "",
-      background: "",
-      description: "",
-      inputFormat: "",
-      outputFormat: "",
-      selectedTime: 1000,
-      selectedMemory: 64,
-      examples: [{ input: "", output: "" }],
-      hint: "",
+      examples: [],
+      stateMent: "新建题目",
       mouseOnSample: new Map(),
-      questionbank: "jxust",
       questionbanks,
+      problemid: this.$route.query.problemid,
+      isModified: false,
+      backup: {}, //保存原来的，看看是否有更改
     };
   },
   methods: {
+    onModify() {
+      this.isModified = true;
+    },
+    beforeUnload(e) {
+      if (this.isModified) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    },
+    deleteQuestion() {
+      axios
+        .post(`${SERVER_URL}/problem/delete/problem`, {
+          problemid: this.problemid,
+        })
+        .then((response) => {
+          this.$store.dispatch("notice", {
+            title: "删除成功！",
+            message: "",
+            type: "success",
+          });
+          sleep(500);
+          router.push({ name: "problems" });
+        })
+        .catch((error) => {
+          this.$store.dispatch("notice", {
+            title: "删除失败！",
+            message: "服务器异常" + error,
+            type: "error",
+          });
+        });
+    },
+    backQuestion() {
+      router.go(-1);
+    },
+    onModify() {
+      this.isModified = true;
+    },
+    beforeUnload(e) {
+      if (this.isModified) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    },
+    saveProblemInfo() {
+      let problemsample = [];
+      let algorithm = "";
+      for (let i = 0; i < this.problemcontent.algorithm.length; i++) {
+        //以空格的形式分开存储
+        algorithm += this.problemcontent.algorithm[i] + " ";
+      }
+      this.problemcontent.algorithm = algorithm;
+      this.problemcontent.problemid = this.problemid;
+      this.examples.forEach((sample) => {
+        problemsample.push({
+          problemid: this.problemid,
+          input: sample.input,
+          output: sample.output,
+        });
+      });
+
+      let problem = {
+        problemcontent: this.problemcontent,
+        problemsample: problemsample,
+      };
+      axios
+        .post(`${SERVER_URL}/problem/update/problem`, problem)
+        .then((response) => {
+          this.$store.dispatch("notice", {
+            title: "保存成功！",
+            message: "",
+            type: "success",
+          });
+          this.problemcontent.algorithm = algorithm.trim().split(" ");
+        })
+        .catch((error) => {
+          this.$store.dispatch("notice", {
+            title: "保存失败！",
+            message: "服务器异常" + error,
+            type: "error",
+          });
+        });
+    },
+    handleFileUpload(event) {
+      this.file = event.target.files[0];
+    },
+    async upload() {
+      let formData = new FormData();
+      formData.append("zipFile", this.file);
+      formData.append("problemId", parseInt(this.problemid));
+      console.log(this.file, this.problemid);
+      await axios
+        .post(`${JUDGE_URL}/sample/upload`, formData)
+        .then(async (response) => {
+          this.$store.dispatch("notice", {
+            title: "数据上传成功！",
+            message: "",
+            type: "success",
+          });
+        })
+        .catch((error) => {
+          this.$store.dispatch("notice", {
+            title: "数据上传失败！",
+            message: error,
+            type: "error",
+          });
+        });
+      // 然后你可以使用你的HTTP库（例如axios）来发送这个formData到服务器
+      // axios.post('/upload', formData)
+    },
     filterOption(input, option) {
       return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     },
@@ -353,6 +526,10 @@ export default {
       this.hint = dataSend.hint;
     },
     save() {
+      if (this.problemid) {
+        this.saveProblemInfo();
+        return;
+      }
       let algorithms = this.algorithm[0];
       for (let i = 1; i < this.algorithm.length; i++)
         algorithms = algorithms + " " + this.algorithm[i];
@@ -367,10 +544,10 @@ export default {
         problemsample: this.examples,
         questionbank: this.questionbank,
         difficulty: this.difficulty,
-        algorithm:algorithms,
-        timelimit:this.selectedTime,
-        memorylimit:this.selectedMemory,
-        source:JSON.parse(localStorage.getItem("user")).userid,
+        algorithm: algorithms,
+        timelimit: this.selectedTime,
+        memorylimit: this.selectedMemory,
+        source: JSON.parse(localStorage.getItem("user")).userid,
       };
       axios
         .post(`${SERVER_URL}/problem/insert`, dataSend)
@@ -403,7 +580,52 @@ export default {
         });
     },
   },
-  setup() {},
+  async created() {
+    this.backup = {
+            ...this.problemcontent,
+            ...this.examples,
+          };
+    if (this.problemid) {
+      this.stateMent = "编辑题目 - P" + this.problemid;
+      axios
+        .get(`${SERVER_URL}/problem/query/probleminfo/${this.problemid}`)
+        .then((response) => {
+          let data = response.data;
+          this.problemcontent = data.problemcontent;
+          this.examples = data.problemsample;
+          this.problemcontent.algorithm = String(data.problemcontent.algorithm)
+            .trim()
+            .split(" ");
+          this.backup = {
+            ...this.problemcontent,
+            ...this.examples,
+          };
+        })
+        .catch((error) => {});
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    let temp = {
+      ...this.problemcontent,
+      ...this.examples,
+    };
+    if (!_.isEqual(this.backup, temp)) {
+      //判断两个对象是否相等
+      if (window.confirm("你有未保存的更改，确定要离开吗？")) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
+  },
+  mounted() {
+    window.addEventListener("beforeunload", this.beforeUnload);
+  },
+  beforeDestroy() {
+    window.removeEventListener("beforeunload", this.beforeUnload);
+  },
 };
 </script>
 

@@ -429,6 +429,7 @@ onMounted(async () => {
       lineNumbers: true,
       mode: "text/x-c++src",
       viewportMargin: Infinity,
+      indentUnit: 4,  // 设置缩进单位为4个空格
       extraKeys: {
         Esc: function (cm) {
           showAutocomplete.value = false;
@@ -477,7 +478,6 @@ onMounted(async () => {
       autoCloseBrackets: true,
       styleActiveLine: true,
     });
-    cmInstance.setOption("theme", "neat");
     cmInstance.on("cursorActivity", () => {
       if (!isUserTyping) {
         showAutocomplete.value = false;

@@ -176,7 +176,7 @@
             <a-row>
               <a-col style="margin-top: 30px" :span="13" :offset="3">
                 <a-card>
-                  <a-row v-if="problemcontent.background !== '无'">
+                  <a-row v-if="problemcontent.background !== '无' && String(problemcontent.background) !== ''">
                     <a-col>
                       <h5 style="font-weight: bold">题目背景</h5>
                       <div
@@ -476,8 +476,8 @@ export default {
     },
     editProblem() {
       router.push({
-        name: "problemedit",
-        params: { problemid: this.problemcontent.problemid },
+        name: "createproblem",
+        query: { problemid: this.problemcontent.problemid },
       });
     },
     jump(path) {
