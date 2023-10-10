@@ -599,13 +599,17 @@ async function queryProblemCode() {
       },
     })
     .then((res) => {
-      cmInstance.off("change", handleEditorChange);
+      if(res.data && res.data.code){
+        cmInstance.off("change", handleEditorChange);
       // 改变内容
       cmInstance.setValue(res.data.code);
       // 添加回监听器
       cmInstance.on("change", handleEditorChange);
       source_code.value = res.data.code;
       lasteditortime.value = res.data.lasteditortime;
+      }else{
+        console.log('本题暂无编辑记录')
+      }
     })
     .catch((err) => {
       console.log(err);

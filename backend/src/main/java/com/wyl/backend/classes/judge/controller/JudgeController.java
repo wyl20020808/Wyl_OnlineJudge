@@ -67,6 +67,13 @@ public class JudgeController {
         return judgeSql.selectList(query);
     }
 
+    @GetMapping("/query/userid")
+    public List<Judge> queryJudgeByUserid(@RequestParam int userid){
+        QueryWrapper<Judge> query = new QueryWrapper<>();
+        query.eq("userid",userid);
+        return judgeSql.selectList(query);
+    }
+
     @GetMapping("/query/judgecontent")
     public List<JudgeContent> queryJudgeContent(@RequestParam int judgeid){
         QueryWrapper<JudgeContent> query = new QueryWrapper<>();
@@ -92,7 +99,6 @@ public class JudgeController {
         log.info("用户判题成功=>{}",problemId);
         return Result.success(judgeResultToUser);
     }
-
 
 
     @PostMapping("/judgeone")

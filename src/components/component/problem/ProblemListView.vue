@@ -22,10 +22,22 @@
           :total="nowQuestions.length"
         ></el-pagination>
         <el-table
-          class="table1"
           :data="displayedQuestions"
           style="width: 100%; font-size: 16px"
+          :row-class-name="tableRowClassName"
         >
+        <el-table-column align="center" width="70" prop="title" label="状态">
+            <template v-slot="{ row }">
+              <div
+                class="hoverable"
+                @click="push_to_problemcontent(row.problemid)"
+              >
+              <DislikeFilled style="font-size: 20px;color: rgb(216, 65, 90);" v-if="historyScore.get(row.problemid) && historyScore.get(row.problemid) !== 100 || historyScore.get(row.problemid) === 0" />
+              <QuestionOutlined style="font-size: 20px;" v-else-if="!historyScore.get(row.problemid)"/>
+              <LikeFilled style="font-size: 20px;color: rgb(10, 146, 10);" v-else />
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column
             align="center"
             width="80"
@@ -95,10 +107,18 @@ import { SERVER_URL } from "../../../js/functions/config";
 import { Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { QuestionOutlined , QuestionCircleFilled,CheckOutlined,CloseOutlined,LikeFilled,DislikeFilled } from "@ant-design/icons-vue";
 
 export default {
   props: ["questionBank", "difficulty", "algorithm"],
-  components: {},
+  components: {
+    QuestionOutlined,
+    CheckOutlined ,
+    CloseOutlined ,
+    LikeFilled,
+    DislikeFilled ,
+    QuestionCircleFilled ,
+  },
   setup() {
     const router = useRouter();
     const push_to_problemcontent = (problemid) => {
@@ -125,6 +145,7 @@ export default {
       searchResult: [],
       searchProblem: "1",
       timeout: null,
+      historyScore: new Map(),
     };
   },
   watch: {
@@ -175,15 +196,27 @@ export default {
           console.log(err, "ahsjdhas");
         });
     },
+    tableRowClassName({ row, rowIndex }) {
+      if (this.historyScore.get(row.problemid) || this.historyScore.get(row.problemid) === 0) {
+        if (this.historyScore.get(row.problemid) !== 100){
+          return 'danger-row';
+        }else{
+          return 'success-row';
+        }
+      }
+      return '';
+    },
     updateQuestions() {
       //更新算法和难度筛选
       let question = [];
       for (let i = 0; i < this.questions.length; i++) {
         if (
-          !this.algorithm || this.algorithm.length === 0 || 
+          !this.algorithm ||
+          this.algorithm.length === 0 ||
           (this.algorithm &&
-          this.algorithm.some(item => this.questions[i].algorithm.trimEnd().split(" ").includes(item))
-          )
+            this.algorithm.some((item) =>
+              this.questions[i].algorithm.trimEnd().split(" ").includes(item)
+            ))
         ) {
           if (
             !this.difficulty ||
@@ -233,6 +266,32 @@ export default {
         problemid: question.problemid,
       }));
     },
+    async getHistoryScore() {
+      await axios
+        .get(`${SERVER_URL}/judge/query/userid`, {
+          params: {
+            userid: JSON.parse(localStorage.getItem("user")).userid,
+          },
+        })
+        .then((res) => {
+          let data = res.data;
+          for (let i = 0; i < data.length; i++) {
+            let problemid = data[i].problemid;
+            if (
+              !this.historyScore.get(problemid) ||
+              data[i].score > this.historyScore.get(problemid)
+            )
+              this.historyScore.set(problemid, data[i].score);
+          }
+          console.log(this.historyScore, "历史分数已经初始化完成");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
+  async created() {
+    await this.getHistoryScore();
   },
 };
 </script>
@@ -262,5 +321,13 @@ export default {
 .hoverable:hover {
   filter: brightness(1.3);
   text-decoration: underline;
+}
+
+
+::v-deep .el-table .danger-row {
+  --el-table-tr-bg-color: var(--el-color-danger-light-8);
+}
+::v-deep .el-table .success-row {
+  --el-table-tr-bg-color: var(--el-color-success-light-8);
 }
 </style>
