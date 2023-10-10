@@ -64,6 +64,25 @@ import VueCodemirror from 'vue-codemirror'
 import 'codemirror/mode/javascript/javascript.js'
 import 'codemirror/theme/base16-dark.css'
 
+//2023年10月10日10:34:12
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
+
+const vuetify = createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: 'mdi',
+    aliases,
+    sets: {
+      mdi,
+    },
+  },
+})
+
 // hljs.registerLanguage('json', json);
 // hljs.registerLanguage('cpp', cpp);
 // hljs.registerLanguage('cpp', javascript);
@@ -98,8 +117,8 @@ app.directive('focus', {
     }
   })
   
-app.use(router).use(ElementPlus).use(store).use(Antd).mount('#app')
+app.use(router).use(ElementPlus).use(vuetify).use(store).use(Antd)
 app.use(VMdEditor).use(VMdPreview)
 
 //2023年10月9日09:59:18
-app.use(VueCodemirror)
+app.use(VueCodemirror).mount('#app')

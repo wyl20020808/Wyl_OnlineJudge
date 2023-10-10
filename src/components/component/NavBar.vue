@@ -1,96 +1,88 @@
 <template>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav">
-            <li class="nav-item logo" style="margin-left: 20px">
-              <router-link :to="{ name: 'home' }">
-                <img
-                  style="width: 200px"
-                  src="../../assets/static/pictures/江西理工大学logo.png"
-                  alt="Avatar"
-                />
-              </router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'home' }"
-                >首页</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'problems' }"
-                >题库</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'competition' }"
-                >比赛</router-link
-              >
-            </li>
-
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'ranklist' }"
-                >排行榜</router-link
-              >
-            </li>
-            <!-- <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'tissue' }"
-                >工作室</router-link
-              >
-            </li> -->
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'evaluationqueue' }"
-                >评测队列</router-link
-              >
-            </li>
-            <li class="nav-item dropdown" v-if="userloginstate === 'true'">
-              <el-dropdown>
-                <span class="el-dropdown-link">
-                  <img class="avatar" :src="userpicture" alt="Avatar" />
-                  <a-badge v-if="unRead > 0" dot></a-badge>
-                  <el-icon class="el-icon--right">
-                    <arrow-down />
-                  </el-icon>
-                </span>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item
-                      ><div @click="toUseInfo" class="dropdown-item">
-                        <el-icon><UserFilled /></el-icon>&ensp;个人资料
-                      </div></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><router-link :to="{ name: 'home' }" class="dropdown-item"
-                        ><el-icon><Setting /></el-icon> &ensp;设置</router-link
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><div @click="toMessage" class="dropdown-item">
-                        <el-icon><Bell /></el-icon>&ensp;消息
-                      </div>
-                      <a-badge :count="unRead" class="item"> </a-badge>
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      ><a @click="logout" class="dropdown-item"
-                        ><el-icon><SwitchButton /></el-icon>&ensp;退出</a
-                      ></el-dropdown-item
-                    >
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </li>
-            <li class="nav-item" v-else>
-              <router-link class="nav-link" :to="{ name: 'userlogin' }"
-                >登录</router-link
-              >
-            </li>
-          </ul>
+  <div>
+    <v-layout class="overflow-visible" style="height: 56px">
+      <v-bottom-navigation v-model="value" grow :bg-color="color" mode="shift">
+        <v-btn @click="jump('')">
+          <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
+          <span style="font-size: 16px">主页</span>
+        </v-btn>
+        <v-btn @click="jump('problems')">
+          <v-icon
+            ><img src="../../assets/static/pictures/题库.png" width="30"
+          /></v-icon>
+          <span style="font-size: 16px">题库</span>
+        </v-btn>
+        <v-btn @click="jump('competition')">
+          <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
+          <span style="font-size: 16px">比赛</span>
+        </v-btn>
+        <v-btn @click="jump('ranklist')">
+          <v-icon
+            ><img src="../../assets/static/pictures/rank.png" width="30"
+          /></v-icon>
+          <span style="font-size: 16px">排行榜</span>
+        </v-btn>
+        <v-btn @click="jump('tissue')">
+          <v-icon
+            ><img src="../../assets/static/pictures/acm.png" width="30"
+          /></v-icon>
+          <span style="font-size: 16px">工作室</span>
+        </v-btn>
+        <v-btn @click="jump('evaluationqueue')">
+          <v-icon><HourglassFilled style="font-size: 25px" /></v-icon>
+          <span style="font-size: 16px">评测队列</span>
+        </v-btn>
+        <div
+          style="margin-left: 100px; margin-top: 7px"
+          class="nav-item dropdown"
+          v-if="userloginstate === 'true'"
+        >
+          <el-dropdown>
+            <span class="el-dropdown-link">
+              <img class="avatar" :src="userpicture" alt="Avatar" />
+              <a-badge v-if="unRead > 0" dot></a-badge>
+              <el-icon class="el-icon--right">
+                <arrow-down />
+              </el-icon>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  ><div @click="toUseInfo" class="dropdown-item">
+                    <el-icon><UserFilled /></el-icon>&ensp;个人资料
+                  </div></el-dropdown-item
+                >
+                <el-dropdown-item
+                  ><router-link :to="{ name: 'home' }" class="dropdown-item"
+                    ><el-icon><Setting /></el-icon> &ensp;设置</router-link
+                  ></el-dropdown-item
+                >
+                <el-dropdown-item
+                  ><div @click="toMessage" class="dropdown-item">
+                    <el-icon><Bell /></el-icon>&ensp;消息
+                  </div>
+                  <a-badge :count="unRead" class="item"> </a-badge>
+                </el-dropdown-item>
+                <el-dropdown-item
+                  ><a @click="logout" class="dropdown-item"
+                    ><el-icon><SwitchButton /></el-icon>&ensp;退出</a
+                  ></el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
-      </nav>
- 
+        <v-btn   class="nav-item" v-else @click="jump('userlogin')">
+          <v-icon
+            ><img src="../../assets/static/pictures/login.png" width="30"
+          /></v-icon>
+          <span style="font-size: 16px">登录</span>
+        </v-btn>
+      </v-bottom-navigation>
+    </v-layout>
+  </div>
 </template>
-
 <script>
-import { SERVER, SERVER_URL } from "../../js/functions/config";
 import {
   Setting,
   UserFilled,
@@ -99,69 +91,55 @@ import {
 } from "@element-plus/icons-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
+import {
+  HomeFilled,
+  HourglassFilled,
+  TrophyFilled,
+  BookFilled,
+} from "@ant-design/icons-vue";
+import { SERVER, SERVER_URL } from "../../js/functions/config";
 import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
-
-import { ref, h } from "vue";
-import {
-  MailOutlined,
-  AppstoreOutlined,
-  SettingOutlined,
-} from "@ant-design/icons-vue";
 export default {
-  name: "BaseComponentView",
   components: {
+    HomeFilled,
+    HourglassFilled,
+    TrophyFilled,
+    BookFilled,
     Setting,
     UserFilled,
     Bell,
     SwitchButton,
-    MailOutlined,
-    AppstoreOutlined,
-    SettingOutlined,
   },
-  data() {
-    return {
-      unRead: 0,
-      menuChoose: "Home",
-      items: [
-        {
-          key: "Home",
-          icon: () => h(MailOutlined),
-          label: "主页",
-          title: "主页",
-        },
-        {
-          key: "Question",
-          icon: () => h(AppstoreOutlined),
-          label: "题库",
-          title: "题库",
-        },
-        {
-          key: "Competition",
-          icon: () => h(SettingOutlined),
-          label: "比赛",
-          title: "比赛",
-        },
-        {
-          key: "Rank",
-          label: "排行榜",
-          title: "排行榜",
-        },
-        {
-          key: "Organization",
-          label: "组织",
-          title: "组织",
-        },
-        {
-          key: "Judge",
-          label: "评测队列",
-          title: "评测队列",
-        },
-      ],
-    };
+  data: () => ({
+    value: Number(localStorage.getItem("navState")) || 0,
+    unRead: 0,
+  }),
+  watch: {
+    value(newVal) {
+      localStorage.setItem("navState", newVal);
+    },
   },
   computed: {
+    color() {
+      switch (this.value) {
+        case 0:
+          return "purple";
+        case 1:
+          return "teal";
+        case 2:
+          return "brown";
+        case 3:
+          return "indigo";
+        case 4:
+          return "blue";
+        case 5:
+          return "red";
+        default:
+          return "blue-grey";
+      }
+    },
     userloginstate: function () {
       let user = localStorage.getItem("user");
       if (user) {
@@ -189,8 +167,10 @@ export default {
       this.getUnreadMessage();
     }
   },
-  setup() {},
   methods: {
+    jump(total) {
+      router.push({ path: "/" + total });
+    },
     async getUnreadMessage() {
       //统计一下未读的消息
       await axios
@@ -224,7 +204,7 @@ export default {
         userinfo,
         loginState: false,
       });
-      localStorage.setItem('user', null);
+      localStorage.setItem("user", null);
       sleep(500).then(() => {
         window.location = `${SERVER}`;
       });
@@ -235,33 +215,12 @@ export default {
 </script>
 
 <style scoped>
-.navbar {
-  padding-left: 0px;
-  border-bottom: 1px solid #ccc;
-}
-.navbar-nav {
+.v-bottom-navigation {
+  position: fixed;
+  top: 0;
   width: 100%;
-  justify-content: space-between;
 }
-.navbar-nav .logo {
-  flex-grow: 1;
-}
-.nav-item {
-  flex-grow: 1;
-  text-align: center;
-  /* border-right: 1px solid #ccc; */
-}
-.nav-item:last-child {
-  border-right: none;
-  margin-right: 20px;
-}
-.navbar-brand {
-  font-size: 2em;
-}
-.nav-link {
-  font-size: 1.2em;
-  outline: none;
-}
+
 .avatar {
   border-radius: 50%;
   width: 40px;

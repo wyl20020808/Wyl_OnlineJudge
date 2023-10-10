@@ -35,11 +35,12 @@ public class UserExtraController {
              userExtraOperator.incrementSubmitCount(userExtra.getUserid());
          else if(userExtra.getSpecial().equals("aceptedcount"))
              userExtraOperator.incrementAceptedcountCount(userExtra.getUserid());
-         else {
+         else if(userExtra.getSpecial().equals("editorstyle")){
              UpdateWrapper
                      update = new UpdateWrapper<>();
              update.eq("userid",userExtra.getUserid());
-             userExtraOperator.update(userExtra,update);
+             update.set("editorstyle",userExtra.getEditorstyle());
+             userExtraOperator.update(null,update);
          }
     }
     @GetMapping("/query/id")

@@ -14,7 +14,7 @@
                 >题目或ID</label
               >
               <a-select
-              allowClear
+                allowClear
                 v-model:value="problems"
                 show-search
                 placeholder="输入题目名称、ID进行搜索"
@@ -198,7 +198,7 @@ export default {
       this.updateJudgeDate();
     },
     async problems(newVal, oldVal) {
-      console.log(oldVal,newVal);
+      console.log(oldVal, newVal);
       this.updateJudgeDate();
     },
     async languagevalue(newVal, oldVal) {
@@ -487,11 +487,15 @@ export default {
         console.log(error);
       });
     this.updateTableData();
-    if(this.$route.query.problemid){//如果有筛选项的话，这里暂时处理了，题目界面的那个提交记录
+    if (this.$route.query.problemid) {
+      //如果有筛选项的话，这里暂时处理了，题目界面的那个提交记录
       this.problems = parseInt(this.$route.query.problemid);
     }
+    if (this.$route.query.userid) {
+      //如果有筛选项的话
+      this.administrators = parseInt(this.$route.query.userid);
+    }
   },
-  
 };
 </script>
 

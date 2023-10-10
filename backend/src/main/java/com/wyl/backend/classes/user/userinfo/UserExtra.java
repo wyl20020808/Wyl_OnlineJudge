@@ -14,7 +14,6 @@ public class UserExtra {
     private int userid;
     private int submitcount;
     private int aceptedcount;
-
     private int fans;
     private int concern;
     private int rating;

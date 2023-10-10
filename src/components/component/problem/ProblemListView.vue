@@ -30,7 +30,7 @@
             <template v-slot="{ row }">
               <div
                 class="hoverable"
-                @click="push_to_problemcontent(row.problemid)"
+                @click="jumpToQueue(row.problemid)"
               >
               <DislikeFilled style="font-size: 20px;color: rgb(216, 65, 90);" v-if="historyScore.get(row.problemid) && historyScore.get(row.problemid) !== 100 || historyScore.get(row.problemid) === 0" />
               <QuestionOutlined style="font-size: 20px;" v-else-if="!historyScore.get(row.problemid)"/>
@@ -108,7 +108,7 @@ import { Search } from "@element-plus/icons-vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { QuestionOutlined , QuestionCircleFilled,CheckOutlined,CloseOutlined,LikeFilled,DislikeFilled } from "@ant-design/icons-vue";
-
+import router from "@/router/router";
 export default {
   props: ["questionBank", "difficulty", "algorithm"],
   components: {
@@ -247,6 +247,15 @@ export default {
     handleSearch() {
       // 在这里处理搜索逻辑
       console.log(this.searchText);
+    },
+    jumpToQueue(problemid) {
+      router.push({
+        name: "evaluationqueue",
+        query: {
+          problemid: problemid,
+          userid:JSON.parse(localStorage.getItem("user")).userid,
+        },
+      });
     },
     handlePageChange(newPage) {
       this.currentPage = newPage;

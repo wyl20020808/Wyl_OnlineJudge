@@ -990,6 +990,7 @@ let changeTheme = async function () {
     editorstyle: selectedTheme.value,
     special: "editorstyle",
   };
+  console.log(userextra)
   await axios
     .post(`${SERVER_URL}/userextra/update/special`, userextra)
     .then((res) => {})
