@@ -1,7 +1,7 @@
 <template>
   <!-- <v-md-editor v-model="text" height="400px"></v-md-editor>
     -->
-  <a-row style="width: 100%"
+  <a-row style="width: 100%;margin-top: 10px;"
     ><a-col :span="24">
       <a-row style="width: 100%"
         ><a-col :span="24">

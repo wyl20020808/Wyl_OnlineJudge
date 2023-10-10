@@ -1,6 +1,6 @@
 <template>
   <a-row style="justify-content: center;align-items: center;">
-  <a-row style="margin-top:10px;">
+  <a-row style="margin-top:30px;">
     <a-col :span="15" :offset="0" class="contest-list">
       <ContestListComponent />
     </a-col >

@@ -1,39 +1,45 @@
 <template>
   <div>
     <v-layout class="overflow-visible" style="height: 56px">
-      <v-bottom-navigation v-model="value" grow :bg-color="color" mode="shift">
+      <v-bottom-navigation
+        height="70"
+        v-model="value"
+        grow
+        :bg-color="color"
+        mode="shift"
+      >
         <v-btn @click="jump('')">
           <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px">主页</span>
+          <span style="font-size: 16px; margin-top: 5px">主页</span>
         </v-btn>
         <v-btn @click="jump('problems')">
           <v-icon
             ><img src="../../assets/static/pictures/题库.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px">题库</span>
+          <span style="font-size: 16px; margin-top: 5px">题库</span>
         </v-btn>
         <v-btn @click="jump('competition')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px">比赛</span>
+          <span style="font-size: 16px; margin-top: 5px">比赛</span>
         </v-btn>
         <v-btn @click="jump('ranklist')">
           <v-icon
             ><img src="../../assets/static/pictures/rank.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px">排行榜</span>
+          <span style="font-size: 16px; margin-top: 5px">排行榜</span>
         </v-btn>
         <v-btn @click="jump('tissue')">
           <v-icon
             ><img src="../../assets/static/pictures/acm.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px">工作室</span>
+          <span style="font-size: 16px; margin-top: 5px">工作室</span>
         </v-btn>
         <v-btn @click="jump('evaluationqueue')">
           <v-icon><HourglassFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px">评测队列</span>
+          <span style="font-size: 16px; margin-top: 5px">评测队列</span>
         </v-btn>
         <div
-          style="margin-left: 100px; margin-top: 7px"
+          style="margin-left: 100px; margin-top: 15px"
           class="nav-item dropdown"
           v-if="userloginstate === 'true'"
         >
@@ -72,11 +78,11 @@
             </template>
           </el-dropdown>
         </div>
-        <v-btn   class="nav-item" v-else @click="jump('userlogin')">
+        <v-btn class="nav-item" v-else @click="jump('userlogin')">
           <v-icon
             ><img src="../../assets/static/pictures/login.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px">登录</span>
+          <span style="font-size: 16px; margin-top: 5px">登录</span>
         </v-btn>
       </v-bottom-navigation>
     </v-layout>
@@ -113,15 +119,18 @@ export default {
     SwitchButton,
   },
   data: () => ({
-    value: Number(localStorage.getItem("navState")) || 0,
+    value: 0,
     unRead: 0,
   }),
   watch: {
-    value(newVal) {
-      localStorage.setItem("navState", newVal);
+    $route(to, from) {
+      this.updateNavState();
     },
   },
   computed: {
+    currentPath() {
+      return this.$route.path;
+    },
     color() {
       switch (this.value) {
         case 0:
@@ -158,6 +167,7 @@ export default {
     },
   },
   async created() {
+    this.updateNavState();
     window.onbeforeunload = () => {
       // console.log(userinfo.userloginstate)
     };
@@ -168,6 +178,30 @@ export default {
     }
   },
   methods: {
+    updateNavState() {
+      switch (this.currentPath) {
+        case "/":
+          this.value = 0;
+          break;
+        case "/problems":
+          this.value = 1;
+          break;
+        case "/competition":
+          this.value = 2;
+          break;
+        case "/ranklist":
+          this.value = 3;
+          break;
+        case "/tissue":
+          this.value = 4;
+          break;
+        case "/evaluationqueue":
+          this.value = 5;
+          break;
+        default:
+          break;
+      }
+    },
     jump(total) {
       router.push({ path: "/" + total });
     },

@@ -3,7 +3,7 @@
 2、如果是比赛则需要：[contestid,problemchar,problemname]
  -->
 <template>
-  <a-row style="margin-left: 200px;margin-top: 20px;">
+  <a-row style="margin-left: 200px;margin-top: 30px;">
     <a-col >
       <a-card class="nav" style="margin-bottom: 10px;">
         <div style="font-size: 36px;">

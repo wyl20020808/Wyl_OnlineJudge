@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-bottom: 5px">
+  <!-- <div style="margin-bottom: 5px;margin-top: 30px;">
     <el-switch v-model="isCollapse"></el-switch>
   </div>
   <el-menu
@@ -27,11 +27,11 @@
       <el-icon><setting /></el-icon>
       <template #title>Navigator Four</template>
     </el-menu-item>
-  </el-menu>
+  </el-menu> -->
 
-  <a-row>
-    <a-col>
-      
+  <a-row style="align-items: center; justify-content: center; margin-top: 200px;">
+    <a-col >
+      <h1>小编正在开发中，敬请期待！</h1>
 
 
     </a-col>

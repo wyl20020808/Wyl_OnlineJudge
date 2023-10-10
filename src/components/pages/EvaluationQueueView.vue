@@ -1,5 +1,5 @@
 <template>
-  <a-row style="justify-content: center; align-items: center; margin-top: 20px">
+  <a-row style="justify-content: center; align-items: center; margin-top: 30px">
     <a-col>
       <a-row>
         <a-card style="width: 1200px">

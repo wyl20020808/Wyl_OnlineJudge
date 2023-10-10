@@ -1,89 +1,46 @@
 <template>
-    
-    <div class="news-card card">
-        <div class="news-card-header">
-            <div style="font-size: 36px;" class="news-card-title">新闻</div>
-        </div>
-        <div class="news-card-body">
-            <!-- 这里可以通过后端传递的数据来展示新闻内容 -->
-            <p>这是一条新闻的内容。</p>
-        </div>
-    </div>
-     <div class="fortune-card card">
-        <div class="fortune-card-header">
-            <div style="font-size: 36px;" class="fortune-card-title">今日</div>
-        </div>
-        <div class="fortune-card-body">
-            <div class="fortune-data">
-                <!-- 这里可以通过后端传递的数据来展示"今日人品" -->
-                <p>今日人品：</p>
-            </div>
-            <button class="refresh-button">点击打卡</button>
-        </div>
-    </div>
+  <a-row style="width: 100%; margin-top: 20px;">
+    <a-col :span="24">
+      <a-row style="align-items: center;justify-content: center;">
+        <a-col :span="23">
+          <el-carousel :interval="4000" type="card" height="300px">
+            <el-carousel-item v-for="item in images" :key="item">
+              <img :src="item" alt="image" style="width: 100%; height: 100%" />
+            </el-carousel-item>
+          </el-carousel>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+            </a-col>
+      </a-row>
+    </a-col>
+  </a-row>
 </template>
 
 <script>
-import BaseComponentViewVue from "../component/NavBar.vue";
-export default{
-    name:"home",
-    components: {
-    BaseComponentViewVue,
-  }
-}
+export default {
+  data() {
+    return {
+      images: [
+        require("../../assets/static/pictures/jxust/1.png"),
+        require("../../assets/static/pictures/jxust/2.png"),
+        require("../../assets/static/pictures/jxust/3.jpg"),
+        require("../../assets/static/pictures/jxust/4.jpg"),
+        require("../../assets/static/pictures/jxust/5.jpg"),
+        // 其他的图片URL...
+      ],
+    };
+  },
+  methods: {
+  
+    // 其他的方法...
+  },
+};
 </script>
 
 <style scoped>
-.news-card {
-            height: 200px;
-            width: 50%;
-            position: absolute;
-            top: 80px;
-            left: 100px;
-        }
-        .news-card-header {
-            background-color: #f8f9fa;
-            padding: 10px;
-        }
-        .news-card-title {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .news-card-body {
-            padding: 10px;
-        }
-/* ----------------------------------------- */
-    .fortune-card {
-            height: 200px;
-            width: 25%;
-            position: absolute;
-            top: 80px;
-            right: 250px;
-        }
-        .fortune-card-header {
-            background-color: #f8f9fa;
-            padding: 10px;
-        }
-        .fortune-card-title {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .fortune-card-body {
-            position: relative;
-            padding: 10px;
-        }
-        .fortune-data {
-            margin-bottom: 30px;
-        }
-        .refresh-button {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
+
+
+
 </style>
