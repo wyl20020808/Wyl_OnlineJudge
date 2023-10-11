@@ -487,7 +487,7 @@ export default {
       formData.append("problemId", parseInt(this.problemid));
       console.log(this.file, this.problemid);
       await axios
-        .post(`${JUDGE_URL}/sample/upload`, formData)
+        .post(`${SERVER_URL}/sample/upload`, formData)
         .then(async (response) => {
           this.$store.dispatch("notice", {
             title: "数据上传成功！",

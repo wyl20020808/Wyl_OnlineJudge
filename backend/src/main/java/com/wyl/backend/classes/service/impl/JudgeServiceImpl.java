@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -49,78 +50,29 @@ public class JudgeServiceImpl implements JudgeService {
     Set<String> busy = new HashSet<>();
     public String PUSH_ONE_SUBMISSION_API = "submissions/?base64_encoded=true&wait=true";
     public String GET_API = "submissions/";
+    private AtomicInteger last = new AtomicInteger(0);
 
-    public int last = 0;
     public void insertJudgecontentOne(JudgeContent judgeContent){
         judgeContentSql.insert(judgeContent);
     }
     @Override
     public Judge0Result judgeOne(Submission push, Map<String, String> MachineToToken, Map<String, String> TokenToMachine) {
-                Map<String, Object> postBody = JsonUtil.convertObjectToMap(push);
+        Map<String, Object> postBody = JsonUtil.convertObjectToMap(push);
         String result = null;
         String mathine = "false";
         List<Judge0> judge0 = judge0Controller.queryJugde0();//不断去查询状态
 //        Random rand = new Random();
 //        mathine = judge0.get(rand.nextInt(judge0.size())).getJudgemachine();
-        mathine = judge0.get(last).getJudgemachine();
-        last = last % 2;
-//        while (true) {//直到有机子空闲为止
-//            if (!mathine.equals("false")) break;
-//            List<Judge0> judge0 = judge0Controller.queryJugde0();//不断去查询状态
-//            free.clear();
-//            busy.clear();
-//            for (Judge0 judge : judge0) {//初始化一下
-//                if (judge.getState().equals("false")) free.add(judge.getJudgemachine());
-//                else busy.add(judge.getJudgemachine());
-//                MachineToToken.put(judge.getJudgemachine(), judge.getToken());
-//                TokenToMachine.put(judge.getToken(), judge.getJudgemachine());
-//            }
-//            //其实这里会涉及到同步问题，因为在几毫秒之内数据可能就被修改了，所以这里要加锁
-//            for (String judge : free) {//遍历机器
-//                if (!mathine.equals("false")) break;
-//                //找机子的时候要拿它的token去判，去看看是不是已经判完了
-//
-//                mathine = judge;
-//                judge0Controller.updateJugde0(mathine, "true", "无");
-//            }
-//
-//            if (!mathine.equals("false")) break;
-//            for (String judge : busy) {
-//                //如果是true的机子就查一下它的token判完了没
-//                //这里完成了所有机子的释放操作，在这里完成就够了，因为只要我要用我再去释放就行了
-//                if (MachineToToken.get(judge).equals("无")) continue;
-//
-//                if (MachineToToken.get(judge).equals("无")) {
-//
-//                    mathine = judge;//我就用这台机器
-//                    break;
-//                };//测试
-//                    //这个是为了同步状态，因为有可能机器被置为true，但是没有token
-//
-////                long startTime = System.currentTimeMillis();
-//// 你的代码块
-//                Judge0Result res = getOneJuge0ResultByToken(judge, MachineToToken.get(judge));
-//                if (res.getStatus().getId() > 2) {//判题完成
-////                    System.out.println("zxy");
-////                    long endTime = System.currentTimeMillis();
-////                    long timeElapsed = endTime - startTime;
-////                    System.out.println("执行时间（毫秒）: " + timeElapsed);
-//
-//                    mathine = judge;//我就用这台机器
-//                    judge0Controller.updateJugde0(mathine, "true", "无");
-//
-//                }
-//            }
-//        }
-
+        mathine = judge0.get(last.getAndIncrement() % judge0.size()).getJudgemachine();
 
         String url = mathine + PUSH_ONE_SUBMISSION_API;
+        System.out.println(url + " url");
         try {
             result = String.valueOf(HttpClientUtil.doPostJson(url, postBody));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(result + "hsajdhj");;
+        System.out.println(result + "hsajdhjhsajdhj");
         Judge0Result judge0Result = null;
         try {
             judge0Result = JsonUtil.jsonToObject(result, Judge0Result.class);
@@ -133,9 +85,7 @@ public class JudgeServiceImpl implements JudgeService {
         try {
             // 创建一个FileWriter对象
             FileWriter writer = new FileWriter("output.txt", true); // true表示追加写入
-
             writer.write(mathine + " 这次用的机器 " + token +"\n"); // 写入文件
-
             // 关闭文件
             writer.close();
         } catch (IOException e) {

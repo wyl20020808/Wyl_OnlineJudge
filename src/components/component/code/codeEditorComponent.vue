@@ -80,26 +80,49 @@
               border-top: 1px solid rgb(217, 216, 216);
             "
           >
-            <a-row style="width: 100%">
-              <a-col :offset="18">
+            <a-row
+              style="width: 100%"
+              type="flex"
+              align="middle"
+              justify="space-between"
+            >
+              <a-col>
+                <span v-for="(sample, index) in problemsample" :key="index">
+                  <a-button
+                    @click="loadSample(index)"
+                    style="
+                      border: none;
+                      color: rgb(0, 198, 132);
+                      margin-right: 10px;
+                      font-size: 14px;
+                      background-color: rgb(238, 250, 247);
+                    "
+                    >载入样例 {{ index + 1 }}</a-button
+                  ></span
+                >
+              </a-col>
+              <a-col>
                 <el-button
                   @click="runCode"
                   style="height: 40px; font-size: 16px; margin-left: 0px"
                   round
                   ><SendOutlined style="margin-right: 5px" />运行代码</el-button
                 >
-              </a-col>
-              <a-col>
                 <el-button
-                  style="height: 40px; font-size: 16px; margin-left: 30px"
+                  style="
+                    height: 40px;
+                    font-size: 16px;
+                    margin-left: 30px;
+                    color: white;
+                  "
                   type="success"
                   @click="submitCode"
                   round
                   ><CloudUploadOutlined
                     style="margin-right: 5px"
                   />提交代码</el-button
-                ></a-col
-              >
+                >
+              </a-col>
             </a-row>
           </div>
           <!-- <div  style="position: absolute;bottom: 0px;;width: 1140px;background-color: rgb(255, 255, 255);height: 5px;"></div> -->
@@ -146,6 +169,7 @@
                 <span :style="{ color: getColor(codeStatus) }" v-else>{{
                   codeStatus
                 }}</span>
+
                 <!-- <span v-else-if="codeStatus === 'error'">错误</span> -->
               </a-col>
             </a-row>
@@ -164,10 +188,28 @@
                     style="
                       display: flex;
                       flex-direction: column;
-                      margin-top: 30px;
+                      margin-top: 20px;
+                    "
+                  >
+                    <span
+                      style="color: rgb(0, 198, 132); font-size: 18px"
+                      v-if="isPassedSample"
+                      >恭喜，您的代码通过了样例！</span
+                    >
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col
+                    :offset="1"
+                    :span="24"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      margin-top: 10px;
                     "
                     ><label style="font-size: 18px" for="name">输入</label>
                     <a-textarea
+                      @change="checkIfJudgeSample"
                       style="
                         width: 90%;
                         font-size: 16px;
@@ -196,6 +238,25 @@
                       readonly
                   /></a-col>
                 </a-row>
+                <a-row v-if="judgeSample">
+                  <a-col
+                    :offset="1"
+                    :span="24"
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      margin-bottom: 20px;
+                      position: relative;
+                      bottom: 10px;
+                    "
+                    ><label style="font-size: 18px" for="name">预期输出</label>
+                    <a-textarea
+                      style="width: 90%; font-size: 16px"
+                      v-model:value="stdout"
+                      auto-size
+                      readonly
+                  /></a-col>
+                </a-row>
                 <a-row v-if="judgeData">
                   <a-col
                     :offset="1"
@@ -209,27 +270,48 @@
             </a-row>
             <!-- 提交状态 -->
             <a-row v-if="submitting">
-              <a-col style="margin-left: 25px" class="container">
-                <div
+              <a-col
+                style="margin-left: 25px; align-items: center;margin-bottom: 10px;"
+                class="container2"
+              >
+                <span style="font-size: 20px"> 测试点信息： </span>
+                <span
                   class="box"
                   v-for="(result, index) in judgeInfo"
                   :key="index"
                 >
                   <span
-                    style="font-size: 30px; position: relative; bottom: 0px"
-                    class="tick"
                     v-if="result.judgestate && result.judgestate === 'Accepted'"
-                    >√</span
-                  >
-                  <span
-                    style="font-size: 50px; position: relative; bottom: 5px"
-                    class="cross"
-                    v-else-if="result.judgestate"
-                    >×</span
-                  >
-                </div>
+                    ><img
+                      style="width: 30px"
+                      src="../../../assets/static/pictures/right.png"
+                      alt=""
+                  /></span>
+                  <span v-else-if="result.judgestate"
+                    ><img
+                      style="width: 30px"
+                      src="../../../assets/static/pictures/wrong.png"
+                      alt=""
+                  /></span>
+                </span>
               </a-col>
             </a-row>
+            <a-row v-if="submitting && judgeEnd">
+              <a-col
+                style="margin-left: 25px; align-items: center;margin-bottom: 20px;"
+             
+              >
+                <div style="color: rgb(0, 198, 132); font-size: 16px" v-if="codeStatus && codeStatus === 'Accepted'">
+                答案正确：恭喜，您提交的代码通过了所有的测试用例！</div>
+                <div style="color: rgb(255, 0, 0); font-size: 16px" v-else-if="codeStatus && codeStatus === 'Wrong Answer'">
+                答案错误：您提交的代码没有通过所有的测试用例。</div>
+                <div style="color: rgb(255, 0, 0); font-size: 16px" v-else-if="codeStatus && codeStatus === 'Time Limit Exceeded'">
+                时间超限：您提交的代码没有在规定时间内运行出结果，请您检查代码时间复杂度是否过大。</div>
+                <div style="color: rgb(255, 0, 0); font-size: 16px" v-else-if="codeStatus && codeStatus === 'Runtime Error (NZEC)'">
+                运行错误：您提交的代码在运行的时候出现错误。可能是数组越界或者是递归调用太深等问题。</div>
+              </a-col>
+            </a-row>
+
             <a-row v-if="codeStatus === 'Compilation Error'">
               <a-col
                 :offset="1"
@@ -345,6 +427,7 @@ import "codemirror/theme/yonce.css";
 import "codemirror/theme/zenburn.css";
 
 import { useRoute } from "vue-router";
+import { sample } from "lodash";
 
 const props = defineProps({
   problemsample: Array,
@@ -427,9 +510,13 @@ let typingTimer = ref(null);
 let modifyed = ref(false);
 let isUserTyping = false;
 const typingDelay = 500; // 500毫秒
+let stdout = ref(null);
 watch(props, async (newValue, oldValue) => {
   await queryProblemCode();
 });
+function trimEnd(str) {
+  return str.replace(/\s+$/, "");
+}
 onMounted(async () => {
   setTimeout(() => {
     // 这里是你想要在页面加载完1秒后执行的操作
@@ -574,7 +661,6 @@ async function saveProblemCode(code) {
   if (modifyed.value === false) {
     //如果没有修改代码
     return;
-   
   }
   let problemcode = {
     userid: JSON.parse(localStorage.getItem("user")).userid,
@@ -599,16 +685,16 @@ async function queryProblemCode() {
       },
     })
     .then((res) => {
-      if(res.data && res.data.code){
+      if (res.data && res.data.code) {
         cmInstance.off("change", handleEditorChange);
-      // 改变内容
-      cmInstance.setValue(res.data.code);
-      // 添加回监听器
-      cmInstance.on("change", handleEditorChange);
-      source_code.value = res.data.code;
-      lasteditortime.value = res.data.lasteditortime;
-      }else{
-        console.log('本题暂无编辑记录')
+        // 改变内容
+        cmInstance.setValue(res.data.code);
+        // 添加回监听器
+        cmInstance.on("change", handleEditorChange);
+        source_code.value = res.data.code;
+        lasteditortime.value = res.data.lasteditortime;
+      } else {
+        console.log("本题暂无编辑记录");
       }
     })
     .catch((err) => {
@@ -701,9 +787,36 @@ function onSelect() {
 }
 let codeStatus = ref("finished");
 const judgeData = ref();
+let judgeSample = ref(false);
 let submitting = ref(false); //正在提交
+let isPassedSample = ref(false);
+let judgeEnd = ref(false);//是否判题结束
+const checkIfJudgeSample = () => {
+  //函数包括在输入改变时候的改变
+  //判断是否在自测
+  for (let i = 0; i < props.problemsample.length; i++) {
+    let temp1 = input.value.trim();
+    let temp2 = String(props.problemsample[i].input).trim();
+    if (temp1 === temp2) {
+      judgeSample.value = true; //如果有就为真
+      stdout.value = props.problemsample[i].output; //输出设置一下
+      return;
+    }
+  }
+  output.value = null;
+  isPassedSample.value = false;
+  stdout.value = null; //更新测试值，不在测试就要换掉
+  judgeSample.value = false;
+};
+const checkIfPassedSample = () => {
+  if (String(output.value).trim() === String(stdout.value).trim()) {
+    isPassedSample.value = true;
+  } else isPassedSample.value = false;
+};
 const runCode = async () => {
-  source_code.value = source_code.value.trimEnd();
+  isPassedSample.value = false;
+  checkIfJudgeSample(); //判断是不是在自测
+  source_code.value = trimEnd(source_code.value);
   if (!source_code.value) {
     store.dispatch("notice", {
       title: "编辑器里的代码不能为空！",
@@ -717,11 +830,12 @@ const runCode = async () => {
   codeStatus.value = "upload";
   let formData = new FormData();
   formData.append("source_code", source_code.value);
-  console.log(props.problemcontent.problemid, selectedLanguage.value);
+  console.log(props.problemcontent.problemid, input.value);
   formData.append("problemId", parseInt(props.problemcontent.problemid));
   formData.append("languageId", parseInt(selectedLanguage.value));
   formData.append("stdin", input.value);
   codeStatus.value = "running";
+
   await axios //提交代码给后端
     .post(`${JUDGE_URL}/judge/judgeone`, formData, {
       headers: {
@@ -734,9 +848,10 @@ const runCode = async () => {
         compileoutput = res.data.compile_output;
       } else codeStatus.value = "finished";
       judgeData.value = res.data;
-
       console.log(res.data);
       output.value = decodeBase64(judgeData.value.stdout);
+      output.value = trimEnd(output.value);
+      checkIfPassedSample();
       nextTick(function () {
         window.scrollTo(0, document.body.scrollHeight);
       });
@@ -861,40 +976,16 @@ const saveJudgeInfo = async (judgedata, submittime) => {
         type: "error",
       });
     });
-
-  return;
-  // 上面是保存单个信息，下面是保存每个测试点的信息
-  let infolist = [];
-  for (let i = 0; i < results.length; i++) {
-    infolist.push({
-      judgeid: judgeid,
-      runtime: results[i].time,
-      memory: results[i].memory,
-      judgestate: results[i].status.description,
-    });
-  }
-  if (route.query.contestid) {
-    //如果是比赛传过来的话
-    for (let i = 0; i < infolist.length; i++) {
-      infolist[i].contestid = route.query.contestid;
-      infolist[i].problemchar = route.query.problemchar; //这里貌似有问题，以后再改
-    }
-  }
-  await axios
-    .post(`${SERVER_URL}/${type}/insert/judgecontent`, infolist)
-    .then((response) => {})
-    .catch((error) => {
-      store.dispatch("notice", {
-        title: "数据保存失败！",
-        message: "服务器异常" + error,
-        type: "error",
-      });
-    });
-  //
 };
-
+const loadSample = async (index) => {
+  output.value = null;
+  input.value = props.problemsample[index].input;
+  stdout.value = props.problemsample[index].output;
+};
 let judgeInfo = ref([]);
 const submitCode = async () => {
+  judgeEnd.value = false;
+  isPassedSample.value = false;
   source_code.value = source_code.value.trimEnd();
   if (!source_code.value) {
     store.dispatch("notice", {
@@ -956,7 +1047,7 @@ const submitCode = async () => {
       .catch((err) => {
         console.log(err);
       });
-  }, 500); // 每秒执行一次
+  }, 100);
   nextTick(function () {
     window.scrollTo(0, document.body.scrollHeight);
   });
@@ -967,6 +1058,7 @@ const submitCode = async () => {
       },
     })
     .then(async (res) => {
+      judgeEnd.value = true;
       await saveJudgeInfo(res.data, time);
       codeStatus.value = judgestate;
       setTimeout(() => {
@@ -990,7 +1082,7 @@ let changeTheme = async function () {
     editorstyle: selectedTheme.value,
     special: "editorstyle",
   };
-  console.log(userextra)
+  console.log(userextra);
   await axios
     .post(`${SERVER_URL}/userextra/update/special`, userextra)
     .then((res) => {})
@@ -1024,16 +1116,9 @@ let changeTheme = async function () {
   align-items: center;
   margin: 5px;
 }
-.container {
+.container2 {
+  margin-top: 10px ;
   display: flex;
   flex-wrap: wrap;
-}
-
-.tick {
-  color: green;
-}
-
-.cross {
-  color: red;
 }
 </style>
