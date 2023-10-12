@@ -2,6 +2,7 @@ import { createRouter,  createWebHistory } from 'vue-router'
 import MainView from "../components/pages/MainView.vue"
 import CompetitionView from "../components/pages/CompetitionView.vue"
 import EvaluationQueueView from "../components/pages/EvaluationQueueView.vue"
+import DicussView from "../components/pages/DicussView.vue"
 import ProblemsView from "../components/pages/Problem/ProblemsView.vue"
 import RankListView from "../components/pages/RankListView.vue"
 import TissueView from "../components/pages/TissueView.vue"
@@ -10,6 +11,8 @@ import CreateProblemView from "../components/pages/Problem/CreateProblemView.vue
 import ProblemDetailView from "../components/pages/Problem/ProblemDetailView.vue"
 import UserRegitserView from "../components/pages/User/UserRegisterView.vue"
 import UserLoginView from "../components/pages/User/UserLoginView.vue"
+import CreateDiscussView from "../components/pages/discuss/CreateDiscussView.vue"
+import DiscussContentView from "../components/pages/discuss/DiscussContentView.vue"
 import UserHomeView from '@/components/pages/User/UserHome/UserHomeView.vue'
 import ProblemEditView from '@/components/pages/Problem/ProblemEditView.vue'
 import SubmitCodeView from "../components/pages/Problem/SubmitCodeView.vue"
@@ -133,6 +136,21 @@ const routes = [
     path: '/message',
     name: 'message',
     component: MessageView,
+  },
+  {
+    path: '/discuss',
+    name: 'discuss',
+    component: DicussView,
+  },
+  {
+    path: '/creatediscuss',
+    name: 'creatediscuss',
+    component: CreateDiscussView,
+  },
+  {
+    path: '/discusscontent',
+    name: 'discusscontent',
+    component: DiscussContentView,
   },
 ]
 

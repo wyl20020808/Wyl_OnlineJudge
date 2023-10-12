@@ -38,6 +38,11 @@
           <v-icon><HourglassFilled style="font-size: 25px" /></v-icon>
           <span style="font-size: 16px; margin-top: 5px">评测队列</span>
         </v-btn>
+        <v-btn @click="jump('discuss')">
+          <v-icon><img src="../../assets/static/pictures/discuss.png" width="30"
+          /></v-icon>
+          <span style="font-size: 16px; margin-top: 5px">讨论</span>
+        </v-btn>
         <div
           style="margin-left: 100px; margin-top: 15px"
           class="nav-item dropdown"
@@ -125,6 +130,8 @@ export default {
   watch: {
     $route(to, from) {
       this.updateNavState();
+      console.log(this.value)
+      localStorage.setItem('nav',this.value);
     },
   },
   computed: {
@@ -166,6 +173,7 @@ export default {
       }
     },
   },
+  
   async created() {
     this.updateNavState();
     window.onbeforeunload = () => {
@@ -173,9 +181,9 @@ export default {
     };
     if (localStorage.getItem("user")) {
       //如果登录了的话
-
       this.getUnreadMessage();
     }
+    
   },
   methods: {
     updateNavState() {
@@ -198,7 +206,11 @@ export default {
         case "/evaluationqueue":
           this.value = 5;
           break;
+        case "/discuss":
+          this.value = 6;
+          break;
         default:
+          this.value = localStorage.getItem('nav');
           break;
       }
     },

@@ -5,11 +5,7 @@
 <template>
   <a-row style="margin-left: 200px;margin-top: 30px;">
     <a-col >
-      <a-card class="nav" style="margin-bottom: 10px;">
-        <div style="font-size: 36px;">
-          {{ titleinfo }}
-        </div>
-      </a-card>
+      
       <div class="card nav2" style="margin-bottom: 10px;">
         <div class="nav-links">
           <div

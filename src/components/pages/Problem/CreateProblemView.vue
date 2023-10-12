@@ -391,9 +391,6 @@ export default {
     };
   },
   methods: {
-    onModify() {
-      this.isModified = true;
-    },
     beforeUnload(e) {
       if (this.isModified) {
         e.preventDefault();
@@ -424,15 +421,6 @@ export default {
     },
     backQuestion() {
       router.go(-1);
-    },
-    onModify() {
-      this.isModified = true;
-    },
-    beforeUnload(e) {
-      if (this.isModified) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
     },
     saveProblemInfo() {
       let problemsample = [];
