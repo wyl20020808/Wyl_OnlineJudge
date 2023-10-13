@@ -26,6 +26,8 @@ public class Discuss {
     public int forward;//转发
     public int collect;
     public int browse;
+    public int funny;
+    public int target;
     @TableField(exist = false)
     private String special;//更新单个数据，借助它来写
     @TableField(exist = false)

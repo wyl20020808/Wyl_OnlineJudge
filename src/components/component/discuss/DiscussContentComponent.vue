@@ -1,60 +1,246 @@
 <template>
-  <div class="card1">
-    <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
-    <div class="text">
-      <a-row style="display: flex; align-items: center">
-        <a-col style="color: #4183c4; font-size: 16px">
-          {{ discuss.username }}
-        </a-col>
-        <a-col style="margin-left: 10px; color: gray; font-size: 16px">
-          发表于：{{ discuss.createtime }}
+  <a-row style="width: 100%">
+    <a-col :span="1"
+      ><img
+        :src="discuss.userpicture"
+        style="width: 50px; border-radius: 50%"
+        alt="Avatar"
+    /></a-col>
+    <a-col :span="22" style="margin-left: 20px">
+      <a-row class="card1">
+        <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
+        <div class="text">
+          <a-row style="display: flex; align-items: center">
+            <a-col style="color: #4183c4; font-size: 16px">
+              {{ discuss.username }}
+            </a-col>
+            <a-col style="margin-left: 10px; color: gray; font-size: 16px">
+              发表于：{{ discuss.createtime }}
+            </a-col>
+            <a-col
+              v-if="discuss.createtime !== discuss.edittime"
+              style="margin-left: 10px; color: gray; font-size: 16px"
+            >
+              更新于：{{ discuss.edittime }}
+            </a-col>
+          </a-row>
+        </div>
+      </a-row>
+      <a-row
+        style="
+          z-index: 1000;
+          position: absolute;
+          border: 1px solid #c6c5c5;
+          border-bottom: 1px solid white;
+          top: 35px;
+          width: 90%;
+          height: 10px;
+          background-color: rgb(255, 255, 255);
+        "
+      ></a-row>
+      <a-row class="card2">
+        <a-row>
+          <a-col>
+            <div
+    
+              v-html="parsedDescription(formattedText(discuss.content))"
+            ></div>
+          </a-col>
+        </a-row>
+      </a-row>
+      <a-row
+        style="
+          z-index: 1000;
+          position: absolute;
+          bottom: 52px;
+          border-left: 1px solid #c6c5c5;
+          border-right: 1px solid #c6c5c5;
+          /* border: 1px solid #c6c5c5;
+          border-bottom: 1px solid white; */
+          width: 90%;
+          height: 10px;
+          background-color: white;
+        "
+      >
+      </a-row>
+      <a-row class="card3">
+        <a-col
+          :style="{
+            padding: '10px',
+            backgroundColor: myDiscussState.liked ? 'rgb(171, 255, 227)' : '',
+            borderRight: '1px solid #c6c5c5',
+            cursor: 'pointer',
+          }"
+          style="display: flex; align-items: center"
+          @click="changeState(0)"
+        >
+          <img src="../../../assets/static/pictures/like.png" width="30" />
+
+          <span
+            v-if="discuss.likes"
+            style="margin-left: 10px; font-size: 20px; color: #4183c4"
+            >{{ discuss.likes }}</span
+          >
         </a-col>
         <a-col
-          v-if="discuss.createtime !== discuss.edittime"
-          style="margin-left: 10px; color: gray; font-size: 16px"
+          :style="{
+            padding: '10px',
+            backgroundColor: myDiscussState.dislike ? 'rgb(171, 255, 227)' : '',
+            borderRight: '1px solid #c6c5c5',
+            cursor: 'pointer',
+          }"
+          style="display: flex; align-items: center"
+          @click="changeState(1)"
         >
-          更新于：{{ discuss.edittime }}
+          <img src="../../../assets/static/pictures/dislike.png" width="30" />
+          <span
+            v-if="discuss.dislike"
+            style="margin-left: 10px; font-size: 20px; color: #4183c4"
+            >{{ discuss.dislike }}</span
+          >
+        </a-col>
+        <a-col
+          :style="{
+            padding: '10px',
+            backgroundColor: myDiscussState.funny ? 'rgb(171, 255, 227)' : '',
+            borderRight: '1px solid #c6c5c5',
+            cursor: 'pointer',
+          }"
+          style="display: flex; align-items: center"
+          @click="changeState(2)"
+        >
+          <img src="../../../assets/static/pictures/funny.png" width="30" />
+          <span
+            v-if="discuss.funny"
+            style="margin-left: 10px; font-size: 20px; color: #4183c4"
+            >{{ discuss.funny }}</span
+          >
+        </a-col>
+        <a-col
+          :style="{
+            padding: '10px',
+            backgroundColor: myDiscussState.collect ? 'rgb(171, 255, 227)' : '',
+            borderRight: '1px solid #c6c5c5',
+            cursor: 'pointer',
+          }"
+          style="display: flex; align-items: center"
+          @click="changeState(3)"
+        >
+          <img src="../../../assets/static/pictures/collect.png" width="30" />
+          <span
+            v-if="discuss.collect"
+            style="margin-left: 10px; font-size: 20px; color: #4183c4"
+            >{{ discuss.collect }}</span
+          >
+        </a-col>
+        <a-col
+          v-if="discuss.type !== 'comment'"
+          :style="{
+            padding: '10px',
+            borderRight: '1px solid #c6c5c5',
+            cursor: 'pointer',
+          }"
+          style=""
+          @click="1"
+        >
+          <img src="../../../assets/static/pictures/forward2.png" width="30" />
         </a-col>
       </a-row>
-    </div>
-  </div>
-  <div
-    style="
-      z-index: 1000;
-      position: relative;
-      bottom: 3px;
-      border: 1px solid #c6c5c5;
-      border-bottom: 1px solid white;
-      width: 90%;
-      height: 10px;
-      background-color: white;
-    "
-  ></div>
-  <div class="card2">
-    <a-row>
-      <a-col>
-        <div
-          v-html="parsedDescription(formattedText(discuss.content))"
-        ></div>
-      </a-col>
-    </a-row>
-  </div>
+    </a-col>
+  </a-row>
 </template>
 
 <script setup>
+import { ref, watch } from "vue";
 import MarkdownIt from "markdown-it";
 import "markdown-it-texmath/css/texmath.css";
 import mk from "markdown-it-katex";
 import "katex/dist/katex.min.css";
+import { onMounted } from "vue";
 import { defineProps } from "vue";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import router from "@/router/router";
-const md = new MarkdownIt({ html: true }).use(mk)
+import axios from "axios";
+import { SERVER, SERVER_URL } from "@/js/functions/config";
+const md = new MarkdownIt({ html: true }).use(mk);
 const props = defineProps({
   discuss: Object,
 });
+
+let myDiscussState = ref({
+  liked: false,
+  dislike: false,
+  collect: false,
+  funny: false,
+  userid: JSON.parse(localStorage.getItem("user")).userid,
+  discussid: props.discuss.id,
+});
 function jump(total) {
   router.push({ path: "/" + total });
+}
+async function updateDiscuss(special, detal) {
+  await axios
+    .post(`${SERVER_URL}/discuss/operator`, {
+      id: props.discuss.id,
+      special: special,
+      detal: detal,
+    })
+    .then(() => {
+      console.log("更新了", special);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+async function changeState(idx) {
+  //更新每篇文章的喜欢等情况
+  if (idx === 0) {
+    if (myDiscussState.value.dislike) {
+      await updateDiscuss("dislike", -1);
+      props.discuss.dislike -= 1;
+    }
+    myDiscussState.value.dislike = false;
+    if (myDiscussState.value.liked) {
+      await updateDiscuss("likes", -1);
+      props.discuss.likes -= 1;
+    } else {
+      await updateDiscuss("likes", 1);
+      props.discuss.likes += 1;
+    }
+    myDiscussState.value.liked = !myDiscussState.value.liked;
+  } else if (idx === 1) {
+    if (myDiscussState.value.liked) {
+      await updateDiscuss("likes", -1);
+      props.discuss.likes -= 1;
+    }
+    if (myDiscussState.value.dislike) {
+      await updateDiscuss("dislike", -1);
+      props.discuss.dislike -= 1;
+    } else {
+      await updateDiscuss("dislike", 1);
+      props.discuss.dislike += 1;
+    }
+    myDiscussState.value.dislike = !myDiscussState.value.dislike;
+    myDiscussState.value.liked = false;
+  } else if (idx == 2) {
+    if (myDiscussState.value.funny) {
+      await updateDiscuss("funny", -1);
+      props.discuss.funny -= 1;
+    } else {
+      await updateDiscuss("funny", 1);
+      props.discuss.funny += 1;
+    }
+    myDiscussState.value.funny = !myDiscussState.value.funny;
+  } else {
+    if (myDiscussState.value.collect) {
+      await updateDiscuss("collect", -1);
+      props.discuss.collect -= 1;
+    } else {
+      await updateDiscuss("collect", 1);
+      props.discuss.collect += 1;
+    }
+    myDiscussState.value.collect = !myDiscussState.value.collect;
+  }
 }
 function parsedDescription(content) {
   return md.render(String(content));
@@ -67,6 +253,55 @@ function formattedText(text) {
   console.log(text.replace(/\n/g, "<br>"));
   return text.replace(/\n/g, "<br>"); //为了体现间距，更加美观
 }
+async function getDiscussState() {
+  await axios
+    .get(`${SERVER_URL}/discuss/state/query`, {
+      params: {
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+        discussid: props.discuss.id,
+      },
+    })
+    .then((res) => {
+      if (res.data) {
+        myDiscussState.value = res.data;
+        console.log(myDiscussState.value,'从后端获取到的discustate数据')
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+watch(
+  myDiscussState,
+  async (newValue, oldValue) => {
+    // 在 myDiscussState.value 的属性发生变化时执行逻辑
+    console.log(`myDiscussState 变化了：${oldValue} -> ${newValue}`);
+    myDiscussState.value.discussid = props.discuss.id;
+    await axios
+      .post(`${SERVER_URL}/discuss/state/update`, myDiscussState.value)
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+  { deep: true }
+);
+//处理父组件传值的情况，要等有值再获取
+watch(
+  () => props.discuss,
+  async (newValue, oldValue) => {
+    // 在父组件属性发生变化时执行初始化逻辑
+    // 执行初始化逻辑，例如获取讨论状态等
+    await getDiscussState();
+  }
+);
+
+onMounted(async () => {
+  if(props.discuss.id){
+    await getDiscussState();
+  }
+});
 </script>
 
 <style scoped>
@@ -82,18 +317,30 @@ function formattedText(text) {
   box-sizing: border-box;
 }
 .card2 {
-  position: relative;
-  bottom: 7px;
   display: flex;
   align-items: center;
   position: relative;
   width: 90%;
-  padding: 10px;
+  padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 10px;
   border-radius: 5px;
   background-color: rgb(255, 255, 255);
   border-left: 1px solid #c6c5c5;
   border-right: 1px solid #c6c5c5;
-  border-bottom: 1px solid #c6c5c5;
+  box-sizing: border-box;
+}
+
+.card3 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 90%;
+  border-radius: 0px 0 5px 5px;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #c6c5c5;
   box-sizing: border-box;
 }
 

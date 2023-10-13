@@ -139,7 +139,8 @@ export default {
       return this.$route.path;
     },
     color() {
-      switch (this.value) {
+      console.log(this.value,'导航值')
+      switch (parseInt(this.value)) {
         case 0:
           return "purple";
         case 1:
@@ -152,8 +153,10 @@ export default {
           return "blue";
         case 5:
           return "red";
-        default:
+        case 6:
           return "blue-grey";
+        default:
+          return "grey";
       }
     },
     userloginstate: function () {
@@ -208,6 +211,9 @@ export default {
           break;
         case "/discuss":
           this.value = 6;
+          break;
+        case "/userlogin":
+          this.value = 7;
           break;
         default:
           this.value = localStorage.getItem('nav');

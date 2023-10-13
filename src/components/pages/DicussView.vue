@@ -20,14 +20,21 @@
       </a-row>
       <a-row>
         <a-col style="width: 1200px">
-          <a-table :columns="columns" :data-source="data">
-            <template #bodyCell="{record, column, text }">
+          <a-table style="font-size: 16px;" :columns="columns" :data-source="data">
+            <template #bodyCell="{ record, column, text }">
               <div
                 class="hoverable2"
                 @click="jumpTodiscuss(record)"
                 v-if="column"
+                :style="{
+                  color:
+                    column.dataIndex === 'title' ||
+                    column.dataIndex === 'username'
+                      ? '#4183c4'
+                      : 'inherit',
+                }"
               >
-                <a style="height: 100px">{{ text }} </a>
+                <a style="height: 100px"> {{ text }}</a>
               </div>
             </template>
           </a-table>
@@ -66,7 +73,7 @@ const columns = [
     align: "center",
   },
   {
-    title: "喜欢",
+    title: "支持",
     dataIndex: "likes",
     key: "likes",
     width: 80,
@@ -77,17 +84,20 @@ const columns = [
     title: "更新时间",
     dataIndex: "edittime",
     key: "edittime",
-    width: 250,
+    width: 200,
     ellipsis: true,
     align: "center",
   },
 ];
 const data = ref([]);
-function jumpTodiscuss(data){
-  router.push({ path: "/discusscontent" ,query:{
-    id:data.id,
-    type:data.type,
-  } });
+function jumpTodiscuss(data) {
+  router.push({
+    path: "/discusscontent",
+    query: {
+      id: data.id,
+      type: data.type,
+    },
+  });
 }
 function jump(total) {
   router.push({ path: "/" + total });

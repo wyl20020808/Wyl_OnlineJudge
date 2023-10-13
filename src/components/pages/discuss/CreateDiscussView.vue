@@ -205,6 +205,16 @@ onBeforeUnmount(() => {
   window.removeEventListener("beforeunload", beforeUnload);
 });
 
+function modifyed(){
+  let temp = {
+    ...discuss.value,
+  };
+  if (!_.isEqual(discussBackup.value, temp)) {
+    return true;
+  }
+  return false;
+}
+
 function cancel() {
   router.go(-1);
 }
@@ -232,7 +242,10 @@ async function saveDiscuss() {
     data = {
       ...discuss.value,
     };
-    console.log(data);
+  }
+
+  if(modifyed()){//如果改过了，就修改时间
+    data.edittime = getNowTime();
   }
 
   await axios
