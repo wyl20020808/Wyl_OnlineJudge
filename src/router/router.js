@@ -24,6 +24,7 @@ import ContestProblemView from "@/components/pages/contest/ContestProblemView.vu
 import ContestSubmitView from "../components/pages/contest/ContestSubmitView.vue"
 import MessageView from "@/components/pages/message/MessageView.vue"
 import codeEditorComponent from "@/components/component/code/codeEditorComponent"
+import UserSettingView from "../components/pages/User/UserSettingView.vue"
 const routes = [
   {
     path: '/',
@@ -151,6 +152,11 @@ const routes = [
     path: '/discusscontent',
     name: 'discusscontent',
     component: DiscussContentView,
+  },
+  {
+    path: '/usersetting',
+    name: 'usersetting',
+    component: UserSettingView,
   },
 ]
 

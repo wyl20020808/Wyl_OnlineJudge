@@ -1,22 +1,36 @@
 <template>
   <div>
-  <BaseComponentView />
-  <router-view :key="$route.fullPath"/>
+    <BaseComponentView />
+    <router-view :key="$route.fullPath" />
   </div>
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/js/bootstrap.js';
-import BaseComponentView from './components/component/NavBar.vue'
-import MainView from './components/pages/MainView.vue'
+import "bootstrap/dist/css/bootstrap.css";
+import axios from "axios";
+import "bootstrap/dist/js/bootstrap.js";
+import BaseComponentView from "./components/component/NavBar.vue";
+import MainView from "./components/pages/MainView.vue";
+import { SERVER_URL } from './js/functions/config';
 export default {
-  name: 'App',
+  name: "App",
   components: {
     BaseComponentView,
-    MainView
-  }
-}
+    MainView,
+  },
+  async created() {
+    await axios
+      .post(`${SERVER_URL}/user/query`, {
+        userid: 17,
+      })
+      .then((res) => {
+        localStorage.setItem("user", JSON.stringify(res.data));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+};
 </script>
 
 <style>

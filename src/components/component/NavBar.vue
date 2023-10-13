@@ -185,6 +185,16 @@ export default {
     if (localStorage.getItem("user")) {
       //如果登录了的话
       this.getUnreadMessage();
+      console.log(localStorage.getItem("user"))
+      await axios.post(`${SERVER_URL}/user/query`,{
+        userid:JSON.parse(localStorage.getItem("user")).userid,
+      })
+      .then(res => {
+        localStorage.setItem("user",JSON.stringify(res.data));
+      })
+      .catch(err => {
+        console.log(err);
+      })
     }
     
   },

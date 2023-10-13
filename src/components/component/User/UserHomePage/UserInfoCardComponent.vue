@@ -60,12 +60,12 @@
             </div> </a-col
         ></a-row>
       </a-col>
-      <a-col
-        v-if="parseInt(userid) !== parseInt(myinfo.userid)"
-        style="margin-right: 40px"
-      >
-        <a-row>
-          <a-col style="z-index: 1000; margin-top: 60px">
+      <a-col>
+        <a-row style="margin-top: 60px; margin-right: 20px">
+          <a-col
+            v-if="parseInt(userid) !== parseInt(myinfo.userid)"
+            style="z-index: 1000; margin-right: 10px"
+          >
             <a-tooltip title="私聊" color="rgb(52, 152, 219)">
               <MessageTwoTone
                 @click="messageConnect"
@@ -95,30 +95,49 @@
               >已关注</a-button
             >
           </a-col>
+          <a-col v-else style="margin-right: 10px">
+            <a-button
+              @click="jump('usersetting')"
+              ghost
+              style="
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                z-index: 1000;
+              "
+            >
+              <img
+                src="../../../../assets/static/pictures/usersetting2.png"
+                style="margin-right: 7px"
+                width="27"
+              />
+              <span>个人设置</span>
+            </a-button>
+          </a-col>
         </a-row>
       </a-col>
     </a-row>
-    <div class="contact">
-      <div class="cover1"></div>
+    <a-row class="contact">
       <div class="functionAndInfo">
         <a-row
           class="nowrap-row"
           style="margin-top: 0px"
           justify="space-between"
         >
-          <a-col style="margin-left: 30px;position: relative;bottom: 3px;">
+          <a-col style="margin-left: 30px; position: relative">
             <a-tabs
               tabBarGutter="0px"
               class="my-tabs"
               size="large"
+              style=""
               v-model:activeKey="activeKey"
+              @change="chooseTab"
             >
-              <a-tab-pane key="1" tab="主页"></a-tab-pane>
+              <a-tab-pane key="1" tab="主页"> </a-tab-pane>
               <a-tab-pane key="2" tab="动态"></a-tab-pane>
               <a-tab-pane key="3" tab="我的"></a-tab-pane>
-              <a-tab-pane key="4" tab="比赛"></a-tab-pane> 
-              <a-tab-pane key="5" tab="收藏"></a-tab-pane> 
-              </a-tabs
+              <a-tab-pane key="4" tab="比赛"></a-tab-pane>
+              <a-tab-pane key="5" tab="收藏"></a-tab-pane> </a-tabs
           ></a-col>
           <a-col>
             <a-row>
@@ -238,7 +257,25 @@
           </a-col>
         </a-row>
       </div>
-    </div>
+    </a-row>
+    <a-row style="margin-top: 70px">
+      <div
+        style="
+          width: 100%;
+          border-radius: 5px;
+          background-color: white;
+          padding: 20px;
+        "
+      >
+        <a-col v-if="tab === 1">
+          <UserHomeComponentVue :userid="userid" />
+        </a-col>
+        <a-col v-if="tab === 2"> </a-col>
+        <a-col v-if="tab === 3"> </a-col>
+        <a-col v-if="tab === 4"> </a-col>
+        <a-col v-if="tab === 5"> </a-col>
+      </div>
+    </a-row>
   </div>
 
   <el-dialog v-model="centerDialogVisible" title="提示" width="30%" center>
@@ -265,10 +302,12 @@ import { SERVER_URL } from "../../../../js/functions/config";
 import axios from "axios";
 import { getNowTime } from "@/js/functions/TimeAbout";
 import { MessageTwoTone } from "@ant-design/icons-vue";
-import router from '@/router/router';
+import router from "@/router/router";
+import UserHomeComponentVue from "../UserHomeComponent.vue";
 export default {
   components: {
     MessageTwoTone,
+    UserHomeComponentVue,
   },
   data() {
     return {
@@ -279,6 +318,7 @@ export default {
       fansed: false,
       myinfo: JSON.parse(localStorage.getItem("user")),
       userid: this.$route.query.userid,
+      tab: 1,
     };
   },
   async created() {
@@ -287,19 +327,25 @@ export default {
   },
 
   methods: {
+    chooseTab(index) {
+      this.tab = parseInt(index);
+    },
+    jump(total) {
+      router.push({ path: "/" + total });
+    },
     async messageConnect() {
       await axios.post(`${SERVER_URL}/message/add/connect`, {
         belong: this.myinfo.userid,
         target: this.userid,
         belongname: this.myinfo.username,
         targetname: this.userinfo.nickname,
-        connecttime:this.getNowTime(),
-        latestconnecttime:this.getNowTime(),
-        targetpicture:this.userinfo.userpicture,
+        connecttime: this.getNowTime(),
+        latestconnecttime: this.getNowTime(),
+        targetpicture: this.userinfo.userpicture,
       });
-      router.push({ path: "/message"})
+      router.push({ path: "/message" });
     },
-   
+
     async cancelFans() {
       await axios
         .get(`${SERVER_URL}/userfans/delete/fans`, {
@@ -406,10 +452,11 @@ export default {
         this.centerDialogVisible = true;
       } else if (userInfo === "usermotto") {
         if (this.userMotto === "") {
-          this.noticeInfo = "格言不能为空！";
+          this.noticeInfo = "个性签名不能为空！";
           this.userMotto = JSON.parse(localStorage.getItem("user")).usermotto;
         } else {
-          this.noticeInfo = "你确定把格言修改为：" + this.userMotto + " 吗？";
+          this.noticeInfo =
+            "你确定把个性签名修改为：" + this.userMotto + " 吗？";
         }
         this.centerDialogVisible = true;
       }
@@ -510,7 +557,6 @@ export default {
 
 <style scoped>
 .card1 {
-  border-radius: 20px;
   border: 1px;
   width: 80%;
   position: relative;
@@ -548,15 +594,14 @@ export default {
   width: 400px;
 }
 .contact {
-  position: relative;
-  top: 110px;
+  margin-top: 125px;
 }
 .functionAndInfo {
-  border-radius: 20px;
+  border-radius: 0 0 5px 5px;
   width: 100%;
   top: 53px;
   position: relative;
-  height: 70px;
+  height: 75px;
   background-color: white;
 }
 .cover1 {
