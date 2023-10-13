@@ -11,8 +11,12 @@
         <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
         <div class="text">
           <a-row style="display: flex; align-items: center">
-            <a-col style="color: #4183c4; font-size: 16px">
+            <a-col style="color: #4183c4; font-size: 16px;">
               {{ discuss.username }}
+            </a-col>
+            <a-col style="margin-left: 5px;"  v-if="discuss.targettype === 'reply'">
+                 回复 
+                <span style="color: #4183c4; font-size: 16px" >@{{ discuss.targetname }} </span>
             </a-col>
             <a-col style="margin-left: 10px; color: gray; font-size: 16px">
               发表于：{{ discuss.createtime }}
@@ -141,27 +145,19 @@
           />
         </div>
       </a-row>
-      <a-row>
-        <div
-          style="
-            border-left: 2px solid #c2c2c2; /* 设置竖线的样式，可以根据需要调整颜色和粗细 */
-            height: 30px; /* 设置竖线的高度，可以根据需要调整 */
-            margin-left: 100px;
-          "
-        ></div>
-      </a-row>
-      <a-row v-for="item in reply" :key="item.id">
-        <div style="width: 90%">
-          <ReplyComponent :targetDiscuss="props.discuss" @addReply="addReply" :discuss="item" />
-        </div>
-      </a-row>
     </a-col>
   </a-row>
+  <a-row>
+    <div
+      style="
+        border-left: 2px solid #c2c2c2; /* 设置竖线的样式，可以根据需要调整颜色和粗细 */
+        height: 30px; /* 设置竖线的高度，可以根据需要调整 */
+        margin-left: 100px;
+      "
+    ></div>
+  </a-row>
 </template>
-<!-- 2023年10月13日09:45:49 这个组件是用来加载各个评论的
-首先我要加载所有和我相关的回复。
-然后这些回复又有回复，这些回复传递回来给我，在我这里展示。
--->
+<!-- 2023年10月13日09:45:49 这个组件是用来加载各个评论的 -->
 <script setup>
 import { ref, watch } from "vue";
 import MarkdownIt from "markdown-it";
@@ -175,18 +171,18 @@ import router from "@/router/router";
 import axios from "axios";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
-import ReplyComponent from "./ReplyComponent.vue";
+import { defineEmits } from "vue";
+
+const emit = defineEmits();
+const addReply = (obj) => {
+  emit("addReply", obj);
+};
+
 const md = new MarkdownIt({ html: true }).use(mk);
 const props = defineProps({
   discuss: Object,
-  type: String,
 });
-
 let commenting = ref(false);
-let reply = ref([]);
-const addReply = (value) => {
-  reply.value.push(value);
-}
 let myDiscussState = ref({
   liked: false,
   dislike: false,
@@ -273,7 +269,6 @@ function formattedText(text) {
   console.log(text.replace(/\n/g, "<br>"));
   return text.replace(/\n/g, "<br>"); //为了体现间距，更加美观
 }
-
 async function getReply() {
   await axios
     .get(`${SERVER_URL}/discuss/reply/query`, {
@@ -283,8 +278,10 @@ async function getReply() {
     })
     .then((res) => {
       if (res.data) {
-        reply.value = res.data;
-        console.log(reply.value, "从后端获取到的reply数据");
+        for(let i = 0 ; i < res.data.length; i++) {
+            addReply(res.data[i]);//把查询到的记录返回给上一级
+        }
+        
       }
     })
     .catch((err) => {
@@ -331,15 +328,15 @@ watch(
   async (newValue, oldValue) => {
     // 在父组件属性发生变化时执行初始化逻辑
     // 执行初始化逻辑，例如获取讨论状态等
-    await getDiscussState();
     await getReply();
+    await getDiscussState();
   }
 );
 
 onMounted(async () => {
   if (props.discuss.id) {
-    await getDiscussState();
     await getReply();
+    await getDiscussState();
   }
 });
 </script>

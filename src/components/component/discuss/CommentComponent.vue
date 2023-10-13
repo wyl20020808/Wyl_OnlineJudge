@@ -31,16 +31,25 @@
       </div>
     </a-col>
   </a-row>
-  <a-row style="width: 98%;" justify="space-between">
-    <a-col></a-col>
-    <a-col >
-        <el-button @click="saveComment" style="color: white;" type="primary" >回复</el-button>
+  <a-row style="width: 98%" justify="space-between">
+    <a-col> </a-col>
+    <a-col>
+      <el-button
+        v-if="props.reply"
+        @click="cancleComment"
+        style="color: white"
+        type="primary"
+        >取消</el-button
+      >
+      <el-button @click="saveComment" style="color: white" type="primary"
+        >回复</el-button
+      >
     </a-col>
   </a-row>
 </template>
-
+<!-- 2023年10月13日09:45:32 这个组件是纯粹用来发表评论的 -->
 <script setup>
-import { defineEmits } from 'vue'
+import { defineEmits } from "vue";
 import { ref, watch } from "vue";
 import MarkdownIt from "markdown-it";
 import "markdown-it-texmath/css/texmath.css";
@@ -56,11 +65,19 @@ import { getNowTime } from "@/js/functions/TimeAbout";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 const props = defineProps({
   discuss: Object,
+  reply: Boolean,
 });
-const emit = defineEmits(['comment'])
+const emit = defineEmits();
 const addComment = (obj) => {
-  emit('addComment', obj)
-}
+  emit("addComment", obj);
+};
+const addReply = (obj) => {
+  emit("addReply", obj);
+};
+const cancleComment = () => {
+  emit("cancleComment", true);
+};
+
 const userpicture = JSON.parse(localStorage.getItem("user")).userpicture;
 const username = JSON.parse(localStorage.getItem("user")).username;
 let store = useStore();
@@ -70,27 +87,43 @@ let discuss = ref({
   type: "comment",
   content: "",
 });
-async function saveComment() {//评论暂时不支持修改
+async function saveComment() {
+  //评论暂时不支持修改
   let data = {
     content: discuss.value.content,
     type: discuss.value.type,
-    target:props.discuss.id,//我的评论目标是谁，id和名字就不存了，因为在显示的时候可以获取到
+    target: props.discuss.id, //我的评论目标是谁，id和名字就不存了，因为在显示的时候可以获取到
+    targetname:props.discuss.username,
+    targettype:props.discuss.type,
+    targetuserid:props.discuss.userid,
     createtime: getNowTime(),
     edittime: getNowTime(),
     userid: JSON.parse(localStorage.getItem("user")).userid,
     username: JSON.parse(localStorage.getItem("user")).username,
     userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
   };
-//   if(modifyed()){//如果改过了，就修改时间
-//     data.edittime = getNowTime();
-//   }
+  if (props.reply) {
+    //是评论还是回复
+    data.type = 'reply';
+  }
+  //   if(modifyed()){//如果改过了，就修改时间
+  //     data.edittime = getNowTime();
+  //   }
   await axios
     .post(`${SERVER_URL}/discuss/update`, data)
     .then((res) => {
-    //   discussBackup.value = {
-    //     ...discuss.value,
-    //   };
+      //   discussBackup.value = {
+      //     ...discuss.value,
+      //   };
+      if (props.reply) {
+        //是评论还是回复
+        addReply(res.data);
+        cancleComment();
+      }
+      else
       addComment(res.data);
+      console.log(res.data, "回复完之后的结果");
+
       store.dispatch("notice", {
         title: "评论成功！",
         message: "",
@@ -106,7 +139,6 @@ async function saveComment() {//评论暂时不支持修改
       console.log(err);
     });
 }
-
 </script>
 
 <style scoped>

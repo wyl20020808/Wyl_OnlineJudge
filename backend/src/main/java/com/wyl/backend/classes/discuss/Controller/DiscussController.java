@@ -40,6 +40,11 @@ public class DiscussController {
         return discussSQL.selectList(new QueryWrapper<Discuss>().eq("type", type));
     }
 
+    @GetMapping(value = "/reply/query")//返回某个评论的所有回复
+    public List<Discuss> queryReply(@RequestParam int id){
+      return discussSQL.selectList(new QueryWrapper<Discuss>().eq("target", id).eq("type", "reply"));
+    }
+
     @GetMapping(value = "/comment/query") //根据文章id查询评论
     public List<Discuss> queryCommentById(@RequestParam int target){
         return discussSQL.selectList(new QueryWrapper<Discuss>().eq("target", target).eq("type", "comment"));

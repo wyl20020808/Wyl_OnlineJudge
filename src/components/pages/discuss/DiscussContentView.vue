@@ -38,16 +38,15 @@
       </a-row>
       <!-- 下面是展示信息的组件 -->
       <a-row>
-        <DiscussContentComponent :discuss="discuss" />
+        <DiscussContentComponent :type="'discuss'" :discuss="discuss" />
       </a-row>
-      <a-row v-for="item in comment" :key="item.id" >
-        <div class="vertical-line"></div>
+      <a-row  v-for="item in comment" :key="item.id" >
         <DiscussContentComponent :discuss="item" />
       </a-row>
       <div
         style="
           border-top: 2px solid #c5c5c5; /* 设置分割线的样式，可以根据需要调整颜色和粗细 */
-          margin: 10px 0; /* 设置分割线的上下间距，可以根据需要调整 */
+          margin-bottom: 10px; /* 设置分割线的上下间距，可以根据需要调整 */
           width: 88%;
         "
       ></div>
@@ -124,6 +123,7 @@ async function getComment() {
     .then((res) => {
       comment.value = res.data;
       console.log(comment.value,'评论的值');
+
     })
     .catch((err) => {
       console.log(err);
@@ -152,8 +152,6 @@ onBeforeMount(async () => {
 
 <style scoped>
 .vertical-line {
-  border-left: 2px solid #c2c2c2; /* 设置竖线的样式，可以根据需要调整颜色和粗细 */
-  height: 30px; /* 设置竖线的高度，可以根据需要调整 */
-  margin-left: 100px;
+  
 }
 </style>

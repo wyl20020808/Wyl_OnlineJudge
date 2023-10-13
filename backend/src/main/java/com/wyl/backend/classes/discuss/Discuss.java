@@ -20,6 +20,9 @@ public class Discuss {
     public String createtime;
     public String edittime;
     public String userpicture;
+    public String targetname;
+    public String targettype;
+    public int targetuserid;
     public int reply;
     public int likes;
     public int dislike;

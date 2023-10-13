@@ -20,11 +20,20 @@
       </a-row>
       <a-row>
         <a-col style="width: 1200px">
-          <a-table style="font-size: 16px;" :columns="columns" :data-source="data">
+          <a-table
+            style="font-size: 16px"
+            :columns="columns"
+            :data-source="data"
+          >
             <template #bodyCell="{ record, column, text }">
               <div
                 class="hoverable2"
-                @click="jumpTodiscuss(record)"
+                @click="
+                  column.dataIndex === 'title' ||
+                  column.dataIndex === 'username'
+                    ? jumpTodiscuss(record, column.dataIndex)
+                    : null
+                "
                 v-if="column"
                 :style="{
                   color:
@@ -90,14 +99,23 @@ const columns = [
   },
 ];
 const data = ref([]);
-function jumpTodiscuss(data) {
-  router.push({
-    path: "/discusscontent",
-    query: {
-      id: data.id,
-      type: data.type,
-    },
-  });
+function jumpTodiscuss(data, column) {
+  if (column === "title")
+    router.push({
+      path: "/discusscontent",
+      query: {
+        id: data.id,
+        type: data.type,
+      },
+    });
+  else {
+    router.push({
+      path: "/userhome",
+      query: {
+        userid: data.userid,
+      },
+    });
+  }
 }
 function jump(total) {
   router.push({ path: "/" + total });
@@ -111,7 +129,7 @@ onMounted(async () => {
       },
     })
     .then((res) => {
-      data.value = res.data;
+      data.value = res.data.reverse();
     });
 });
 </script>
