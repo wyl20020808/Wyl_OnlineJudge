@@ -2,7 +2,8 @@
   <a-row>
     <a-col :span="1">
       <img
-        style="width: 50px; border-radius: 50%"
+      @click="goToUser(myUserid)"
+        style="width: 50px; border-radius: 50%;cursor: pointer;"
         :src="userpicture"
         alt="Avatar"
       />
@@ -42,7 +43,12 @@
         >取消</el-button
       >
       <el-button @click="saveComment" style="color: white" type="primary"
+      v-if="props.reply"
         >回复</el-button
+      >
+      <el-button @click="saveComment" style="color: white;width: 80px;" type="primary"
+      v-else
+        >评论</el-button
       >
     </a-col>
   </a-row>
@@ -60,6 +66,7 @@ import { defineProps } from "vue";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
+import router from "@/router/router";
 import axios from "axios";
 import { getNowTime } from "@/js/functions/TimeAbout";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
@@ -67,6 +74,7 @@ const props = defineProps({
   discuss: Object,
   reply: Boolean,
 });
+const myUserid = JSON.parse(localStorage.getItem("user")).userid;
 const emit = defineEmits();
 const addComment = (obj) => {
   emit("addComment", obj);
@@ -81,12 +89,20 @@ const cancleComment = () => {
 const userpicture = JSON.parse(localStorage.getItem("user")).userpicture;
 const username = JSON.parse(localStorage.getItem("user")).username;
 let store = useStore();
-const router = useRouter();
+
 const route = useRoute();
 let discuss = ref({
   type: "comment",
   content: "",
 });
+const goToUser = (userid) => {
+  router.push({
+    name: "userhome",
+    query: {
+      userid: userid,
+    },
+  });
+};
 async function saveComment() {
   //评论暂时不支持修改
   let data = {
@@ -123,7 +139,7 @@ async function saveComment() {
       else
       addComment(res.data);
       console.log(res.data, "回复完之后的结果");
-
+      discuss.value.content = "";
       store.dispatch("notice", {
         title: "评论成功！",
         message: "",

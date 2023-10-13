@@ -37,12 +37,30 @@
         >
       </a-row>
       <!-- 下面是展示信息的组件 -->
-      <a-row>
+      <a-row style="margin-bottom: 20px">
         <DiscussContentComponent :type="'discuss'" :discuss="discuss" />
       </a-row>
-      <a-row  v-for="item in comment" :key="item.id" >
-        <DiscussContentComponent :discuss="item" />
+      <a-row style="margin-bottom: 20px">
+        <a-col style="width: 88%">
+          <a-collapse
+            style="background-color: #f5f5f5"
+            v-model:activeKey="activeKey"
+          >
+            <a-collapse-panel
+              key="1"
+              :header="'评论区' + ' (' + '共' + comment.length + '条评论' + ')'"
+            >
+              <a-row v-for="item in comment" :key="item.id">
+                <DiscussContentComponent
+                  @deleteComment="deleteComment"
+                  :discuss="item"
+                />
+              </a-row>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-col>
       </a-row>
+
       <div
         style="
           border-top: 2px solid #c5c5c5; /* 设置分割线的样式，可以根据需要调整颜色和粗细 */
@@ -61,7 +79,7 @@
 <!-- 2023年10月12日14:57:40 -->
 <script setup>
 import { getNowTime } from "@/js/functions/TimeAbout";
-import { onBeforeUnmount, onMounted,onBeforeMount } from "vue";
+import { onBeforeUnmount, onMounted, onBeforeMount } from "vue";
 import router from "@/router/router";
 import { ref } from "vue";
 import axios from "axios";
@@ -81,8 +99,8 @@ let comment = ref([]);
 
 const onAddComment = (value) => {
   comment.value.push(value);
-  console.log(value) // 输出：{ key1: 'value1', key2: 'value2' }
-}
+  console.log(value); // 输出：{ key1: 'value1', key2: 'value2' }
+};
 function editDiscuss() {
   router.push({
     path: "/creatediscuss",
@@ -91,6 +109,14 @@ function editDiscuss() {
       type: type.value,
     },
   });
+}
+function deleteComment(value) {
+  for (let i = 0; i < comment.value.length; i++) {
+    if (parseInt(comment.value[i].id) === parseInt(value)) {
+      comment.value.splice(i, 1);
+      break;
+    }
+  }
 }
 function jump(total) {
   router.push({ path: "/" + total });
@@ -122,8 +148,7 @@ async function getComment() {
     })
     .then((res) => {
       comment.value = res.data;
-      console.log(comment.value,'评论的值');
-
+      console.log(comment.value, "评论的值");
     })
     .catch((err) => {
       console.log(err);
@@ -152,6 +177,5 @@ onBeforeMount(async () => {
 
 <style scoped>
 .vertical-line {
-  
 }
 </style>

@@ -2,32 +2,60 @@
   <a-row style="width: 100%">
     <a-col :span="1"
       ><img
+        @click="goToUser(discuss.userid)"
         :src="discuss.userpicture"
-        style="width: 50px; border-radius: 50%"
+        style="width: 50px; border-radius: 50%; cursor: pointer"
         alt="Avatar"
     /></a-col>
     <a-col :span="22" style="margin-left: 20px">
-      <a-row class="card1">
+      <a-row
+        class="card1"
+        :style="{
+          width:
+            discuss.type === 'comment' || discuss.type === 'reply'
+              ? '100%'
+              : '90%',
+        }"
+        justify="space-between"
+      >
         <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
-        <div class="text">
-          <a-row style="display: flex; align-items: center">
-            <a-col style="color: #4183c4; font-size: 16px">
-              {{ discuss.username }}
-            </a-col>
-            <a-col style="margin-left: 10px; color: gray; font-size: 16px">
-              发表于：{{ discuss.createtime }}
-            </a-col>
-            <a-col
-              v-if="discuss.createtime !== discuss.edittime"
-              style="margin-left: 10px; color: gray; font-size: 16px"
-            >
-              更新于：{{ discuss.edittime }}
-            </a-col>
-          </a-row>
-        </div>
+        <a-col>
+          <div class="text">
+            <a-row style="display: flex; align-items: center">
+              <a-col style="color: #4183c4; font-size: 16px">
+                <div style="cursor: pointer" @click="goToUser(discuss.userid)">
+                  {{ discuss.username }}
+                </div>
+              </a-col>
+              <a-col style="margin-left: 10px; color: gray; font-size: 16px">
+                发表于：{{ discuss.createtime }}
+              </a-col>
+              <a-col
+                v-if="discuss.createtime !== discuss.edittime"
+                style="margin-left: 10px; color: gray; font-size: 16px"
+              >
+                更新于：{{ discuss.edittime }}
+              </a-col>
+            </a-row>
+          </div>
+        </a-col>
+        <a-col
+          @click="deleteDiscuss(discuss.id)"
+          style="margin-right: 10px; cursor: pointer"
+        >
+          <img src="../../../assets/static/pictures/delete.png" width="28" />
+        </a-col>
       </a-row>
 
-      <a-row class="card2">
+      <a-row
+        class="card2"
+        :style="{
+          width:
+            discuss.type === 'comment' || discuss.type === 'reply'
+              ? '100%'
+              : '90%',
+        }"
+      >
         <a-row>
           <a-col>
             <div
@@ -36,7 +64,15 @@
           </a-col>
         </a-row>
       </a-row>
-      <a-row class="card3">
+      <a-row
+        class="card3"
+        :style="{
+          width:
+            discuss.type === 'comment' || discuss.type === 'reply'
+              ? '100%'
+              : '90%',
+        }"
+      >
         <a-col
           :style="{
             padding: '10px',
@@ -126,7 +162,7 @@
             cursor: 'pointer',
           }"
           style=""
-          @click="commenting = true"
+          @click="commenting = !commenting"
         >
           <img src="../../../assets/static/pictures/reply.png" width="30" />
         </a-col>
@@ -141,7 +177,7 @@
           />
         </div>
       </a-row>
-      <a-row>
+      <!-- <a-row>
         <div
           style="
             border-left: 2px solid #c2c2c2; /* 设置竖线的样式，可以根据需要调整颜色和粗细 */
@@ -149,11 +185,34 @@
             margin-left: 100px;
           "
         ></div>
-      </a-row>
-      <a-row v-for="item in reply" :key="item.id">
-        <div style="width: 90%">
-          <ReplyComponent :targetDiscuss="props.discuss" @addReply="addReply" :discuss="item" />
-        </div>
+      </a-row> -->
+      <a-row
+        style="margin-top: 10px; margin-bottom: 10px"
+        v-if="reply.length > 0"
+      >
+        <a-col style="width: 100%">
+          <a-collapse v-model:activeKey="activeKey">
+            <a-collapse-panel
+              key="1"
+              :header="'回复' + ' (' + '共' + reply.length + '条回复' + ')'"
+            >
+              <a-row
+                style="margin-top: 10px; margin-bottom: 10px"
+                v-for="item in reply"
+                :key="item.id"
+              >
+                <div style="width: 100%">
+                  <ReplyComponent
+                    @deleteReply="deleteReply"
+                    :targetDiscuss="props.discuss"
+                    @addReply="addReply"
+                    :discuss="item"
+                  />
+                </div>
+              </a-row>
+            </a-collapse-panel>
+          </a-collapse>
+        </a-col>
       </a-row>
     </a-col>
   </a-row>
@@ -163,6 +222,7 @@
 然后这些回复又有回复，这些回复传递回来给我，在我这里展示。
 -->
 <script setup>
+import { defineEmits } from "vue";
 import { ref, watch } from "vue";
 import MarkdownIt from "markdown-it";
 import "markdown-it-texmath/css/texmath.css";
@@ -173,19 +233,61 @@ import { defineProps } from "vue";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import router from "@/router/router";
 import axios from "axios";
+import { useStore } from "vuex";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
 import ReplyComponent from "./ReplyComponent.vue";
+let store = useStore();
 const md = new MarkdownIt({ html: true }).use(mk);
 const props = defineProps({
   discuss: Object,
   type: String,
 });
+const emit = defineEmits();
+const deleteComment = (id) => {
+  emit("deleteComment", id);
+};
 
+const goToUser = (userid) => {
+  router.push({
+    name: "userhome",
+    query: {
+      userid: userid,
+    },
+  });
+};
+let activeKey = ref(false);
 let commenting = ref(false);
 let reply = ref([]);
 const addReply = (value) => {
   reply.value.push(value);
+};
+const deleteReply = (id) => {
+  for (let i = 0; i < reply.value.length; i++) {
+    if (parseInt(reply.value[i].id) === parseInt(id)) {
+      reply.value.splice(i, 1);
+      break;
+    }
+  }
+};
+async function deleteDiscuss(id) {
+  await axios
+    .post(`${SERVER_URL}/discuss/operator`, {
+      id: id,
+      special: "delete",
+    })
+    .then((res) => {
+      // 遍历reply数组，找到匹配id的元素并删除
+      deleteComment(id);
+      store.dispatch("notice", {
+        title: "删除成功",
+        message: "",
+        type: "success",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 let myDiscussState = ref({
   liked: false,

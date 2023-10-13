@@ -1,14 +1,14 @@
 <template>
     <div class="all">
-        <BaseInfoComponentVue />
+        <UserInfoCardComponent />
     </div>
 </template>
     
 <script>
-import BaseInfoComponentVue from "@/components/component/User/UserHomePage/UserInfoCardComponent.vue";
+import UserInfoCardComponent from "@/components/component/User/UserHomePage/UserInfoCardComponent.vue";
 export default {
     components:{
-        BaseInfoComponentVue
+        UserInfoCardComponent
     }
 }
 </script>

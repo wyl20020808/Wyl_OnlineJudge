@@ -115,9 +115,10 @@
             >
               <a-tab-pane key="1" tab="主页"></a-tab-pane>
               <a-tab-pane key="2" tab="动态"></a-tab-pane>
-              <a-tab-pane key="3" tab="题库"></a-tab-pane>
-              <a-tab-pane key="4" tab="组织"></a-tab-pane>
-              <a-tab-pane key="5" tab="收藏"></a-tab-pane> </a-tabs
+              <a-tab-pane key="3" tab="我的"></a-tab-pane>
+              <a-tab-pane key="4" tab="比赛"></a-tab-pane> 
+              <a-tab-pane key="5" tab="收藏"></a-tab-pane> 
+              </a-tabs
           ></a-col>
           <a-col>
             <a-row>

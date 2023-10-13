@@ -2,21 +2,34 @@
   <a-row style="width: 100%">
     <a-col :span="1"
       ><img
+        @click="goToUser(discuss.userid)"
         :src="discuss.userpicture"
-        style="width: 50px; border-radius: 50%"
+        style="width: 50px; border-radius: 50%; cursor: pointer"
         alt="Avatar"
     /></a-col>
     <a-col :span="22" style="margin-left: 20px">
-      <a-row class="card1">
-        <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
-        <div class="text">
+      <a-row class="card1"  justify="space-between">
+        <a-col>
+          <div class="text">
           <a-row style="display: flex; align-items: center">
-            <a-col style="color: #4183c4; font-size: 16px;">
-              {{ discuss.username }}
+            <a-col style="color: #4183c4; font-size: 16px">
+              <div style="cursor: pointer;"
+               @click="goToUser(discuss.userid)">
+                {{ discuss.username }}
+              </div>
             </a-col>
-            <a-col style="margin-left: 5px;"  v-if="discuss.targettype === 'reply'">
-                 回复 
-                <span style="color: #4183c4; font-size: 16px" >@{{ discuss.targetname }} </span>
+            <a-col
+              style="margin-left: 5px"
+              v-if="discuss.targettype === 'reply'"
+            >
+              回复
+              <span style="color: #4183c4; font-size: 16px; margin-left: 3px"
+                >
+                <span style="cursor: pointer;"
+               @click="goToUser(discuss.targetuserid)">
+               @{{ discuss.targetname }}
+              </span>
+              </span>
             </a-col>
             <a-col style="margin-left: 10px; color: gray; font-size: 16px">
               发表于：{{ discuss.createtime }}
@@ -29,6 +42,12 @@
             </a-col>
           </a-row>
         </div>
+        </a-col>
+        <a-col @click="deleteDiscuss(discuss.id)" style="margin-right: 10px;cursor: pointer;">
+          <img src="../../../assets/static/pictures/delete.png" width="28" />
+        </a-col>
+        <!-- 这里为了布局所以用了div 2023年10月12日14:57:22 -->
+        
       </a-row>
 
       <a-row class="card2">
@@ -130,7 +149,7 @@
             cursor: 'pointer',
           }"
           style=""
-          @click="commenting = true"
+          @click="commenting = !commenting"
         >
           <img src="../../../assets/static/pictures/reply.png" width="30" />
         </a-col>
@@ -147,7 +166,7 @@
       </a-row>
     </a-col>
   </a-row>
-  <a-row>
+  <!-- <a-row>
     <div
       style="
         border-left: 2px solid #c2c2c2; /* 设置竖线的样式，可以根据需要调整颜色和粗细 */
@@ -155,7 +174,7 @@
         margin-left: 100px;
       "
     ></div>
-  </a-row>
+  </a-row> -->
 </template>
 <!-- 2023年10月13日09:45:49 这个组件是用来加载各个评论的 -->
 <script setup>
@@ -169,19 +188,30 @@ import { defineProps } from "vue";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import router from "@/router/router";
 import axios from "axios";
+import { useStore } from "vuex";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
 import { defineEmits } from "vue";
-
+let store = useStore();
 const emit = defineEmits();
 const addReply = (obj) => {
   emit("addReply", obj);
 };
-
+const deleteReply = (id) => {
+  emit("deleteReply", id);
+};
 const md = new MarkdownIt({ html: true }).use(mk);
 const props = defineProps({
   discuss: Object,
 });
+const goToUser = (userid) => {
+  router.push({
+    name: "userhome",
+    query: {
+      userid: userid,
+    },
+  });
+};
 let commenting = ref(false);
 let myDiscussState = ref({
   liked: false,
@@ -193,6 +223,24 @@ let myDiscussState = ref({
 });
 function jump(total) {
   router.push({ path: "/" + total });
+}
+async function deleteDiscuss(id) {
+  await axios
+    .post(`${SERVER_URL}/discuss/operator`, {
+      id: id,
+      special: "delete",
+    })
+    .then((res) => {
+      deleteReply(id);
+      store.dispatch("notice", {
+        title: "删除成功",
+        message: "",
+        type: "success",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 async function updateDiscuss(special, detal) {
   await axios
@@ -278,10 +326,9 @@ async function getReply() {
     })
     .then((res) => {
       if (res.data) {
-        for(let i = 0 ; i < res.data.length; i++) {
-            addReply(res.data[i]);//把查询到的记录返回给上一级
+        for (let i = 0; i < res.data.length; i++) {
+          addReply(res.data[i]); //把查询到的记录返回给上一级
         }
-        
       }
     })
     .catch((err) => {
@@ -346,7 +393,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   position: relative;
-  width: 90%;
+  width: 100%;
   height: 40px;
   background-color: rgb(238, 238, 238);
   border-radius: 5px 5px 0 0;
@@ -357,7 +404,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   position: relative;
-  width: 90%;
+  width: 100%;
   padding-top: 10px;
   padding-right: 10px;
   padding-bottom: 0px;
@@ -374,7 +421,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   position: relative;
-  width: 90%;
+  width: 100%;
   border-radius: 0px 0 5px 5px;
   background-color: rgb(255, 255, 255);
   border: 1px solid #c6c5c5;

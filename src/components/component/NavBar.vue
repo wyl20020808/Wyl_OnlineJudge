@@ -156,7 +156,7 @@ export default {
         case 6:
           return "blue-grey";
         default:
-          return "grey";
+          return "blue-grey";
       }
     },
     userloginstate: function () {
