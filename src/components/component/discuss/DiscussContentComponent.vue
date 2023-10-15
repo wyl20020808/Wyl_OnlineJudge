@@ -134,7 +134,7 @@
             cursor: 'pointer',
           }"
           style="display: flex; align-items: center"
-          @click="changeState(3)"
+          @click="changeState(3) && collectComment(discuss.id)"
         >
           <img src="../../../assets/static/pictures/collect.png" width="30" />
           <span
@@ -235,9 +235,11 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import router from "@/router/router";
 import axios from "axios";
 import { useStore } from "vuex";
+import { getNowTime } from "@/js/functions/TimeAbout";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
 import ReplyComponent from "./ReplyComponent.vue";
+
 let store = useStore();
 const md = new MarkdownIt({ html: true }).use(mk);
 const props = defineProps({
@@ -270,6 +272,40 @@ const deleteReply = (id) => {
       break;
     }
   }
+};
+const collectComment = async (id) => {
+  let data = {
+    createtime: getNowTime(),
+    userid: JSON.parse(localStorage.getItem("user")).userid,
+    username: JSON.parse(localStorage.getItem("user")).username,
+    collectid: id,
+    type: "discuss",
+  };
+  let deleted = null;
+  let mes = '收藏成功！';
+  if(myDiscussState.value.collect){
+    deleted = 'yes';
+    mes = '取消成功！';
+  }
+  await axios
+    .post(`${SERVER_URL}/collect/update`, data, {
+      params: {
+        delete: deleted,
+      },
+    })
+    .then((res) => {
+      
+      
+      store.dispatch("notice", {
+        title: mes,
+        message: "",
+        type: "success",
+      });
+      
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 async function deleteDiscuss(id) {
   await axios
@@ -364,6 +400,8 @@ async function changeState(idx) {
     }
     myDiscussState.value.collect = !myDiscussState.value.collect;
   }
+
+  return true;
 }
 function parsedDescription(content) {
   return md.render(String(content));

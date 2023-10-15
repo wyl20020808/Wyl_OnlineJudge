@@ -1,7 +1,7 @@
 <template>
   <!-- <v-md-editor v-model="text" height="400px"></v-md-editor>
     -->
-  <a-row style="width: 100%;margin-top: 10px;"
+  <a-row style="width: 100%; "
     ><a-col :span="24">
       <a-row style="width: 100%"
         ><a-col :span="24">
@@ -64,7 +64,7 @@
                   font-weight: bold;
                   margin-top: 10px;
                 "
-                >[{{$route.query.problemchar }}] {{ problemcontent.title }}
+                >[{{ $route.query.problemchar }}] {{ problemcontent.title }}
               </a-col>
             </a-row>
             <a-row class="nowrap-row" style="margin-top: 20px">
@@ -76,7 +76,7 @@
                   >提交答案</a-button
                 >
               </a-col>
-              <a-col >
+              <a-col>
                 <a-button
                   @click="editProblem"
                   style="color: white; margin-left: 10px"
@@ -84,7 +84,24 @@
                   >编辑题目</a-button
                 >
               </a-col>
-              <a-col v-if="!$route.query.contestid"
+              <a-col>
+                <a-button
+                  v-if="!collected"
+                  @click="collectProblem(null)"
+                  style="color: white; margin-left: 10px"
+                  ghost
+                  >收藏题目</a-button
+                >
+                <a-button
+                  v-else
+                  @click="collectProblem('yes')"
+                  style="color: white; margin-left: 10px"
+                  ghost
+                  >取消收藏</a-button
+                >
+              </a-col>
+              <a-col
+                v-if="!$route.query.contestid"
                 style="
                   display: flex;
                   flex-direction: column;
@@ -108,7 +125,7 @@
                 />
               </a-col>
               <a-col
-              v-if="!$route.query.contestid"
+                v-if="!$route.query.contestid"
                 style="
                   display: flex;
                   flex-direction: column;
@@ -124,10 +141,10 @@
                   problemcontent.aceptedcount
                 }}</span>
               </a-col>
-              <a-col v-else style="margin-right: 40px;"></a-col>
+              <a-col v-else style="margin-right: 40px"></a-col>
               <a-col>
                 <a-divider
-                v-if="!$route.query.contestid"
+                  v-if="!$route.query.contestid"
                   type="vertical"
                   style="height: 44px; background-color: white"
                 />
@@ -176,7 +193,12 @@
             <a-row>
               <a-col style="margin-top: 30px" :span="13" :offset="3">
                 <a-card>
-                  <a-row v-if="problemcontent.background !== '无' && String(problemcontent.background) !== ''">
+                  <a-row
+                    v-if="
+                      problemcontent.background !== '无' &&
+                      String(problemcontent.background) !== ''
+                    "
+                  >
                     <a-col>
                       <h5 style="font-weight: bold">题目背景</h5>
                       <div
@@ -353,8 +375,14 @@
                         align="middle"
                         justify="space-between"
                       >
-                        <a-col v-if="!$route.query.contestid" style="font-size: 16px">历史分数</a-col>
-                        <a-col v-else style="font-size: 16px">本场比赛分数</a-col>
+                        <a-col
+                          v-if="!$route.query.contestid"
+                          style="font-size: 16px"
+                          >历史分数</a-col
+                        >
+                        <a-col v-else style="font-size: 16px"
+                          >本场比赛分数</a-col
+                        >
                         <a-col
                           class="hoverable2"
                           @click="goToJudgeContent(history.judgeid)"
@@ -440,6 +468,7 @@ import { CopyTwoTone, PieChartTwoTone } from "@ant-design/icons-vue";
 import codeEditorComponent from "../code/codeEditorComponent.vue";
 
 import router from "@/router/router";
+import { getNowTime } from "@/js/functions/TimeAbout";
 export default {
   components: {
     CopyTwoTone,
@@ -460,9 +489,43 @@ export default {
         score: "无",
       },
       isContest: this.$route.query.contestid !== undefined,
+      collected:false,
     };
   },
   methods: {
+    async collectProblem(deleted) {
+      //收藏夹暂时不能选择
+      let data = {
+        createtime: getNowTime(),
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+        username: JSON.parse(localStorage.getItem("user")).username,
+        collectid: this.$route.query.problemid,
+        type: "problem",
+      };
+
+      await axios
+        .post(`${SERVER_URL}/collect/update`, data,{
+          params:{
+            delete:deleted,
+          }
+        })
+        .then((res) => {
+          let mes = '收藏成功！';
+          
+          this.collected = !this.collected;
+          if(!this.collected){
+            mes = '取消成功！';
+          }
+          this.$store.dispatch("notice", {
+            title: mes,
+            message: "",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
     back() {
       router.go(-1);
     },
@@ -554,6 +617,24 @@ export default {
       //   },
       // });
     },
+    async getCollectStatus(){
+      await axios.get(`${SERVER_URL}/collect/query`,{//查询是否收藏了这道题
+        params:{
+          userid:JSON.parse(localStorage.getItem("user")).userid,
+          type:'problem',
+          collectid:this.$route.query.problemid
+        }
+      })
+      .then(res => {
+        console.log(res.data,'collect')
+        if(res.data.length > 0){
+          this.collected = true;
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
   },
   computed: {
     htmlText(text) {
@@ -563,6 +644,8 @@ export default {
     },
   },
   async created() {
+    await this.getCollectStatus();
+    //下面是之前写的代码，会发现还是挺乱的
     await axios
       .get(`${SERVER_URL}/problem/query/${this.$route.query.problemid}`)
       .then((res) => {
@@ -595,16 +678,16 @@ export default {
       .catch((error) => {
         console.log(error);
       });
-    let type = 'judge';
+    let type = "judge";
     let params = {
       userid: JSON.parse(localStorage.getItem("user")).userid,
       problemid: this.problemcontent.problemid,
-    }
-    if(this.$route.query.contestid){
-      type = 'contest';
+    };
+    if (this.$route.query.contestid) {
+      type = "contest";
       params.contestid = this.$route.query.contestid;
     }
-    
+
     await axios
       .get(`${SERVER_URL}/${type}/query/userproblem`, {
         params: params,

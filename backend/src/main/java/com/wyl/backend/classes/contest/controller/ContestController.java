@@ -126,9 +126,12 @@ public class ContestController {
     }
 
     @GetMapping("/query")
-    public List<ContestContent> queryContestContent(){
-        System.out.println(System.getProperty("user.dir") + "ceshi");
-        return contestContentSQL.selectList(null);
+    public List<ContestContent> queryContestContent(@RequestParam(required = false, defaultValue = "0") int userid){
+        QueryWrapper<ContestContent> queryWrapper = new QueryWrapper<>();
+        if(userid!=0){
+            queryWrapper.eq("userid",userid);
+        }
+        return contestContentSQL.selectList(queryWrapper);
     }
 
     @PostMapping("/join/personal")

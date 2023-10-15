@@ -1,0 +1,81 @@
+package com.wyl.backend.classes.Collect.Controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wyl.backend.classes.Collect.Collect;
+import com.wyl.backend.classes.Collect.CollectSet;
+import com.wyl.backend.classes.Collect.SQL.CollectSQL;
+import com.wyl.backend.classes.Collect.SQL.CollectSetSQL;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@CrossOrigin
+@RequestMapping(value = "/collect")
+@RestController
+public class CollectController {
+    @Autowired
+    private CollectSQL collectSQL;
+    @Autowired
+    private CollectSetSQL collectSetSQL;
+
+    @PostMapping(value = "/update")//包含插入、更新、删除
+    public Collect updateCollect(@RequestBody Collect collect,@RequestParam(required = false) String delete){
+        if(delete != null){
+            collectSQL.delete(new QueryWrapper<Collect>().eq("userid",collect.getUserid()).eq("collectid",collect.getCollectid()));
+            return null;
+        }
+        if(collect.getId() > 0){
+            collectSQL.updateById(collect);
+        }else{
+            collectSQL.insert(collect);
+        }
+        return collectSQL.selectOne(new QueryWrapper<Collect>().eq("userid",collect.getUserid()).eq("createtime",collect.getCreatetime()));
+    }
+
+    @GetMapping(value = "/query")//包含插入和更新
+    public List<Collect> queryCollect(@RequestParam int userid,@RequestParam(required = false) Integer belong,
+
+                                      @RequestParam(required = false) String type,
+                                      @RequestParam(required = false) Integer collectid){
+        QueryWrapper<Collect> query = new QueryWrapper<>();
+        query.eq("userid",userid);
+        if(belong != null) {
+            query.eq("collectid", collectid);
+        }
+        if(belong != null){
+            query.eq("belong",belong);
+        }
+        if(type != null){
+
+            query.eq("type",type);
+        }
+
+        return collectSQL.selectList(query);
+    }
+
+    @PostMapping(value = "/update/set")//包含插入、更新、删除
+    public CollectSet updateCollectSet(@RequestBody CollectSet collectSet,@RequestParam(required = false) String delete){
+        if(delete != null){
+            collectSetSQL.delete(new QueryWrapper<CollectSet>().eq("userid",collectSet.getUserid()).eq("id",collectSet.getId()));
+            return null;
+        }
+        if(collectSet.getId() > 0){
+            collectSetSQL.updateById(collectSet);
+        }else{
+            collectSetSQL.insert(collectSet);
+        }
+        return collectSetSQL.selectOne(new QueryWrapper<CollectSet>().eq("userid",collectSet.getUserid()).eq("createtime",collectSet.getCreatetime()));
+    }
+
+    @GetMapping(value = "/query/set")//包含所有查询
+    public List<CollectSet> queryCollectSet(@RequestParam int userid,@RequestParam(required = false) String type){
+        QueryWrapper<CollectSet> query = new QueryWrapper<>();
+        query.eq("userid",userid);
+        if(type != null){
+            query.eq("type",type);
+        }
+
+        return collectSetSQL.selectList(query);
+    }
+}

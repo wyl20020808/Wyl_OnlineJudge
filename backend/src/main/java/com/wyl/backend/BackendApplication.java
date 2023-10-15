@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
         "com.wyl.backend.classes.message.Controller",
         "com.wyl.backend.classes.message.SQL",
         "com.wyl.backend.classes.discuss",
+        "com.wyl.backend.classes.Collect",
 })
 public class BackendApplication {
 

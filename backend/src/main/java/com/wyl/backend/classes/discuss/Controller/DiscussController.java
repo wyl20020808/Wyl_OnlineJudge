@@ -43,7 +43,7 @@ public class DiscussController {
         }
         return discussSQL.selectList(queryWrapper);
     }
- 
+
 
     @GetMapping(value = "/query/all")
     public List<Discuss> queryAllDiscussByUserid(@RequestParam int userid){

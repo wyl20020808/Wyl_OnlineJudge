@@ -278,8 +278,8 @@
           <UserTrendComponent :userid="userid" />
         </a-col>
         <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 3"><UserMineComponentVue :userid="userid"/> </a-col>
-        <a-col v-if="tab === 4"> </a-col>
-        <a-col v-if="tab === 5"> </a-col>
+        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 4"><UserContestComponent :userid="userid"/> </a-col>
+        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 5"><UserCollectComponent :userid="userid"/> </a-col>
       </div>
     </a-row>
   </div>
@@ -312,12 +312,16 @@ import router from "@/router/router";
 import UserHomeComponentVue from "../UserHomeComponent.vue";
 import UserTrendComponent from "../UserTrendComponent.vue";
 import UserMineComponentVue from '../UserMineComponent.vue';
+import UserContestComponent from "../UserContestComponent.vue";
+import UserCollectComponent from "../UserCollectComponent.vue";
 export default {
   components: {
     MessageTwoTone,
     UserHomeComponentVue,
     UserTrendComponent,
     UserMineComponentVue,
+    UserContestComponent,
+    UserCollectComponent,
   },
   data() {
     return {
