@@ -265,13 +265,19 @@
           border-radius: 5px;
           background-color: white;
           padding: 20px;
+          margin-bottom: 20px;
         "
       >
-        <a-col v-if="tab === 1">
+        <a-col
+          style="display: flex; align-items: center; justify-content: center"
+          v-if="tab === 1"
+        >
           <UserHomeComponentVue :userid="userid" />
         </a-col>
-        <a-col v-if="tab === 2"> </a-col>
-        <a-col v-if="tab === 3"> </a-col>
+        <a-col style="padding: 10px;" v-if="tab === 2">
+          <UserTrendComponent :userid="userid" />
+        </a-col>
+        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 3"><UserMineComponentVue :userid="userid"/> </a-col>
         <a-col v-if="tab === 4"> </a-col>
         <a-col v-if="tab === 5"> </a-col>
       </div>
@@ -304,10 +310,14 @@ import { getNowTime } from "@/js/functions/TimeAbout";
 import { MessageTwoTone } from "@ant-design/icons-vue";
 import router from "@/router/router";
 import UserHomeComponentVue from "../UserHomeComponent.vue";
+import UserTrendComponent from "../UserTrendComponent.vue";
+import UserMineComponentVue from '../UserMineComponent.vue';
 export default {
   components: {
     MessageTwoTone,
     UserHomeComponentVue,
+    UserTrendComponent,
+    UserMineComponentVue,
   },
   data() {
     return {

@@ -181,7 +181,6 @@ async function getDiscuss(id, type) {
     .get(`${SERVER_URL}/discuss/query`, {
       params: {
         id: id,
-        type: type,
       },
     })
     .then((res) => {

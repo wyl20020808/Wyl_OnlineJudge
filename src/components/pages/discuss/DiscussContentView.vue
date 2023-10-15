@@ -23,7 +23,7 @@
       </a-row>
       <a-row style="margin-bottom: 10px; width: 1150px" justify="space-between">
         <a-col
-          ><h3 style="">{{ discuss.title }}</h3></a-col
+          ><h3 style="font-family: SimSun;">{{ discuss.title }}</h3></a-col
         >
         <a-col
           ><a-button
@@ -127,7 +127,6 @@ async function getDiscuss() {
     .get(`${SERVER_URL}/discuss/query`, {
       params: {
         id: id.value,
-        type: type.value,
       },
     })
     .then((res) => {

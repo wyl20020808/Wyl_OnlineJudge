@@ -40,6 +40,7 @@
           </div>
         </a-col>
         <a-col
+          v-if="props.type !== 'trend'"
           @click="deleteDiscuss(discuss.id)"
           style="margin-right: 10px; cursor: pointer"
         >

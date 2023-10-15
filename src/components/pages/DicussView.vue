@@ -125,7 +125,7 @@ onMounted(async () => {
     .get(`${SERVER_URL}/discuss/query`, {
       params: {
         id: 0,
-        type: "discuss",
+        type:'discuss',
       },
     })
     .then((res) => {

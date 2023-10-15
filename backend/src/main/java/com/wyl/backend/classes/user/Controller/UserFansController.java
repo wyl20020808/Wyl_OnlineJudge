@@ -10,6 +10,8 @@ import com.wyl.backend.classes.user.userinfo.UserFans;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @CrossOrigin
 @RequestMapping("/userfans")
@@ -54,5 +56,19 @@ public class UserFansController {
         updateWrapper2.eq("userid", fansId).setSql("concern = concern - 1");//减少关注数量
         userExtraOperator.update(null, updateWrapper2);
         userFansSQL.delete(queryWrapper);
+    }
+
+    @GetMapping("/query/myfans")
+    public List<UserFans> queryMyFans(@RequestParam("userid") int userId){
+        QueryWrapper<UserFans> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userid",userId);
+        return userFansSQL.selectList(queryWrapper);
+    }
+
+    @GetMapping("/query/myconcern")
+    public List<UserFans> queryMyConcern(@RequestParam("userid") int userId){
+        QueryWrapper<UserFans> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("fansuserid",userId);
+        return userFansSQL.selectList(queryWrapper);
     }
 }

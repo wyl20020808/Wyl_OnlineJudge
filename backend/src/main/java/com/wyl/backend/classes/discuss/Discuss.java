@@ -23,6 +23,8 @@ public class Discuss {
     public String userpicture;
     public String targetname;
     public String targettype;
+    public String discusstitle;//存一下依赖的是哪个title
+    public int discussid;//存一下依赖的是哪个id
     public int targetuserid;
     public int reply;
     public int likes;

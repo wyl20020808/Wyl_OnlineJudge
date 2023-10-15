@@ -33,11 +33,24 @@ public class DiscussController {
     }
 
     @GetMapping(value = "/query")
-    public List<Discuss> queryAllDiscuss(@RequestParam int id,@RequestParam String type){
+    public List<Discuss> queryDiscuss(@RequestParam int id, @RequestParam(required = false) String type){
+        QueryWrapper<Discuss> queryWrapper = new QueryWrapper<>();
         if(id != 0){
-            return discussSQL.selectList(new QueryWrapper<Discuss>().eq("id", id).eq("type", type));
+            queryWrapper.eq("id", id);
         }
-        return discussSQL.selectList(new QueryWrapper<Discuss>().eq("type", type));
+        if(type != null){
+            queryWrapper.eq("type", type);
+        }
+        return discussSQL.selectList(queryWrapper);
+    }
+ 
+
+    @GetMapping(value = "/query/all")
+    public List<Discuss> queryAllDiscussByUserid(@RequestParam int userid){
+        if(userid != 0){
+            return discussSQL.selectList(new QueryWrapper<Discuss>().eq("userid", userid));
+        }
+        return discussSQL.selectList(null);
     }
 
     @GetMapping(value = "/reply/query")//返回某个评论的所有回复

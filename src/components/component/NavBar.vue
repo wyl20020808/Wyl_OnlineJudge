@@ -2,7 +2,7 @@
   <div>
     <v-layout class="overflow-visible" style="height: 56px">
       <v-bottom-navigation
-        height="70"
+        height="50"
         v-model="value"
         grow
         :bg-color="color"
@@ -10,41 +10,41 @@
       >
         <v-btn @click="jump('')">
           <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">主页</span>
+          <span style="font-size: 16px; margin-top: 0px">主页</span>
         </v-btn>
         <v-btn @click="jump('problems')">
           <v-icon
             ><img src="../../assets/static/pictures/题库.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">题库</span>
+          <span style="font-size: 16px; margin-top: 0px">题库</span>
         </v-btn>
         <v-btn @click="jump('competition')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">比赛</span>
+          <span style="font-size: 16px; margin-top: 0px">比赛</span>
         </v-btn>
         <v-btn @click="jump('ranklist')">
           <v-icon
             ><img src="../../assets/static/pictures/rank.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">排行榜</span>
+          <span style="font-size: 16px; margin-top: 0px">排行榜</span>
         </v-btn>
         <v-btn @click="jump('tissue')">
           <v-icon
             ><img src="../../assets/static/pictures/acm.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">工作室</span>
+          <span style="font-size: 16px; margin-top: 0px">工作室</span>
         </v-btn>
         <v-btn @click="jump('evaluationqueue')">
           <v-icon><HourglassFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">评测队列</span>
+          <span style="font-size: 16px; margin-top: 0px">评测队列</span>
         </v-btn>
         <v-btn @click="jump('discuss')">
           <v-icon><img src="../../assets/static/pictures/discuss.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">讨论</span>
+          <span style="font-size: 16px; margin-top: 0px">讨论</span>
         </v-btn>
         <div
-          style="margin-left: 100px; margin-top: 15px"
+          style="margin-left: 100px; margin-top: 5px"
           class="nav-item dropdown"
           v-if="userloginstate === 'true'"
         >
@@ -87,7 +87,7 @@
           <v-icon
             ><img src="../../assets/static/pictures/login.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 5px">登录</span>
+          <span style="font-size: 16px; margin-top: 0px">登录</span>
         </v-btn>
       </v-bottom-navigation>
     </v-layout>

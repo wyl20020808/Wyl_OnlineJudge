@@ -46,7 +46,7 @@ public class UserController {
         return userOperator.selectById(userInfo.getUserid());
     }
     @GetMapping("/query/all")
-    public List<User> queryUserInfoAll() {
+    public List<User> queryUserAll() {
         List<User> user = new ArrayList<>();
        List<UserInfo> userinfo =  userOperator.selectList(null);
        List<UserExtra> extra = userExtraOperator.selectList(null);
@@ -57,6 +57,11 @@ public class UserController {
             user.add(new User(userInfo,userExtra));
         }
         return user;
+    }
+
+    @GetMapping("/query/alluser")
+    public List<UserInfo> queryAllUserInfo() {
+        return  userOperator.selectList(null);
     }
 
 

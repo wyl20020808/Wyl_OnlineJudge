@@ -117,10 +117,14 @@ async function saveComment() {
     userid: JSON.parse(localStorage.getItem("user")).userid,
     username: JSON.parse(localStorage.getItem("user")).username,
     userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
+    discussid: props.discuss.id,//存一下依赖的那个id是多少
+    discusstitle:props.discuss.title,
   };
   if (props.reply) {
-    //是评论还是回复
+    //如果是回复
     data.type = 'reply';
+    data.discussid =  props.discuss.discussid;
+    data.discusstitle = props.discuss.discusstitle;
   }
   //   if(modifyed()){//如果改过了，就修改时间
   //     data.edittime = getNowTime();
