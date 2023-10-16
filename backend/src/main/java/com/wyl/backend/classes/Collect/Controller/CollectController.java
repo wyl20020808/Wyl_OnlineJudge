@@ -1,10 +1,12 @@
 package com.wyl.backend.classes.Collect.Controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.wyl.backend.classes.Collect.Collect;
 import com.wyl.backend.classes.Collect.CollectSet;
 import com.wyl.backend.classes.Collect.SQL.CollectSQL;
 import com.wyl.backend.classes.Collect.SQL.CollectSetSQL;
+import com.wyl.backend.classes.discuss.Discuss;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +42,7 @@ public class CollectController {
                                       @RequestParam(required = false) Integer collectid){
         QueryWrapper<Collect> query = new QueryWrapper<>();
         query.eq("userid",userid);
-        if(belong != null) {
+        if(collectid != null) {
             query.eq("collectid", collectid);
         }
         if(belong != null){
@@ -56,8 +58,9 @@ public class CollectController {
 
     @PostMapping(value = "/update/set")//包含插入、更新、删除
     public CollectSet updateCollectSet(@RequestBody CollectSet collectSet,@RequestParam(required = false) String delete){
+        System.out.println(collectSet.toString() +"ahjsdhas");
         if(delete != null){
-            collectSetSQL.delete(new QueryWrapper<CollectSet>().eq("userid",collectSet.getUserid()).eq("id",collectSet.getId()));
+            collectSetSQL.delete(new QueryWrapper<CollectSet>().eq("id",collectSet.getId()));
             return null;
         }
         if(collectSet.getId() > 0){
@@ -68,14 +71,26 @@ public class CollectController {
         return collectSetSQL.selectOne(new QueryWrapper<CollectSet>().eq("userid",collectSet.getUserid()).eq("createtime",collectSet.getCreatetime()));
     }
 
+    @GetMapping(value = "/set/operator")
+    public void operatorDiscuss(@RequestParam Integer id,@RequestParam Integer detal) {//统计次数
+        UpdateWrapper<CollectSet> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", id)
+                .setSql("count = count" + (detal > 0 ? " + 1" : " - 1")); // 设置要更新的字段及操作
+        collectSetSQL.update(null, updateWrapper);
+    }
+
     @GetMapping(value = "/query/set")//包含所有查询
-    public List<CollectSet> queryCollectSet(@RequestParam int userid,@RequestParam(required = false) String type){
+    public List<CollectSet> queryCollectSet(@RequestParam(required = false) Integer userid,@RequestParam(required = false) String type,@RequestParam(required = false) Integer id){
         QueryWrapper<CollectSet> query = new QueryWrapper<>();
-        query.eq("userid",userid);
+        if(userid != null){
+            query.eq("userid",userid);
+        }
+        if(id != null){
+            query.eq("id",id);
+        }
         if(type != null){
             query.eq("type",type);
         }
-
         return collectSetSQL.selectList(query);
     }
 }

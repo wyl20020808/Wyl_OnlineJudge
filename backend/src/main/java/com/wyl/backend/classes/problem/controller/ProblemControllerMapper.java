@@ -2,6 +2,7 @@ package com.wyl.backend.classes.problem.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.wyl.backend.classes.discuss.Discuss;
 import com.wyl.backend.classes.problem.Problem;
 import com.wyl.backend.classes.problem.ProblemCode;
 import com.wyl.backend.classes.problem.ProblemContent;
@@ -13,6 +14,8 @@ import com.wyl.backend.classes.problem.sql.ProblemSampleSQL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @CrossOrigin
@@ -42,6 +45,24 @@ public class ProblemControllerMapper {
         if (rows == 0) {
             problemCodeSQL.insert(problemCode);
         }
+    }
+
+    @PostMapping(value = "/query/bylist")
+    public List<ProblemContent> queryProblemByList(@RequestBody List<Integer> list){
+        QueryWrapper<ProblemContent> queryWrapper = new QueryWrapper<>();
+        HashSet<Integer> set = new HashSet<>();
+        for(int i = 0; i < list.size(); i++) {
+            set.add(list.get(i));
+        }
+        List<ProblemContent> discussList = new ArrayList<>();
+        List<ProblemContent> queryList = problemContentSQL.selectList(queryWrapper);
+
+        for(int i = 0; i < queryList.size(); i++) {
+            if(set.contains(queryList.get(i).getProblemid())){
+                discussList.add(queryList.get(i));
+            }
+        }
+        return discussList;
     }
 
     @GetMapping("/query/problemcode")

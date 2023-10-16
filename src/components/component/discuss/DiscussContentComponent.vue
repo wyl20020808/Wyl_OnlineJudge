@@ -134,7 +134,7 @@
             cursor: 'pointer',
           }"
           style="display: flex; align-items: center"
-          @click="changeState(3) && collectComment(discuss.id)"
+          @click="chooseCollectSet()"
         >
           <img src="../../../assets/static/pictures/collect.png" width="30" />
           <span
@@ -217,6 +217,12 @@
       </a-row>
     </a-col>
   </a-row>
+
+  <CollectChoiceComponent
+    @collectThing="handleCollectThing"
+    :open="openCollcetSet"
+    :type="'discuss'"
+  />
 </template>
 <!-- 2023年10月13日09:45:49 这个组件是用来加载各个评论的
 首先我要加载所有和我相关的回复。
@@ -224,7 +230,7 @@
 -->
 <script setup>
 import { defineEmits } from "vue";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick } from "vue";
 import MarkdownIt from "markdown-it";
 import "markdown-it-texmath/css/texmath.css";
 import mk from "markdown-it-katex";
@@ -239,6 +245,7 @@ import { getNowTime } from "@/js/functions/TimeAbout";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
 import ReplyComponent from "./ReplyComponent.vue";
+import CollectChoiceComponent from "../User/CollectChoiceComponent.vue";
 
 let store = useStore();
 const md = new MarkdownIt({ html: true }).use(mk);
@@ -273,19 +280,63 @@ const deleteReply = (id) => {
     }
   }
 };
-const collectComment = async (id) => {
+
+const belongCollectSet = ref(-1);
+const getCollectStatus = async () => {
+  await axios
+    .get(`${SERVER_URL}/collect/query`, {
+      //查询我是否收藏了这篇文章
+      params: {
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+        type: "discuss",
+        collectid: props.discuss.id,
+      },
+    })
+    .then((res) => {
+      if (res.data.length > 0) {
+        belongCollectSet.value = res.data[0].belong;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+const openCollcetSet = ref(false);
+const handleCollectThing = (id) => {
+  // 在这里处理 id
+  collectComment(props.discuss.id, id);
+};
+const chooseCollectSet = async () => {
+  //用来打开和关闭
+  if (myDiscussState.value.collect) {
+    //如果收藏过了
+    collectComment(props.discuss.id, belongCollectSet.value);
+    return;
+  }
+  if (openCollcetSet.value) {
+    openCollcetSet.value = false;
+    // 等待下一个事件循环，以便Vue可以检测到openCollcetSet的值已经发生了变化
+    await nextTick();
+  }
+  openCollcetSet.value = true;
+};
+
+const collectComment = async (id, belong) => {
   let data = {
     createtime: getNowTime(),
     userid: JSON.parse(localStorage.getItem("user")).userid,
     username: JSON.parse(localStorage.getItem("user")).username,
     collectid: id,
     type: "discuss",
+    belong,
   };
   let deleted = null;
-  let mes = '收藏成功！';
-  if(myDiscussState.value.collect){
-    deleted = 'yes';
-    mes = '取消成功！';
+  let mes = "收藏成功！";
+  let detal = 1;
+  if (myDiscussState.value.collect) {
+    deleted = "yes";
+    mes = "取消成功！";
+    detal = -1;
   }
   await axios
     .post(`${SERVER_URL}/collect/update`, data, {
@@ -293,20 +344,31 @@ const collectComment = async (id) => {
         delete: deleted,
       },
     })
-    .then((res) => {
-      
-      
+    .then(async (res) => {
+      changeState(3);
       store.dispatch("notice", {
         title: mes,
         message: "",
         type: "success",
       });
-      
+      openCollcetSet.value = false;
+      await getCollectStatus();
+      await axios
+        .get(`${SERVER_URL}/collect/set/operator`, {
+          params: {
+            id: belong,
+            detal,
+          },
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     })
     .catch((err) => {
       console.log(err);
     });
 };
+
 async function deleteDiscuss(id) {
   await axios
     .post(`${SERVER_URL}/discuss/operator`, {
@@ -474,6 +536,7 @@ watch(
     // 执行初始化逻辑，例如获取讨论状态等
     await getDiscussState();
     await getReply();
+    await getCollectStatus();
   }
 );
 
@@ -481,6 +544,7 @@ onMounted(async () => {
   if (props.discuss.id) {
     await getDiscussState();
     await getReply();
+    await getCollectStatus();
   }
 });
 </script>

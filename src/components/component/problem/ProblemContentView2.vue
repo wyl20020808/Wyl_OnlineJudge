@@ -1,7 +1,7 @@
 <template>
   <!-- <v-md-editor v-model="text" height="400px"></v-md-editor>
     -->
-  <a-row style="width: 100%; "
+  <a-row style="width: 100%"
     ><a-col :span="24">
       <a-row style="width: 100%"
         ><a-col :span="24">
@@ -87,14 +87,14 @@
               <a-col>
                 <a-button
                   v-if="!collected"
-                  @click="collectProblem(null)"
+                  @click="chooseCollectSet()"
                   style="color: white; margin-left: 10px"
                   ghost
                   >收藏题目</a-button
                 >
                 <a-button
                   v-else
-                  @click="collectProblem('yes')"
+                  @click="collectProblem('yes', belongCollectSet)"
                   style="color: white; margin-left: 10px"
                   ghost
                   >取消收藏</a-button
@@ -454,6 +454,11 @@
         </a-col>
       </a-row> </a-col
   ></a-row>
+  <CollectChoiceComponent
+    @collectThing="handleCollectThing"
+    :open="openCollcetSet"
+    :type="'problem'"
+  />
 </template>
 
 <script>
@@ -466,14 +471,16 @@ import { SERVER, SERVER_URL } from "@/js/functions/config";
 import { message } from "ant-design-vue";
 import { CopyTwoTone, PieChartTwoTone } from "@ant-design/icons-vue";
 import codeEditorComponent from "../code/codeEditorComponent.vue";
+import CollectChoiceComponent from "../User/CollectChoiceComponent.vue";
 
 import router from "@/router/router";
-import { getNowTime } from "@/js/functions/TimeAbout";
+import { getNowTime, sleep } from "@/js/functions/TimeAbout";
 export default {
   components: {
     CopyTwoTone,
     PieChartTwoTone,
     codeEditorComponent,
+    CollectChoiceComponent,
   },
   data() {
     return {
@@ -489,11 +496,25 @@ export default {
         score: "无",
       },
       isContest: this.$route.query.contestid !== undefined,
-      collected:false,
+      collected: false,
+      openCollcetSet: false,
+      belongCollectSet: 1,
     };
   },
   methods: {
-    async collectProblem(deleted) {
+    handleCollectThing(id) {
+      // 在这里处理 id
+      this.collectProblem(null, id);
+    },
+    async chooseCollectSet() {
+      if (this.openCollcetSet) {
+        this.openCollcetSet = false;
+        // 等待下一个事件循环，以便Vue可以检测到openCollcetSet的值已经发生了变化
+        await this.$nextTick();
+      }
+      this.openCollcetSet = true;
+    },
+    async collectProblem(deleted, id) {
       //收藏夹暂时不能选择
       let data = {
         createtime: getNowTime(),
@@ -501,30 +522,43 @@ export default {
         username: JSON.parse(localStorage.getItem("user")).username,
         collectid: this.$route.query.problemid,
         type: "problem",
+        belong: id,
       };
-
+      let mes = "收藏成功！";
+      let detal = 1;
+      this.collected = !this.collected;
+      this.openCollcetSet = false;
+      if (!this.collected) {
+        mes = "取消成功！";
+        detal = -1;
+      }
       await axios
-        .post(`${SERVER_URL}/collect/update`, data,{
-          params:{
-            delete:deleted,
-          }
+        .post(`${SERVER_URL}/collect/update`, data, {
+          params: {
+            delete: deleted,
+          },
         })
-        .then((res) => {
-          let mes = '收藏成功！';
-          
-          this.collected = !this.collected;
-          if(!this.collected){
-            mes = '取消成功！';
-          }
+        .then(async (res) => {
           this.$store.dispatch("notice", {
             title: mes,
             message: "",
             type: "success",
           });
+          await axios
+            .get(`${SERVER_URL}/collect/set/operator`, {
+              params: {
+                id: id,
+                detal,
+              },
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         })
         .catch((err) => {
           console.log(err);
         });
+      await this.getCollectStatus(); //更新一下收藏情况，为了获取是在哪个收藏夹里面
     },
     back() {
       router.go(-1);
@@ -617,24 +651,26 @@ export default {
       //   },
       // });
     },
-    async getCollectStatus(){
-      await axios.get(`${SERVER_URL}/collect/query`,{//查询是否收藏了这道题
-        params:{
-          userid:JSON.parse(localStorage.getItem("user")).userid,
-          type:'problem',
-          collectid:this.$route.query.problemid
-        }
-      })
-      .then(res => {
-        console.log(res.data,'collect')
-        if(res.data.length > 0){
-          this.collected = true;
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      })
-    }
+    async getCollectStatus() {
+      await axios
+        .get(`${SERVER_URL}/collect/query`, {
+          //查询是否收藏了这道题
+          params: {
+            userid: JSON.parse(localStorage.getItem("user")).userid,
+            type: "problem",
+            collectid: this.$route.query.problemid,
+          },
+        })
+        .then((res) => {
+          if (res.data.length > 0) {
+            this.collected = true;
+            this.belongCollectSet = res.data[0].belong;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
   computed: {
     htmlText(text) {

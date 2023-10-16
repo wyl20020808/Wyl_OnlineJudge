@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @CrossOrigin
@@ -31,6 +33,24 @@ public class DiscussController {
         //返回有discussid的值，方便前端更新
         return discussSQL.selectOne(new QueryWrapper<Discuss>().eq("userid", discuss.getUserid()).eq("createtime", discuss.getCreatetime()));
     }
+    @PostMapping(value = "/query/bylist")
+    public List<Discuss> queryDiscussByList(@RequestBody List<Integer> list){
+        QueryWrapper<Discuss> queryWrapper = new QueryWrapper<>();
+        HashSet<Integer> set = new HashSet<>();
+        for(int i = 0; i < list.size(); i++) {
+            set.add(list.get(i));
+        }
+        List<Discuss>  discussList = new ArrayList<>();
+        List<Discuss> queryList = discussSQL.selectList(queryWrapper);
+
+        for(int i = 0; i < queryList.size(); i++) {
+            if(set.contains(queryList.get(i).getId())){
+                discussList.add(queryList.get(i));
+            }
+        }
+        return discussList;
+    }
+
 
     @GetMapping(value = "/query")
     public List<Discuss> queryDiscuss(@RequestParam int id, @RequestParam(required = false) String type){

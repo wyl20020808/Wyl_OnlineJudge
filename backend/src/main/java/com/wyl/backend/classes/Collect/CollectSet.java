@@ -13,6 +13,7 @@ public class CollectSet {
     @TableId(value = "id")
     public int id;
     public int userid;
+    public int count = 0;
     public String username;
     public String name;
     public String createtime;
@@ -21,5 +22,5 @@ public class CollectSet {
     public String type;
     public String secret;
     @TableLogic // 标记逻辑删除注解
-    private Boolean deleted;
+    private Boolean deleted = false;
 }
