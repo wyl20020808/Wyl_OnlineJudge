@@ -12,35 +12,45 @@
           <a-row>
             <!-- <a-col style="width: 100px;height: 100px;background-color:rgb(232, 7, 7) ;"></a-col> -->
             <a-col style="width: 100%">
-                <a-row style="justify-content: center" v-if="myJoinContest.length === 0">
+              <a-row
+                style="justify-content: center"
+                v-if="myJoinContest.length === 0"
+              >
                 <a-empty />
               </a-row>
               <a-row
                 v-for="(contest, index) in myJoinContest"
                 :key="contest.contestid"
               >
-                <a-col style="width: 100%;">
+                <a-col style="width: 100%">
                   <a-row v-if="index">
                     <a-divider />
                   </a-row>
                   <a-row
-                  justify="space-between"
+                    justify="space-between"
                     style="
                       height: 50px;
                       display: flex;
-                      padding:0 8px 0 8px ;
+                      padding: 0 8px 0 8px;
                       align-items: center;
                       border: 1px solid rgb(224, 224, 224);
                       background-color: rgb(249, 249, 249);
                     "
                   >
-                    <a-col >
+                    <a-col>
                       <a-row>
-                        <a-col :style="{color:getColorByStatus(getContestStatus(
-                              contest.startdate,
-                              contest.enddate,
-                              getNowTime()
-                            ))}" style="font-size: 18px;font-weight: bold;">
+                        <a-col
+                          :style="{
+                            color: getColorByStatus(
+                              getContestStatus(
+                                contest.startdate,
+                                contest.enddate,
+                                getNowTime()
+                              )
+                            ),
+                          }"
+                          style="font-size: 18px; font-weight: bold"
+                        >
                           {{
                             getContestStatus(
                               contest.startdate,
@@ -49,25 +59,63 @@
                             )
                           }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(10, 139, 225);margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(10, 139, 225);
+                            margin-left: 10px;
+                            cursor: pointer;
+                          "
+                          @click="jumpToContest(contest.contestid)"
+                        >
                           {{ contest.contestname }}
                         </a-col>
                       </a-row>
                     </a-col>
                     <a-col>
                       <a-row>
-                        <a-col style="font-family: Verdana ;font-size: 18px;color: rgb(114, 18, 199);">
+                        <a-col
+                          style="
+                            font-family: Verdana;
+                            font-size: 18px;
+                            color: rgb(114, 18, 199);
+                          "
+                        >
                           {{ contest.contestformat }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(144, 144, 144);margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(144, 144, 144);
+                            margin-left: 10px;
+                          "
+                        >
                           {{ contest.startdate }}
                           ~ {{ contest.enddate }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(143, 143, 143);margin-left: 10px;">
-                            <img style="width: 33px;"  src="../../../assets/static/pictures/peoples2.png" alt="">
-                            <span >{{ contest.joinpeople }}</span>
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(143, 143, 143);
+                            margin-left: 10px;
+                          "
+                        >
+                          <img
+                            style="width: 33px"
+                            src="../../../assets/static/pictures/peoples2.png"
+                            alt=""
+                          />
+                          <span>{{ contest.joinpeople }}</span>
                         </a-col>
-                        <a-col style="font-size: 18px;color: #1296db;margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: #1296db;
+                            margin-left: 10px;
+                            cursor: pointer;
+                          "
+                          @click="jumpToUserInfo(contest.userid)"
+                        >
                           {{ contest.username }}
                         </a-col>
                       </a-row>
@@ -79,38 +127,48 @@
           </a-row>
         </a-tab-pane>
         <a-tab-pane key="2" tab="我创建的比赛">
-            <a-row>
+          <a-row>
             <!-- <a-col style="width: 100px;height: 100px;background-color:rgb(232, 7, 7) ;"></a-col> -->
             <a-col style="width: 100%">
-              <a-row style="justify-content: center" v-if="myCreateContest.length === 0">
+              <a-row
+                style="justify-content: center"
+                v-if="myCreateContest.length === 0"
+              >
                 <a-empty />
               </a-row>
               <a-row
                 v-for="(contest, index) in myCreateContest"
                 :key="contest.contestid"
               >
-                <a-col style="width: 100%;">
+                <a-col style="width: 100%">
                   <a-row v-if="index">
                     <a-divider />
                   </a-row>
                   <a-row
-                  justify="space-between"
+                    justify="space-between"
                     style="
                       height: 50px;
                       display: flex;
-                      padding:0 8px 0 8px ;
+                      padding: 0 8px 0 8px;
                       align-items: center;
                       border: 1px solid rgb(224, 224, 224);
                       background-color: rgb(249, 249, 249);
                     "
                   >
-                    <a-col >
+                    <a-col>
                       <a-row>
-                        <a-col :style="{color:getColorByStatus(getContestStatus(
-                              contest.startdate,
-                              contest.enddate,
-                              getNowTime()
-                            ))}" style="font-size: 18px;font-weight: bold;">
+                        <a-col
+                          :style="{
+                            color: getColorByStatus(
+                              getContestStatus(
+                                contest.startdate,
+                                contest.enddate,
+                                getNowTime()
+                              )
+                            ),
+                          }"
+                          style="font-size: 18px; font-weight: bold"
+                        >
                           {{
                             getContestStatus(
                               contest.startdate,
@@ -119,25 +177,63 @@
                             )
                           }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(10, 139, 225);margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(10, 139, 225);
+                            margin-left: 10px;
+                            cursor: pointer;
+                          "
+                          @click="jumpToContest(contest.contestid)"
+                        >
                           {{ contest.contestname }}
                         </a-col>
                       </a-row>
                     </a-col>
                     <a-col>
                       <a-row>
-                        <a-col style="font-family: Verdana ;font-size: 18px;color: rgb(114, 18, 199);">
+                        <a-col
+                          style="
+                            font-family: Verdana;
+                            font-size: 18px;
+                            color: rgb(114, 18, 199);
+                          "
+                        >
                           {{ contest.contestformat }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(144, 144, 144);margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(144, 144, 144);
+                            margin-left: 10px;
+                          "
+                        >
                           {{ contest.startdate }}
                           ~ {{ contest.enddate }}
                         </a-col>
-                        <a-col style="font-size: 18px;color: rgb(143, 143, 143);margin-left: 10px;">
-                            <img style="width: 33px;"  src="../../../assets/static/pictures/peoples2.png" alt="">
-                            <span >{{ contest.joinpeople }}</span>
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: rgb(143, 143, 143);
+                            margin-left: 10px;
+                          "
+                        >
+                          <img
+                            style="width: 33px"
+                            src="../../../assets/static/pictures/peoples2.png"
+                            alt=""
+                          />
+                          <span>{{ contest.joinpeople }}</span>
                         </a-col>
-                        <a-col style="font-size: 18px;color: #1296db;margin-left: 10px;">
+                        <a-col
+                          style="
+                            font-size: 18px;
+                            color: #1296db;
+                            margin-left: 10px;
+                            cursor: pointer;
+                          "
+                          @click="jumpToUserInfo(contest.userid)"
+                        >
                           {{ contest.username }}
                         </a-col>
                       </a-row>
@@ -146,7 +242,7 @@
                 </a-col>
               </a-row>
             </a-col>
-          </a-row>    
+          </a-row>
         </a-tab-pane>
       </a-tabs>
     </a-col>
@@ -175,23 +271,31 @@ const props = defineProps({
 let myJoinContest = ref([]);
 let myCreateContest = ref([]);
 let allContest = ref([]);
-const jumpToContest = (userid) => {
+const jumpToUserInfo = (userid) => {
   router.push({
     name: "userhome",
     query: { userid },
   });
 };
+const jumpToContest = (contestid) => {
+  router.push({
+    name: "contestcontest",
+    query: {
+      contestid: contestid,
+    },
+  });
+};
 function getColorByStatus(status) {
-    switch (status) {
-        case "未开始":
-            return "green";  // 未开始的比赛显示为蓝色
-        case "正在进行":
-            return "orange";  // 进行中的比赛显示为绿色
-        case "已结束":
-            return "rgb(232, 7, 7)";  // 已结束的比赛显示为红色
-        default:
-            return "黑色";  // 其他状态显示为黑色
-    }
+  switch (status) {
+    case "未开始":
+      return "green"; // 未开始的比赛显示为蓝色
+    case "正在进行":
+      return "orange"; // 进行中的比赛显示为绿色
+    case "已结束":
+      return "rgb(232, 7, 7)"; // 已结束的比赛显示为红色
+    default:
+      return "黑色"; // 其他状态显示为黑色
+  }
 }
 function getContestStatus(startTime, endTime, currentTime) {
   // 将时间字符串转换为 Date 对象

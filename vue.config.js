@@ -3,7 +3,8 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
-    port: 80
+    port: 80,
+    
   },
   chainWebpack: config => {
     const svgRule = config.module.rule('svg')

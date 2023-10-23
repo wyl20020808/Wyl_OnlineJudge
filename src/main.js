@@ -59,6 +59,8 @@ import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 
 
+// 引入使用主题的样式
+
 //2023年10月9日09:47:17
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/mode/javascript/javascript.js'
@@ -70,6 +72,10 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+
+//2023年10月23日16:24:11
+import VMdPreviewHtml from '@kangc/v-md-editor/lib/preview-html';
+import '@kangc/v-md-editor/lib/style/preview-html.css';
 
 const vuetify = createVuetify({
   components,
@@ -119,6 +125,6 @@ app.directive('focus', {
   
 app.use(router).use(ElementPlus).use(vuetify).use(store).use(Antd)
 app.use(VMdEditor).use(VMdPreview)
-
+app.use(VMdPreviewHtml)
 //2023年10月9日09:59:18
 app.use(VueCodemirror).mount('#app')

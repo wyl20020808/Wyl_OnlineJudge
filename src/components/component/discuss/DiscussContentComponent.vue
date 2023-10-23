@@ -59,9 +59,11 @@
       >
         <a-row>
           <a-col>
-            <div
+            <!-- <div
               v-html="parsedDescription(formattedText(discuss.content))"
-            ></div>
+            ></div> -->
+            <v-md-preview :text="parsedDescription(formattedText(discuss.content))"></v-md-preview>
+            <!-- <v-md-preview-html :html="parsedDescription(formattedText(discuss.content))" preview-class="vuepress-markdown-body"></v-md-preview-html> -->
           </a-col>
         </a-row>
       </a-row>

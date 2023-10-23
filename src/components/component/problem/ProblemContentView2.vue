@@ -201,68 +201,56 @@
                   >
                     <a-col>
                       <h5 style="font-weight: bold">题目背景</h5>
-                      <div
+                      <v-md-preview
                         style="font-size: 16px"
-                        class=""
-                        v-html="
-                          parsedDescription(
-                            formattedText(problemcontent.background)
-                          )
+                        :text="
+                          parsedDescription(formattedText(problemcontent.background))
                         "
-                      ></div>
+                      ></v-md-preview>
+                      
                     </a-col>
                   </a-row>
                   <a-row
-                    :style="{
-                      'margin-top':
-                        problemcontent.background !== '无' ? '10px' : '0px',
-                    }"
+                    
                   >
                     <a-col>
                       <h5 style="font-weight: bold">题目描述</h5>
 
-                      <div
-                        style="font-size: 16px"
-                        class=""
-                        v-html="
-                          parsedDescription(
-                            formattedText(problemcontent.description)
-                          )
+                      <v-md-preview
+                  
+                        style="font-size: 16px;"
+                        :text="
+                          parsedDescription(formattedText(problemcontent.description))
                         "
-                      ></div>
+                      ></v-md-preview>
+                      
                     </a-col>
                   </a-row>
-                  <a-row style="margin-top: 10px">
+                  <a-row >
                     <a-col>
                       <h5 style="font-weight: bold">输入格式</h5>
-
-                      <div
+                      <v-md-preview
                         style="font-size: 16px"
-                        class=""
-                        v-html="
-                          parsedDescription(
-                            formattedText(problemcontent.inputformat)
-                          )
+                        :text="
+                          parsedDescription(formattedText(problemcontent.inputformat))
                         "
-                      ></div>
+                      ></v-md-preview>
+                     
                     </a-col>
                   </a-row>
-                  <a-row style="margin-top: 10px">
+                  <a-row >
                     <a-col>
                       <h5 style="font-weight: bold">输出格式</h5>
-
-                      <div
+                      <v-md-preview
                         style="font-size: 16px"
-                        class=""
-                        v-html="
-                          parsedDescription(
-                            formattedText(problemcontent.outputformat)
-                          )
+                        :text="
+                          parsedDescription(formattedText(problemcontent.outputformat))
                         "
-                      ></div>
+                      ></v-md-preview>
+                      
                     </a-col>
                   </a-row>
-                  <a-row style="margin-top: 10px">
+                  <a-row >
                     <a-col>
                       <h5 style="font-weight: bold">输入输出样例</h5>
                     </a-col>
@@ -270,7 +258,7 @@
                   <a-row
                     v-for="(sample, index) in problemSample"
                     :key="sample.input + sample.output"
-                    style="margin-top: 10px"
+                    
                   >
                     <a-col :span="11">
                       <a-row type="flex" justify="space-between">
@@ -320,13 +308,13 @@
                   <a-row style="margin-top: 10px">
                     <a-col>
                       <h5 style="font-weight: bold">说明/提示</h5>
-
-                      <div
+                      <v-md-preview
                         style="font-size: 16px"
-                        v-html="
+                        :text="
                           parsedDescription(formattedText(problemcontent.hint))
                         "
-                      ></div>
+                      ></v-md-preview>
+                      
                     </a-col>
                   </a-row>
                 </a-card>
@@ -795,5 +783,9 @@ p {
   width: 40px;
   height: 40px;
   outline: none;
+}
+
+.github-markdown-body{
+  padding: 0 0 0 0 !important;
 }
 </style>

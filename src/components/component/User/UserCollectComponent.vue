@@ -92,7 +92,7 @@
                 </a-col>
               </a-row>
             </a-tab-pane>
-            <a-tab-pane key="2" tab="文章收藏夹">
+            <a-tab-pane  key="2" tab="文章收藏夹">
               <a-row>
                 <a-col style="width: 100%">
                   <a-row
@@ -220,6 +220,7 @@ const store = useStore();
 const props = defineProps({
   userid: Number,
 });
+
 
 const editCollectSet = ref(null);
 const activeKey2 = ref("1");

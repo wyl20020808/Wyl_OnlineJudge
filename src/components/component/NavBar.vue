@@ -11,12 +11,12 @@
         <v-btn @click="jump('')">
           <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
           <span style="font-size: 16px; margin-top: 0px">主页</span>
-        </v-btn>
+        </v-btn>     
         <v-btn @click="jump('problems')">
           <v-icon
             ><img src="../../assets/static/pictures/题库.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 0px">题库</span>
+           <span style="font-size: 16px; margin-top: 0px">题库</span>
         </v-btn>
         <v-btn @click="jump('competition')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
