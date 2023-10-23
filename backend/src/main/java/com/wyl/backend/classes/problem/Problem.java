@@ -1,60 +1,70 @@
 package com.wyl.backend.classes.problem;
 
 
+import java.util.List;
+
 public class Problem {
-    private String create_man;
-    private String create_time;
-    private String update_time;
-    private String update_man;
-    private String problem_id;
-    private ProblemContent problem_content;
-    public String getCreate_man() {
-        return create_man;
+    private String createman;
+    private String createtime;
+    private String updatetime;
+    private String updateman;
+    private String problemid;
+    private ProblemContent problemcontent;
+    private List<ProblemSample> problemsample;
+
+    public List<ProblemSample> getProblemsample() {
+        return problemsample;
     }
 
-    public void setCreate_man(String create_man) {
-        this.create_man = create_man;
+    public void setProblemsample(List<ProblemSample> problemsample) {
+        this.problemsample = problemsample;
     }
 
-    public String getCreate_time() {
-        return create_time;
+    public String getCreateman() {
+        return createman;
     }
 
-    public void setCreate_time(String create_time) {
-        this.create_time = create_time;
+    public void setCreateman(String createman) {
+        this.createman = createman;
     }
 
-    public String getUpdate_time() {
-        return update_time;
+    public String getCreatetime() {
+        return createtime;
     }
 
-    public void setUpdate_time(String update_time) {
-        this.update_time = update_time;
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
     }
 
-    public String getUpdate_man() {
-        return update_man;
+    public String getUpdatetime() {
+        return updatetime;
     }
 
-    public void setUpdate_man(String update_man) {
-        this.update_man = update_man;
+    public void setUpdatetime(String updatetime) {
+        this.updatetime = updatetime;
     }
 
-    public String getProblem_id() {
-        return problem_id;
+    public String getUpdateman() {
+        return updateman;
     }
 
-    public void setProblem_id(String problem_id) {
-        this.problem_id = problem_id;
+    public void setUpdateman(String updateman) {
+        this.updateman = updateman;
     }
 
-    public ProblemContent getProblem_content() {
-        return problem_content;
+    public String getProblemid() {
+        return problemid;
     }
 
-    public void setProblem_content(ProblemContent problem_content) {
-        this.problem_content = problem_content;
+    public void setProblemid(String problemid) {
+        this.problemid = problemid;
     }
 
+    public ProblemContent getProblemcontent() {
+        return problemcontent;
+    }
 
+    public void setProblemcontent(ProblemContent problemcontent) {
+        this.problemcontent = problemcontent;
+    }
 }

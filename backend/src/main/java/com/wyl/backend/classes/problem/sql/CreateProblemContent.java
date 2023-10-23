@@ -1,8 +1,10 @@
 package com.wyl.backend.classes.problem.sql;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.wyl.backend.classes.problem.Problem;
 import com.wyl.backend.classes.problem.ProblemContent;
 import com.wyl.backend.classes.problem.ProblemSample;
+import com.wyl.backend.classes.user.userinfo.UserInfo;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
-public interface CreateProblemContent{
+public interface CreateProblemContent extends BaseMapper<ProblemContent>{
     @Insert("INSERT INTO problemcontent(title, background, description, inputformat, outputformat, hint) " +
             "VALUES(#{problemContent.title}, #{problemContent.background}, #{problemContent.description}, " +
             "#{problemContent.inputformat}, #{problemContent.outputformat}, #{problemContent.hint})")

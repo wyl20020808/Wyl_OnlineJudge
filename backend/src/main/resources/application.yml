@@ -1,0 +1,58 @@
+#spring:
+#  profiles:
+#    active: dev
+#  datasource:
+#    url: ${dev.datasource.url}
+#    username: ${dev.datasource.username}
+#    password: ${dev.datasource.password}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    type: com.alibaba.druid.pool.DruidDataSource
+#  redis:
+#    database: ${dev.redis.database}
+#    url: ${dev.redis.url}
+#    timeout: 1000
+#  servlet:
+#    multipart:
+#      max-request-size: 100MB
+#      max-file-size: 100MB
+#
+#server:
+#  port: ${dev.server.port}
+#
+#oj:
+#  # jwt的配置，secret万万不可丢失
+#  jwt:
+#    secret-key: ${dev.jwt.secret-key}
+#    ttl: ${dev.jwt.ttl}
+#    token-name: ${dev.jwt.token-name}
+#
+#  judge0:
+#    # judge0的服务器位置
+#    SERVER_URL: ${dev.judge0.SERVER_URL}
+#    IN_FILE_PATH: ${dev.judge0.IN_FILE_PATH}
+#    OUT_FILE_PATH: ${dev.judge0.OUT_FILE_PATH}
+#
+## 暂时没用上
+#oss:
+#  accessKeyId: LTAI5tD2eMgTQFoT1ruhdd1p
+#  accessKeySecret: uVMTCIIGnz60VcBzHad22C3QGPUnUm
+#  endpoint: oss-cn-shenzhen.aliyuncs.com
+#  bucketName: zyt-ali-oss
+#  #  输入文件路径
+#  pathIn: oj/in/
+#  #  输出文件路径
+#  pathOut: oj/out/
+#
+#
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  #mapper配置文件
+#  mapper-locations: classpath:mapper/*.xml
+#  type-aliases-package: com.wyl.backend.entity
+#  #开启驼峰命名
+#  map-underscore-to-camel-case: true
+#mybatis:
+#  # 搜索指定包别名
+#  typeAliasesPackage: com.wyl.backend.entity
+#

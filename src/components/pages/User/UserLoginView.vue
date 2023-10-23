@@ -19,7 +19,7 @@
                       <label for="password">密码</label>
                       <input type="password" class="form-control form-control-lg rounded-0" id="password" v-model="data.password" required>
                     </div>
-                    <button  type="submit" class="btn btn-primary button1 ">登录</button>
+                    <button  style="width: 100px;margin-top: 20px;"  class="btn btn-primary ">登录</button>
     
                   </form>
                   <div class="signin">
@@ -35,6 +35,8 @@
         </div>
       </div>
     </div>
+
+  
   </template>
   
   <script >
@@ -56,11 +58,13 @@
         .then(() => {
         // 处理成功的情况
           console.log('登录部分成功');
+          
         })
         .catch(error => {
           // 处理失败的情况
           console.error('Action failed:', error);
         });
+        
       };
       
   
@@ -74,32 +78,8 @@
   </script>
   
   <style scoped>
-  .outer{
-    position: relative;
-    top:100px;
-  }
-  .container {
-    background: #f8f9fa;
-    padding-top: 100px;
-    padding-bottom: 100px;
-  }
-  .card-header {
-    background: #e9ecef;
-    color: black;
-  }
-  .col-md-12{
-    width:1000px;
-  }
-  .button1{
-    color:#e9ecef;
-    position: relative;
-    top: 10px;
-    left:80px;
-    width: 300px;
-  }
-  .signin{
-    position: relative;
-    top: 10px;
-  }
+
+
+
   
   </style>
