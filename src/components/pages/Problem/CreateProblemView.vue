@@ -92,34 +92,33 @@
       </el-form-item>
     </el-form>
 
-    <el-form label-position="left" >
+    <el-form label-position="left">
       <a-row>
         <a-col
-          ><el-form-item label="时间限制" >
+          ><el-form-item label="时间限制">
             <a-select
-            
               ref="select"
               v-model:value="problemcontent.timelimit"
-              style="width: 100px;margin-left: 30px;"
+              style="width: 100px; margin-left: 30px"
               :options="timeoptions"
               @focus="focus"
             ></a-select>
             <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
           </el-form-item></a-col
         >
-        <a-col style="margin-left: 100px;"
-          ><el-form-item label="空间限制" >
+        <a-col style="margin-left: 100px"
+          ><el-form-item label="空间限制">
             <a-select
               ref="select"
               v-model:value="problemcontent.memorylimit"
-              style="width: 100px;"
+              style="width: 100px"
               :options="memoryoptions"
               @focus="focus"
             ></a-select>
             <!-- <el-input v-model="hint" type="textarea" placeholder="请输入提示" class="input"></el-input> -->
           </el-form-item></a-col
         >
-        <a-col style="margin-left: 100px;">
+        <a-col style="margin-left: 100px">
           <el-form-item label="难度">
             <a-select
               ref="select"
@@ -130,7 +129,7 @@
             ></a-select>
           </el-form-item>
         </a-col>
-        <a-col style="margin-left: 100px;"
+        <a-col style="margin-left: 100px"
           ><el-form-item label="算法">
             <a-select
               v-model:value="problemcontent.algorithm"
@@ -150,7 +149,7 @@
             <a-select
               ref="select"
               v-model:value="problemcontent.questionbank"
-              style="width: 200px;margin-left: 30px;"
+              style="width: 200px; margin-left: 30px"
               :options="questionbanks"
               @focus="focus"
             ></a-select>
@@ -159,7 +158,7 @@
         >
       </a-row>
     </el-form>
-    <a-row style="width: 100%;" justify="space-between">
+    <a-row style="width: 100%" justify="space-between">
       <a-col>
         <el-button
           style="color: aliceblue; width: 80px"
@@ -168,7 +167,7 @@
           class="save-button"
           >保存</el-button
         >
-     
+
         <el-button
           v-if="problemid"
           type="primary"
@@ -179,21 +178,21 @@
         <el-button
           v-else
           type="primary"
-          style="color: rgb(255, 252, 252);width: 80px; margin-left: 20px"
+          style="color: rgb(255, 252, 252); width: 80px; margin-left: 20px"
           @click="backQuestion"
           >取消</el-button
         >
       </a-col>
-      <a-col  v-if="problemid">
+      <a-col v-if="problemid">
         <el-button
           type="danger"
           style="color: white; width: 100px; margin-left: 20px"
           @click="deleteQuestion"
           >删除题目</el-button
         >
-    
+
         <input
-          style="margin-left: 20px;width: 200px;"
+          style="margin-left: 20px; width: 200px"
           type="file"
           accept=".zip"
           @change="handleFileUpload($event)"
@@ -206,7 +205,6 @@
         >
       </a-col>
     </a-row>
-
   </div>
 </template>
 
@@ -451,12 +449,12 @@ export default {
             message: "",
             type: "success",
           });
-          
-          this.problemcontent.algorithm = algorithm.trim().split(" ");//恢复
+
+          this.problemcontent.algorithm = algorithm.trim().split(" "); //恢复
           this.backup = {
             ...this.problemcontent,
             ...this.examples,
-          }
+          };
         })
         .catch((error) => {
           this.$store.dispatch("notice", {
@@ -574,10 +572,22 @@ export default {
     },
   },
   async created() {
+    window.addEventListener("unhandledrejection", function (event) {
+      if (
+        event.reason &&
+        event.reason.message &&
+        event.reason.message.includes(
+          "ResizeObserver loop completed with undelivered notifications"
+        )
+      ) {
+        event.preventDefault();
+      }
+    });
+
     this.backup = {
-            ...this.problemcontent,
-            ...this.examples,
-          };
+      ...this.problemcontent,
+      ...this.examples,
+    };
     if (this.problemid) {
       this.stateMent = "编辑题目 - P" + this.problemid;
       axios

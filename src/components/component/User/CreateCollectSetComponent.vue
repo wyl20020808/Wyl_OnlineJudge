@@ -138,7 +138,7 @@ const updateCollectSet = async () =>{
     });
 }
 const createColletSet = async () => {
-  if(props.collectSet !== null){
+  if(props.collectSet){
     await updateCollectSet();
     return ;
   }
