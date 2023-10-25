@@ -1,7 +1,10 @@
 package com.wyl.backend.classes.user.Controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wyl.backend.classes.user.pojo.UserProtocol;
 import com.wyl.backend.classes.user.sql.UserExtraOperator;
 import com.wyl.backend.classes.user.sql.UserOperator;
 import com.wyl.backend.classes.user.userinfo.User;
@@ -17,9 +20,9 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @CrossOrigin
 @RequestMapping("/user")
@@ -29,6 +32,7 @@ public class UserController {
     private UserOperator userOperator;
     @Autowired
     private UserExtraOperator userExtraOperator;
+
     private Boolean exists(String username) {
         List<UserInfo> userinfo = userOperator.select();
         for (UserInfo userInfo : userinfo) {
@@ -38,86 +42,115 @@ public class UserController {
         }
         return false;
     }
+
     public String getUsername(int userid) {
         return userOperator.selectById(userid).getUsername();
     }
+
     @PostMapping("/query")
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
         return userOperator.selectById(userInfo.getUserid());
     }
+
     @GetMapping("/query/all")
     public List<User> queryUserAll() {
         List<User> user = new ArrayList<>();
-       List<UserInfo> userinfo =  userOperator.selectList(null);
-       List<UserExtra> extra = userExtraOperator.selectList(null);
+        List<UserInfo> userinfo = userOperator.selectList(null);
+        List<UserExtra> extra = userExtraOperator.selectList(null);
         for (int i = 0; i < userinfo.size(); i++) {
             UserInfo userInfo = userinfo.get(i);
             UserExtra userExtra = extra.get(i);
             // 在这里，i 就是元素的下标
-            user.add(new User(userInfo,userExtra));
+            user.add(new User(userInfo, userExtra));
         }
         return user;
     }
 
     @GetMapping("/query/alluser")
     public List<UserInfo> queryAllUserInfo() {
-        return  userOperator.selectList(null);
+        return userOperator.selectList(null);
     }
 
 
     @PostMapping("/synchronize/userinfo")
     public String synchronizeUserInfo(@RequestBody UserInfo userInfo) {
-        try{
+        try {
             userOperator.updateById(userInfo);
             return "success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "error";
         }
     }
+
+    /**
+     * 注册用户
+     *
+     * @param userInfo
+     * @return
+     */
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
+
+        //获取当前时间，并匹配SQL的格式
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = now.format(formatter);
         userInfo.setRegistertime(formattedNow);
-        if(exists(userInfo.getUsername())){
+
+        if (exists(userInfo.getUsername())) {
             return "用户名已存在";
         }
 
         int cnt = userOperator.insert(userInfo);
-        if(cnt > 0)
+        if (cnt > 0)
             return "注册成功";
         return "error";
     }
 
+    /**
+     * 登录接口
+     * 成功登录返回用户id，用户不存在返回0
+     * 出现异常返回-1
+     * 其他情况返回-2
+     * @param info
+     * @return
+     */
     @PostMapping("/login")
-    public int login(@RequestBody UserInfo userInfo) {
+    public int login(@RequestBody UserProtocol.UserLoginInfoInput info) {
+        //用来暂存从数据库获取到的信息
+        UserInfo userInfo = null;
+
         try {
-            List<UserInfo>userinfo = userOperator.select();
-            for(UserInfo u:userinfo) {
-                System.out.println(u.getUsername());
-                if(Objects.equals(u.getUsername(), userInfo.getUsername())){
-                    if(Objects.equals(u.getPassword(), userInfo.getPassword())){
-                        return u.getUserid();
-                    }else{
-                        return 0;
-                    }
-                }
+            //从数据库中查询用户姓名与密码
+            LambdaQueryWrapper<UserInfo> queryWrapper = Wrappers.lambdaQuery();
+            //获取匹配名字和密码的用户id
+            queryWrapper
+                    .select(UserInfo::getUserid)
+                    .eq(UserInfo::getUsername, info.getUsername())
+                    .eq(UserInfo::getPassword, info.getPassword())
+            ;
+
+            userInfo = userOperator.selectOne(queryWrapper);
+
+            if (userInfo != null) {
+                return userInfo.getUserid();
+            } else {
+                return 0;
             }
         } catch (Exception e) {
             return -1;
         }
-        return -2;
     }
 
     @PostMapping("/update/cardinfo")
     public int updateUsename(@RequestBody UserInfo userInfo) {
 //        System.out.println(userInfo.getNickname());
         int cnt = userOperator.updateUsername(userInfo);
-        if(cnt > 0)
+        if (cnt > 0)
             return 1;
         return 0;
     }
+
     @PostMapping("/update/userpicture")
     public int updateUserpicture(@RequestBody UserInfo userInfo) {
         return userOperator.updateUserPictrue(userInfo);
@@ -157,7 +190,7 @@ public class UserController {
                 return "http://8.134.48.157:8088/images/" + newFileName;
                 // 生产环境
             }
-                // 开发环境
+            // 开发环境
             return "http://localhost:8088/images/" + newFileName;
 
 
