@@ -2,6 +2,7 @@ package com.wyl.backend.classes.user.Controller;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wyl.backend.classes.LoginJWT.JwtUtil;
 import com.wyl.backend.classes.user.sql.UserExtraOperator;
 import com.wyl.backend.classes.user.sql.UserOperator;
 import com.wyl.backend.classes.user.userinfo.User;
@@ -91,23 +92,26 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public int login(@RequestBody UserInfo userInfo) {
+    public String login(@RequestBody UserInfo userInfo) {
         try {
             List<UserInfo>userinfo = userOperator.select();
             for(UserInfo u:userinfo) {
                 System.out.println(u.getUsername());
                 if(Objects.equals(u.getUsername(), userInfo.getUsername())){
                     if(Objects.equals(u.getPassword(), userInfo.getPassword())){
-                        return u.getUserid();
+                        String token = JwtUtil.generateToken(String.valueOf(u.getUserid()));
+
+                        // 返回JWT
+                        return token + " " +  u.getUserid();
                     }else{
-                        return 0;
+                        return "passworderror";
                     }
                 }
             }
         } catch (Exception e) {
-            return -1;
+            return "backenderror";
         }
-        return -2;
+        return "usernotexist";
     }
 
     @PostMapping("/update/cardinfo")

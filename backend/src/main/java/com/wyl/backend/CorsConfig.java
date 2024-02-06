@@ -12,6 +12,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/images/**")
                 .allowedOriginPatterns("*")
+                .allowedOrigins("http://localhost") // 允许的源
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true);
     }

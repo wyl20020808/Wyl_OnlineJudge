@@ -2,18 +2,18 @@ import axios from "axios";
 import router from "@/router/router";
 import { ElNotification } from 'element-plus'
 import { sleep } from "@/js/functions/TimeAbout";
-import {SERVER_URL,SERVER} from "../../js/functions/config"
+import { SERVER_URL, SERVER } from "../../js/functions/config"
 const ModuleUserInfo = ({
   state: {
-    userid:"",
-    username:"",
-    userimg:"",
-    userpassword:"",
-    userphone:"",
-    useraddress:"",
-    userloginstate:"false",
-    userisadmin:"false",
-    userpicture:"",
+    userid: "",
+    username: "",
+    userimg: "",
+    userpassword: "",
+    userphone: "",
+    useraddress: "",
+    userloginstate: "false",
+    userisadmin: "false",
+    userpicture: "",
   },
   getters: {
 
@@ -22,38 +22,38 @@ const ModuleUserInfo = ({
 
   },
   actions: {
-    notice(context,noticeInfo)  {
-        ElNotification({
-            title: noticeInfo.title,
-            message: noticeInfo.message,
-            type: noticeInfo.type,
-        })
-      },
-    async signin(context,userinfo){
-       
-        await axios.post(`${SERVER_URL}/user/signin`, userinfo,)
+    notice(context, noticeInfo) {
+      ElNotification({
+        title: noticeInfo.title,
+        message: noticeInfo.message,
+        type: noticeInfo.type,
+      })
+    },
+    async signin(context, userinfo) {
+
+      await axios.post(`${SERVER_URL}/user/signin`, userinfo,)
         .then(async response => {
           // alert("yes")
           let type = 'error';
-          if(response.data === '注册成功'){
-              type = "success";
-               await axios.post(`${SERVER_URL}/userextra/synchronizeinfo `,{})//注册完同步一下表的信息
+          if (response.data === '注册成功') {
+            type = "success";
+            await axios.post(`${SERVER_URL}/userextra/synchronizeinfo `, {})//注册完同步一下表的信息
           }
-          context.dispatch("notice",{
-            title:response.data,
-            message:"",
-            type:type,
-          })   
-          if(type === 'success'){
-            router.push({name:'userlogin'})
-          }       
+          context.dispatch("notice", {
+            title: response.data,
+            message: "",
+            type: type,
+          })
+          if (type === 'success') {
+            router.push({ name: 'userlogin' })
+          }
         })
         .catch(error => {
-          context.dispatch("notice",{
-            title:error,
-            message:"",
-            type:'error',
-          }) 
+          context.dispatch("notice", {
+            title: error,
+            message: "",
+            type: 'error',
+          })
         });
     },
     async SynchronizeInfo(context, info) {
@@ -61,7 +61,7 @@ const ModuleUserInfo = ({
         const response = await axios.post(`${SERVER_URL}/user/query`, info.userinfo);
         response.data.userloginstate = info.loginState;
         localStorage.setItem('user', JSON.stringify(response.data));//同步本地数据
-        
+
         await axios.post(`${SERVER_URL}/user/synchronize/userinfo`, response.data);
         context.dispatch("notice", {
           title: 'Success',
@@ -81,47 +81,52 @@ const ModuleUserInfo = ({
         // });
       }
     },
-    login(context,userinfo){
-      axios.post(`${SERVER_URL}/user/login`, userinfo,)//这里注意不能用get，get有别的用法
+    login(context, userinfo) {
+      axios.post(`${SERVER_URL}/user/login`, userinfo, {
+        headers: {
+          'Authorization': `login`
+        }
+      })//这里注意不能用get，get有别的用法
         .then(response => {
-          if(response.data > 0) {
+          if (!["passworderror", "backenderror", "usernotexist"].includes(response.data)) {
             // alert("欢迎回来！" + userinfo.username)
-            context.dispatch("notice",{
+            context.dispatch("notice", {
               title: '欢迎回来！',
               message: userinfo.username,
               type: 'success',
             })
-            userinfo.userid = response.data;
+            userinfo.userid = response.data.split(" ")[1];//空格后面的是id
+            response.data = response.data.split(" ")[0]
             // console.log(userinfo.username)
-            context.dispatch("SynchronizeInfo",{
+            context.dispatch("SynchronizeInfo", {
               userinfo,
-              loginState:"true"
+              loginState: "true"
             }
-             )
-             sleep(500).then(()=>{
+            )
+            sleep(500).then(() => {
               window.location = `${SERVER}`;
             })
-            
+
             // let user = JSON.parse(localStorage.getItem('user'));
             // console.log(user)
             // router.push({name:'home'})
-          }else if(response.data === 0){
+          } else if (response.data === 0) {
             // alert("抱歉，您输入的密码有误！" )
-            context.dispatch("notice",{
+            context.dispatch("notice", {
               title: 'Error',
               message: "密码错误！",
               type: 'error',
             })
-          }else if(response.data === -1){
+          } else if (response.data === -1) {
             // alert("服务器异常，请稍后再试")
-            context.dispatch("notice",{
+            context.dispatch("notice", {
               title: 'Error',
               message: "服务器异常！",
               type: 'error',
             })
-          }else{
+          } else {
             // alert("抱歉，您的用户名不存在！")
-            context.dispatch("notice",{
+            context.dispatch("notice", {
               title: 'Error',
               message: "用户名不存在！",
               type: 'error',
@@ -138,7 +143,7 @@ const ModuleUserInfo = ({
     }
   },
   modules: {
-    
+
   }
 })
 export default ModuleUserInfo;

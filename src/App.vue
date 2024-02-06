@@ -2,7 +2,7 @@
   <div>
     <NavBar />
     <router-view :key="$route.fullPath" />
-    <floatButton style="z-index: 1000" />
+    <!-- <floatButton style="z-index: 1000" /> -->
   </div>
 </template>
 
