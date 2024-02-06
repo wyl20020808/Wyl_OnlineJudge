@@ -1,7 +1,8 @@
 <template>
+  <div ref="slideElement" >
   <a-row>
     <a-col>
-      <div class="search" style="display: flex; align-items: center">
+      <div class="search slide-up" v-if="showDivs.includes(1)" style="display: flex; align-items: center">
         <a-input
           size="large"
           v-model:value="searchProblem"
@@ -10,7 +11,7 @@
         />
         <el-button :icon="Search" circle @click="handleSearch"></el-button>
       </div>
-      <div class="card card1" style="">
+      <div class="card card1 slide-up" v-if="showDivs.includes(2)" style="">
         <el-pagination
           style="margin: 10px"
           background
@@ -100,6 +101,7 @@
       </div>
     </a-col>
   </a-row>
+</div>
 </template>
 
 <script>
@@ -136,6 +138,7 @@ export default {
   },
   data() {
     return {
+      showDivs:[],
       searchText: "",
       questions: [],
       nowQuestions: [],
@@ -177,9 +180,27 @@ export default {
 
   async mounted() {
     this.searchProblem = "";
+    this.applyAnimation();
     await this.getQuestions();
   },
   methods: {
+    applyAnimation() {
+      //有序出现
+      for (let i = 0; i < 2; i++) {
+        setTimeout(() => {
+          this.showDivs.push(i + 1);
+          this.$nextTick(() => {
+            const elements = document.querySelectorAll(".slide-up");
+            elements.forEach((element, index) => {
+              console.log("ahgskjdhajks");
+              const delay = index * 0.05;
+              element.style.transitionDelay = `${delay}s`;
+              element.classList.add("active");
+            });
+          });
+        }, 150 * (i + 1)); // 每个div延时增加500ms
+      }
+    },
     fetch: async function (value, type, callback) {
       await axios
         .post(`${SERVER_URL}/contest/query/${type}`, {

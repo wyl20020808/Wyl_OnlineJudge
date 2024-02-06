@@ -167,7 +167,7 @@
             <a-button
               @click="
                 () => {
-                  this.$router.push({ path: '/competition' });
+                  this.$router.push({ path: '/contest' });
                 }
               "
               >取消</a-button
@@ -217,7 +217,7 @@ export default {
             type: "success",
           });
           sleep(500);
-          router.push({ path: "/competition" });
+          router.push({ path: "/contest" });
         })
         .catch((err) => {
           console.log(err);

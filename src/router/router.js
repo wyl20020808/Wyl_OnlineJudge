@@ -26,7 +26,13 @@ import MessageView from "@/components/pages/message/MessageView.vue"
 import codeEditorComponent from "@/components/component/code/codeEditorComponent"
 import UserSettingView from "../components/pages/User/UserSettingView.vue"
 import UserCollectSetView from "../components/pages/User/UserCollectSetView.vue"
+import YozoFile from "@/components/component/YozoFile/YozoFile.vue"
 const routes = [
+  {
+    path: '/yozoFile/',
+    name: 'yozoFile',
+    component: YozoFile
+  },
   {
     path: '/',
     name: 'home',
@@ -38,8 +44,8 @@ const routes = [
     component: codeEditorComponent
   },
   {
-    path: '/competition/',
-    name: 'competition',
+    path: '/contest/',
+    name: 'contest',
     component: CompetitionView
   },
   {

@@ -18,7 +18,7 @@
           /></v-icon>
            <span style="font-size: 16px; margin-top: 0px">题库</span>
         </v-btn>
-        <v-btn @click="jump('competition')">
+        <v-btn @click="jump('contest')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
           <span style="font-size: 16px; margin-top: 0px">比赛</span>
         </v-btn>
@@ -207,7 +207,7 @@ export default {
         case "/problems":
           this.value = 1;
           break;
-        case "/competition":
+        case "/contest":
           this.value = 2;
           break;
         case "/ranklist":

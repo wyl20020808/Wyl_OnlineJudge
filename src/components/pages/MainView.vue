@@ -12,7 +12,10 @@
       </a-row>
       <a-row>
         <a-col :span="24">
-            </a-col>
+          <div style="padding: ;">
+
+          </div>
+        </a-col>
       </a-row>
     </a-col>
   </a-row>

@@ -314,7 +314,6 @@
                           parsedDescription(formattedText(problemcontent.hint))
                         "
                       ></v-md-preview>
-                      
                     </a-col>
                   </a-row>
                 </a-card>

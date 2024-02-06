@@ -1,74 +1,91 @@
 <template>
-  <a-row style="justify-content: center; align-items: center; margin-top: 30px">
-    <a-col>
-      <a-card style="width: 1175px; margin-bottom: 20px">
-        <a-row style="display: flex; align-items: center; margin-bottom: 20px">
-          <a-col>
-            <h5>所属题库：</h5>
-          </a-col>
-          <a-col>
-            <a-radio-group v-model:value="questionBank">
-              <a-radio-button value="jxust">江理题库</a-radio-button>
-              <a-radio-button value="loj">LOJ</a-radio-button>
-              <a-radio-button value="luogu" disabled>洛谷</a-radio-button>
-              <a-radio-button value="codeforces" disabled
-                >CodeForces</a-radio-button
-              >
-            </a-radio-group>
-          </a-col>
-          <a-col style="margin-left: 570px">
-            <el-button
-              @click="validateLogon"
-              class=""
-              style="width: 150px; height: 30px; margin-left: 0px"
-              ><el-icon><Plus /></el-icon> &ensp; 新建题目</el-button
-            >
-          </a-col>
-        </a-row>
-        <a-row style="display: flex; align-items: center; margin-bottom: 0px">
-          <a-col>
-            <h5>难度：</h5>
-          </a-col>
-          <a-col style="margin-left: 40px"
-            ><a-select
-              allowClear
-              ref="select"
-              v-model:value="difficulty"
-              style="width: 200px"
-              :options="difficultys"
-              @focus="focus"
-              placeholder="难度"
-            ></a-select
-          ></a-col>
+  <!-- 动画效果实现，要用div，因为row是异步的，会出错 -->
 
-          <a-col style="margin-left: 20px">
-            <h5>算法：</h5>
-          </a-col>
-          <a-col>
-            <a-select
-              allowClear
-              v-model:value="algorithm"
-              mode="multiple"
-              show-search
-              placeholder="支持搜索功能"
-              style="width: 200px"
-              :options="algorithmsAndDataStructuresOptions"
-            ></a-select>
-          </a-col>
+
+    <a-row
+      style="justify-content: center; align-items: center; margin-top: 30px"
+    >
+      <a-col>
+        <a-card
+          class="slide-up"
+          v-if="showDivs.includes(1)"
+          style="width: 1175px; margin-bottom: 20px"
+        >
+          <a-row
+            style="display: flex; align-items: center; margin-bottom: 20px"
+          >
+            <a-col>
+              <h5>所属题库：</h5>
+            </a-col>
+            <a-col>
+              <a-radio-group v-model:value="questionBank">
+                <a-radio-button value="jxust">江理题库</a-radio-button>
+                <a-radio-button value="loj">LOJ</a-radio-button>
+                <a-radio-button value="luogu" disabled>洛谷</a-radio-button>
+                <a-radio-button value="codeforces" disabled
+                  >CodeForces</a-radio-button
+                >
+              </a-radio-group>
+            </a-col>
+            <a-col style="margin-left: 570px">
+              <el-button
+                @click="validateLogon"
+                class=""
+                style="width: 150px; height: 30px; margin-left: 0px"
+                ><el-icon><Plus /></el-icon> &ensp; 新建题目</el-button
+              >
+            </a-col>
+          </a-row>
+          <a-row style="display: flex; align-items: center; margin-bottom: 0px">
+            <a-col>
+              <h5>难度：</h5>
+            </a-col>
+            <a-col style="margin-left: 40px"
+              ><a-select
+                allowClear
+                ref="select"
+                v-model:value="difficulty"
+                style="width: 200px"
+                :options="difficultys"
+                @focus="focus"
+                placeholder="难度"
+              ></a-select
+            ></a-col>
+
+            <a-col style="margin-left: 20px">
+              <h5>算法：</h5>
+            </a-col>
+            <a-col>
+              <a-select
+                allowClear
+                v-model:value="algorithm"
+                mode="multiple"
+                show-search
+                placeholder="支持搜索功能"
+                style="width: 200px"
+                :options="algorithmsAndDataStructuresOptions"
+              ></a-select>
+            </a-col>
+          </a-row>
+        </a-card>
+
+        <a-row>
+          <a-col style="">
+            <div
+              class="slide-up"
+     
+              style="margin-bottom: 20px"
+            >
+              <ProblemListViewVue
+                :questionBank="questionBank"
+                :algorithm="algorithm"
+                :difficulty="difficulty"
+              /></div
+          ></a-col>
         </a-row>
-      </a-card>
-      <a-row>
-        <a-col style="">
-          <div style="margin-bottom: 20px">
-            <ProblemListViewVue
-              :questionBank="questionBank"
-              :algorithm="algorithm"
-              :difficulty="difficulty"
-            /></div
-        ></a-col>
-      </a-row>
-    </a-col>
-  </a-row>
+      </a-col>
+    </a-row>
+ 
 
   <el-dialog
     v-model="centerDialogVisible"
@@ -93,6 +110,7 @@ import router from "@/router/router";
 import { Plus } from "@element-plus/icons-vue";
 
 import ProblemListViewVue from "@/components/component/problem/ProblemListView.vue";
+import { sleep } from "@/js/functions/TimeAbout";
 export default {
   components: {
     ProblemListViewVue,
@@ -143,9 +161,32 @@ export default {
       difficulty: "",
       algorithm: [],
       algorithmsAndDataStructuresOptions,
+      showDivs: [],
     };
   },
+  mounted() {
+    // this.$refs.slideElement.classList.add("active");
+    // script.js
+    this.applyAnimation();
+  },
   methods: {
+    applyAnimation() {
+      //有序出现
+      for (let i = 0; i < 2; i++) {
+        setTimeout(() => {
+          this.showDivs.push(i + 1);
+          this.$nextTick(() => {
+            const elements = document.querySelectorAll(".slide-up");
+            elements.forEach((element, index) => {
+              console.log("ahgskjdhajks");
+              const delay = index * 0.05;
+              element.style.transitionDelay = `${delay}s`;
+              element.classList.add("active");
+            });
+          });
+        }, 100 * i); // 每个div延时增加500ms
+      }
+    },
     validateLogon() {
       if (JSON.parse(localStorage.getItem("user")).userloginstate !== "true") {
         this.centerDialogVisible = true;
@@ -161,4 +202,16 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.slide-up {
+  /* width: 200px;
+  height: 100px; */
+  /* background-color: skyblue; */
+  transform: translateY(40px);
+  transition: transform 0.8s ease;
+}
+
+.slide-up.active {
+  transform: translateY(0);
+}
+</style>

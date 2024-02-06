@@ -77,6 +77,12 @@ import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import VMdPreviewHtml from '@kangc/v-md-editor/lib/preview-html';
 import '@kangc/v-md-editor/lib/style/preview-html.css';
 
+//2024年1月9日11:38:30
+
+//2024年1月10日10:43:21
+// main.js
+import Ionicons from 'ionicons';
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -122,6 +128,18 @@ app.directive('focus', {
       })
     }
   })
+
+
+app.config.errorHandler = (err, instance, info) => {
+  // 检查错误信息，决定是否忽略
+  if (err.message.includes("ResizeObserver loop completed with undelivered notifications")) {
+    // 忽略这个错误
+    console.log("Ignored ResizeObserver error");
+  } else {
+    // 对于其他错误，可以抛出异常或者使用console.error记录错误
+    console.error(err, instance, info);
+  }
+};
   
 app.use(router).use(ElementPlus).use(vuetify).use(store).use(Antd)
 app.use(VMdEditor).use(VMdPreview)

@@ -1,7 +1,12 @@
 <template>
-  <a-row style="align-items: center; justify-content: center;width: 1200px;">
+  <a-row style="align-items: center; justify-content: center; width: 1200px">
     <a-col>
-      <div v-for="(contest, index) in contestList" :key="contest.contestid">
+      <div
+        class="slide-up"
+        v-for="(contest, index) in contestList"
+        :key="contest.contestid"
+      >
+      <div v-if="showDivs.includes(index + 1)">
         <div
           v-if="
             index === 0 ||
@@ -55,7 +60,8 @@
                     style="margin-right: 8px"
                     ><Trophy
                   /></el-icon>
-                  <div style="font-size: 36px;"
+                  <div
+                    style="font-size: 36px"
                     @click="viewContest(contest.contestid)"
                     class="card-title hoverable"
                   >
@@ -169,6 +175,7 @@
             </div>
           </div>
         </div>
+        </div>
       </div>
       <!-- <a-button @click="dialogVisible = true" >uye</a-button> -->
       <el-dialog
@@ -215,6 +222,24 @@ export default {
   },
 
   methods: {
+    applyAnimation() {
+      //有序出现
+     
+      for (let i = 0; i < this.contestList.length; i++) {
+        setTimeout(() => {
+          this.showDivs.push(i + 1);
+          this.$nextTick(() => {
+            const elements = document.querySelectorAll(".slide-up");
+            elements.forEach((element, index) => {
+              
+              const delay = index * 0.05;
+              element.style.transitionDelay = `${delay}s`;
+              element.classList.add("active");
+            });
+          });
+        }, 150 * i); // 每个div延时增加500ms
+      }
+    },
     async cancleJoinContest(contestid) {
       await axios
         .post(`${SERVER_URL}/contest/join/personal/cancel`, {
@@ -358,8 +383,10 @@ export default {
         });
     },
   },
+  mounted() {},
   data() {
     return {
+      showDivs: [],
       SERVER_URL: `${SERVER_URL}/images/icpc_logo.png`,
       contestList: [],
       joinSet: new Set(),
@@ -375,6 +402,12 @@ export default {
       .get(`${SERVER_URL}/contest/query`)
       .then((res) => {
         this.contestList = res.data;
+
+        setTimeout(() => {
+          //这里还可能取决于网速，不行
+          this.applyAnimation();
+        }, 200); // 每个div延时增加500ms
+
         // 对比赛列表进行排序
         this.contestList.sort((a, b) => {
           let now = new Date();

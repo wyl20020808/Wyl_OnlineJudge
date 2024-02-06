@@ -1,7 +1,8 @@
 <template>
   <div>
-    <BaseComponentView />
+    <NavBar />
     <router-view :key="$route.fullPath" />
+    <floatButton style="z-index: 1000" />
   </div>
 </template>
 
@@ -9,14 +10,18 @@
 import "bootstrap/dist/css/bootstrap.css";
 import axios from "axios";
 import "bootstrap/dist/js/bootstrap.js";
-import BaseComponentView from "./components/component/NavBar.vue";
+import NavBar from "./components/component/NavBar.vue";
 import MainView from "./components/pages/MainView.vue";
-import { SERVER_URL } from './js/functions/config';
+import { SERVER_URL } from "./js/functions/config";
+import floatButton from "./components/component/floatButton/floatButton.vue";
+import { computed, watch } from 'vue';
+import { useRoute } from "vue-router";
 export default {
   name: "App",
   components: {
-    BaseComponentView,
+    NavBar,
     MainView,
+    floatButton,
   },
   async created() {
     await axios

@@ -205,7 +205,6 @@ public class JudgeServiceImpl implements JudgeService {
                     judgeContent.setSubmittime(submittime);
                     judgeContent.setProblemid((int)problemId);
                     judgeContent.setContestid(contestId);
-                    System.out.println(judgeContent + " here");
                     contestJudgeContentSql.insert(judgeContent);//插入进去
                 } catch (IOException e) {
                     throw new RuntimeException(e);
