@@ -98,6 +98,7 @@ const ModuleUserInfo = ({
             })
             userinfo.userid = response.data.split(" ")[1];//空格后面的是id
             response.data = response.data.split(" ")[0]
+            localStorage.setItem("token",response.data);
             // console.log(userinfo.username)
             context.dispatch("SynchronizeInfo", {
               userinfo,

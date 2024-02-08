@@ -140,6 +140,24 @@ app.config.errorHandler = (err, instance, info) => {
     console.error(err, instance, info);
   }
 };
+import axios from 'axios'
+// // 全局配置axios的 头部 token传递 2024年2月8日17:14:30
+// axios.interceptors.request.use(
+//   config => {
+//     // 从localStorage中获取token
+//     const token = localStorage.getItem('token');
+//     if (token) {
+//       // 如果token存在，则在请求头中携带token
+//       config.headers.Authorization = `${token}`;
+//     }
+//     return config;
+//   },
+//   error => {
+//     // 对请求错误做些什么
+//     return Promise.reject(error);
+//   }
+// );
+axios.defaults.withCredentials = true;
   
 app.use(router).use(ElementPlus).use(vuetify).use(store).use(Antd)
 app.use(VMdEditor).use(VMdPreview)

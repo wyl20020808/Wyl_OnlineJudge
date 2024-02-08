@@ -11,12 +11,12 @@
         <v-btn @click="jump('')">
           <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
           <span style="font-size: 16px; margin-top: 0px">主页</span>
-        </v-btn>     
+        </v-btn>
         <v-btn @click="jump('problems')">
           <v-icon
             ><img src="../../assets/static/pictures/题库.png" width="30"
           /></v-icon>
-           <span style="font-size: 16px; margin-top: 0px">题库</span>
+          <span style="font-size: 16px; margin-top: 0px">题库</span>
         </v-btn>
         <v-btn @click="jump('contest')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
@@ -39,7 +39,8 @@
           <span style="font-size: 16px; margin-top: 0px">评测队列</span>
         </v-btn>
         <v-btn @click="jump('discuss')">
-          <v-icon><img src="../../assets/static/pictures/discuss.png" width="30"
+          <v-icon
+            ><img src="../../assets/static/pictures/discuss.png" width="30"
           /></v-icon>
           <span style="font-size: 16px; margin-top: 0px">讨论</span>
         </v-btn>
@@ -131,8 +132,8 @@ export default {
   watch: {
     $route(to, from) {
       this.updateNavState();
-    
-      localStorage.setItem('nav',this.value);
+
+      localStorage.setItem("nav", this.value);
     },
   },
   computed: {
@@ -140,7 +141,7 @@ export default {
       return this.$route.path;
     },
     color() {
-      console.log(this.value,'导航值')
+      console.log(this.value, "导航值");
       switch (parseInt(this.value)) {
         case 0:
           return "purple";
@@ -177,7 +178,7 @@ export default {
       }
     },
   },
-  
+
   async created() {
     this.updateNavState();
     window.onbeforeunload = () => {
@@ -187,17 +188,17 @@ export default {
       //如果登录了的话
       this.getUnreadMessage();
 
-      await axios.post(`${SERVER_URL}/user/query`,{
-        userid:JSON.parse(localStorage.getItem("user")).userid,
-      })
-      .then(res => {
-        localStorage.setItem("user",JSON.stringify(res.data));
-      })
-      .catch(err => {
-        console.log(err);
-      })
+      await axios
+        .post(`${SERVER_URL}/user/query`, {
+          userid: JSON.parse(localStorage.getItem("user")).userid,
+        })
+        .then((res) => {
+          localStorage.setItem("user", JSON.stringify(res.data));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    
   },
   methods: {
     updateNavState() {
@@ -227,7 +228,7 @@ export default {
           this.value = 7;
           break;
         default:
-          this.value = localStorage.getItem('nav');
+          this.value = localStorage.getItem("nav");
           break;
       }
     },
@@ -235,7 +236,7 @@ export default {
       router.push({ path: "/" + total });
     },
     async getUnreadMessage() {
-      if(!isLogin)return;
+      if (!isLogin) return;
       //统计一下未读的消息
       await axios
         .get(`${SERVER_URL}/message/query/unread`, {
@@ -262,17 +263,36 @@ export default {
     },
     async logout() {
       const userinfo = JSON.parse(localStorage.getItem("user"));
+      console.log(localStorage.getItem("token"), "这是当前的token");
 
-      this.$store.dispatch("SynchronizeInfo", {
-        userinfo,
-        loginState: false,
-      });
-      localStorage.setItem("user", null);
+      await axios
+        .post(`${SERVER_URL}/user/logout`, {
+          userInfo: userinfo,
+        })
+        .then((res) => {
+          this.$store.dispatch("SynchronizeInfo", {
+            userinfo,
+            loginState: false,
+          });
+          localStorage.setItem("user", null);
 
-      sleep(500).then(() => {
-        localStorage.setItem("user", null);
-        location.reload();
-      });
+          sleep(500).then(() => {
+            localStorage.setItem("user", null);
+            location.reload();
+          });
+        })
+        .catch((err) => {
+          this.$store.dispatch("SynchronizeInfo", {
+            userinfo,
+            loginState: false,
+          });
+          localStorage.setItem("user", null);
+          sleep(500).then(() => {
+            localStorage.setItem("user", null);
+            location.reload();
+          });
+        });
+
       // router.push({ name: "home" });
     },
   },

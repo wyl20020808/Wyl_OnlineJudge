@@ -92,6 +92,21 @@ public class UserController {
         return "error";
     }
 
+    @PostMapping("/logout")
+    public String logout(@RequestBody UserInfo userInfo) {
+        System.out.println(StpUtil.getLoginId() + "退出的id");
+        StpUtil.logout();
+        return "usernotexist";
+    }
+    @PostMapping("/checkLogin")
+    public Boolean checkLogin() {
+        return StpUtil.isLogin();
+    }
+    @PostMapping("/kickout")
+    public String kickOut(@RequestParam int userid) {
+        StpUtil.kickout(userid);
+        return "123" + userid;
+    }
     @PostMapping("/login")
     public String login(@RequestBody UserInfo userInfo) {
         try {
@@ -100,11 +115,11 @@ public class UserController {
                 System.out.println(u.getUsername());
                 if(Objects.equals(u.getUsername(), userInfo.getUsername())){
                     if(Objects.equals(u.getPassword(), userInfo.getPassword())){
-                        String token = JwtUtil.generateToken(String.valueOf(u.getUserid()));
+//                        String token = JwtUtil.generateToken(String.valueOf(u.getUserid()));
 
                         // 会话登录：参数填写要登录的账号id，建议的数据类型：long | int | String， 不可以传入复杂类型，如：User、Admin 等等
-                        StpUtil.login(u.getUserid());
-
+                         StpUtil.login(u.getUserid());
+                        String token = StpUtil.getTokenValue();
                         // 返回JWT
                         return token + " " +  u.getUserid();
                     }else{

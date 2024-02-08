@@ -13,12 +13,18 @@
       <a-row style="padding: 2%;width: 50%;">
         <NoticeVue />
       </a-row>
-   
+     <!-- <a-row>
+      <a-button @click="tiren(17)">
+        踢人下线！
+      </a-button>
+     </a-row> -->
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 import NoticeVue from '../component/Home/Notice.vue';
+import { SERVER_URL } from '@/js/functions/config';
 export default {
   components:{
     NoticeVue,
@@ -36,7 +42,14 @@ export default {
     };
   },
   methods: {
-  
+    async tiren(userid){
+      await axios.post(`${SERVER_URL}/user/kickout?userid=${userid}`).then(res => {
+        console.log(res.data);
+      })
+      .catch(res => {
+        console.log("踢人失败")
+      })
+    }
     // 其他的方法...
   },
 };

@@ -1,4 +1,4 @@
-import { createRouter,  createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import MainView from "../components/pages/MainView.vue"
 import CompetitionView from "../components/pages/CompetitionView.vue"
 import EvaluationQueueView from "../components/pages/EvaluationQueueView.vue"
@@ -83,7 +83,7 @@ const routes = [
     name: 'problemdetail',
     component: ProblemDetailView,
     props: "true"
-  }, 
+  },
   {
     path: '/userregitser/',
     name: 'userregitser',
@@ -103,7 +103,7 @@ const routes = [
     path: '/problemedit/:problemid',
     name: 'problemedit',
     component: ProblemEditView,
-    props:true,
+    props: true,
   },
   {
     path: '/problem/submit',
@@ -179,5 +179,51 @@ const router = createRouter({
     return { top: 0 }
   },
 })
+
+let fresh = false;
+router.beforeEach(async (to, from, next) => {
+
+    const shouldContinue = await checkIsLogin(to);
+    
+      next();
+    
+});
+
+import axios from "axios"
+import { SERVER_URL } from "../js/functions/config.js"
+import { useStore } from 'vuex'
+import { warningMessage } from '../js/functions/common.js'
+import { notice } from '../js/functions/common.js'
+import { sleep } from '../js/functions/TimeAbout.js'
+async function checkIsLogin(to) {
+  try {
+    const res = await axios.post(`${SERVER_URL}/user/checkLogin`);
+    if (res.data === false) {
+      localStorage.setItem('user', null); // 同步本地数据
+      if (!sessionStorage.getItem('refreshed')) {
+        sessionStorage.setItem('refreshed', 'true');
+        notice("",{
+          title: '登陆已过期',
+          message: "抱歉，您的登录信息已过期，请重新登陆 ",
+          type: 'error',
+        })
+        sleep(1000).then(function () {
+          window.location.href = `${to.fullPath}`;
+        })
+        // 保存目标路径
+        // 重定向到登录页面，并在登录成功后跳转到目标页面
+        // window.location.href = `${to.fullPath}`;
+        return false; // 表示不需要执行next()
+      }
+    } else {
+      sessionStorage.removeItem('refreshed');
+    }
+    return true; // 用户已登录，或不需要刷新，继续执行next()
+  } catch (error) {
+    console.error("An error occurred:", error);
+    return true; // 出现错误时，也继续执行next()
+  }
+}
+
 
 export default router
