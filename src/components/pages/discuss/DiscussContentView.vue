@@ -91,6 +91,8 @@ import { useRoute } from "vue-router";
 import _ from "lodash";
 import CommentComponent from "@/components/component/discuss/CommentComponent.vue";
 import { sleep } from "@/js/functions/TimeAbout";
+import { isLogin } from "@/js/functions/login";
+import { warningMessage } from "@/js/functions/common";
 let route = useRoute();
 let id = ref(1);
 let type = ref("discuss");
@@ -102,6 +104,10 @@ const onAddComment = (value) => {
   console.log(value); // 输出：{ key1: 'value1', key2: 'value2' }
 };
 function editDiscuss() {
+  if(!isLogin){
+    warningMessage("请先登录")
+    return;
+  }
   router.push({
     path: "/creatediscuss",
     query: {

@@ -6,175 +6,175 @@
         v-for="(contest, index) in contestList"
         :key="contest.contestid"
       >
-      <div v-if="showDivs.includes(index + 1)">
-        <div
-          v-if="
-            index === 0 ||
-            getContestStatus(contestList[index - 1]) !==
-              getContestStatus(contest)
-          "
-        >
+        <div v-if="showDivs.includes(index + 1)">
           <div
-            class="alert alert-primary"
-            role="alert"
-            style="
-              width: 1000px;
-              border-left: 5px solid rgb(37, 187, 155);
-              background-color: rgb(255, 255, 255);
+            v-if="
+              index === 0 ||
+              getContestStatus(contestList[index - 1]) !==
+                getContestStatus(contest)
             "
           >
-            <h4>{{ getContestStatusText(contest) }}</h4>
-          </div>
-        </div>
-        <div
-          class="card mb-3 card1"
-          style="max-width: 1000px; max-height: 400px"
-        >
-          <div
-            style="
-              position: absolute;
-              left: 0;
-              top: 0;
-              bottom: 0;
-              width: 5px;
-              background-color: rgb(37, 187, 155);
-            "
-          ></div>
-          <div class="row g-0">
             <div
-              class="col-md-3 d-flex justify-content-center align-items-center"
+              class="alert alert-primary"
+              role="alert"
+              style="
+                width: 1000px;
+                border-left: 5px solid rgb(37, 187, 155);
+                background-color: rgb(255, 255, 255);
+              "
             >
-              <img
-                style="width: 80%"
-                :src="SERVER_URL"
-                class="img-fluid rounded-start"
-                alt="..."
-              />
+              <h4>{{ getContestStatusText(contest) }}</h4>
             </div>
-            <div class="col-md-7">
-              <div class="card-body">
-                <a-row style="display: flex; align-items: center">
-                  <el-icon
-                    size="40"
-                    color="rgb(24, 144, 255)"
-                    style="margin-right: 8px"
-                    ><Trophy
-                  /></el-icon>
-                  <div
-                    style="font-size: 36px"
-                    @click="viewContest(contest.contestid)"
-                    class="card-title hoverable"
+          </div>
+          <div
+            class="card mb-3 card1"
+            style="max-width: 1000px; max-height: 400px"
+          >
+            <div
+              style="
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 5px;
+                background-color: rgb(37, 187, 155);
+              "
+            ></div>
+            <div class="row g-0">
+              <div
+                class="col-md-3 d-flex justify-content-center align-items-center"
+              >
+                <img
+                  style="width: 80%"
+                  :src="SERVER_URL"
+                  class="img-fluid rounded-start"
+                  alt="..."
+                />
+              </div>
+              <div class="col-md-7">
+                <div class="card-body">
+                  <a-row style="display: flex; align-items: center">
+                    <el-icon
+                      size="40"
+                      color="rgb(24, 144, 255)"
+                      style="margin-right: 8px"
+                      ><Trophy
+                    /></el-icon>
+                    <div
+                      style="font-size: 36px"
+                      @click="viewContest(contest.contestid)"
+                      class="card-title hoverable"
+                    >
+                      {{ contest.contestname }}
+                    </div></a-row
                   >
-                    {{ contest.contestname }}
-                  </div></a-row
-                >
 
-                <div class="contesttime1 d-flex align-items-center">
-                  <NotificationTwoTone style="fontsize: 24px" />
-                  <span style="font-size: 16px; margin-left: 5px">
-                    比赛时间：{{ toBeijingTime(contest.startdate) }} ~
-                    {{ toBeijingTime(contest.enddate) }} ({{
-                      getTimeDifference(contest.startdate, contest.enddate)
-                    }})
-                  </span>
-                </div>
-                <div class="organizer1 d-flex align-items-center">
-                  <HomeTwoTone style="fontsize: 24px" />
-                  <span style="font-size: 16px; margin-left: 5px"
-                    >主办方：{{ contest.username }}</span
-                  >
-                </div>
-                <div class="people1 d-flex align-items-center">
-                  <el-icon size="20" color="rgb(24, 144, 255)"
-                    ><User
-                  /></el-icon>
-                  <span style="font-size: 16px; margin-left: 5px"
-                    >参赛人数：{{ contest.joinpeople }}</span
-                  >
+                  <div class="contesttime1 d-flex align-items-center">
+                    <NotificationTwoTone style="fontsize: 24px" />
+                    <span style="font-size: 16px; margin-left: 5px">
+                      比赛时间：{{ toBeijingTime(contest.startdate) }} ~
+                      {{ toBeijingTime(contest.enddate) }} ({{
+                        getTimeDifference(contest.startdate, contest.enddate)
+                      }})
+                    </span>
+                  </div>
+                  <div class="organizer1 d-flex align-items-center">
+                    <HomeTwoTone style="fontsize: 24px" />
+                    <span style="font-size: 16px; margin-left: 5px"
+                      >主办方：{{ contest.username }}</span
+                    >
+                  </div>
+                  <div class="people1 d-flex align-items-center">
+                    <el-icon size="20" color="rgb(24, 144, 255)"
+                      ><User
+                    /></el-icon>
+                    <span style="font-size: 16px; margin-left: 5px"
+                      >参赛人数：{{ contest.joinpeople }}</span
+                    >
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-2">
-              <div
-                class="card-body d-flex flex-column justify-content-center align-items-center"
-                style="height: 100%"
-              >
-                <a-button
-                  size="large"
-                  style="
-                    color: white;
-                    width: 150px;
-                    margin-right: 20px;
-                    background-color: rgb(37, 187, 155);
-                  "
-                  type="primary"
-                  @click="viewContest(contest.contestid)"
-                  v-if="
-                    cmpNowTime(contest.enddate) === true &&
-                    joinSet.has(contest.contestid) === true &&
-                    getContestStatus(contest) === '进行中'
-                  "
-                  >进入比赛</a-button
+              <div class="col-md-2">
+                <div
+                  class="card-body d-flex flex-column justify-content-center align-items-center"
+                  style="height: 100%"
                 >
-                <a-button
-                  size="large"
-                  style="
-                    color: white;
-                    width: 150px;
-                    margin-right: 20px;
-                    background-color: rgb(37, 187, 155);
-                  "
-                  type="primary"
-                  @click="cancleJoinContest(contest.contestid)"
-                  v-else-if="
-                    cmpNowTime(contest.enddate) === true &&
-                    joinSet.has(contest.contestid) === true &&
-                    getContestStatus(contest) === '未开始'
-                  "
-                  >已报名
-                </a-button>
-                <a-button
-                  size="large"
-                  style="
-                    color: white;
-                    width: 150px;
-                    margin-right: 20px;
-                    background-color: rgb(37, 187, 155);
-                  "
-                  type="primary"
-                  @click="
-                    joinContest(
-                      contest.contestid,
-                      contest.contestlimit,
-                      contest.contestpassword
-                    )
-                  "
-                  v-else-if="cmpNowTime(contest.enddate) === true"
-                  >报名</a-button
-                >
-                <a-button
-                  size="large"
-                  style="
-                    color: white;
-                    width: 150px;
-                    margin-right: 20px;
-                    background-color: rgb(166, 164, 164);
-                  "
-                  type="primary"
-                  @click="viewContest(contest.contestid)"
-                  v-else
-                  >回顾比赛</a-button
-                >
-                <div class="countdown">
-                  <Countdown
-                    :startdate="contest.startdate"
-                    :enddate="contest.enddate"
-                  />
+                  <a-button
+                    size="large"
+                    style="
+                      color: white;
+                      width: 150px;
+                      margin-right: 20px;
+                      background-color: rgb(37, 187, 155);
+                    "
+                    type="primary"
+                    @click="viewContest(contest.contestid)"
+                    v-if="
+                      cmpNowTime(contest.enddate) === true &&
+                      joinSet.has(contest.contestid) === true &&
+                      getContestStatus(contest) === '进行中'
+                    "
+                    >进入比赛</a-button
+                  >
+                  <a-button
+                    size="large"
+                    style="
+                      color: white;
+                      width: 150px;
+                      margin-right: 20px;
+                      background-color: rgb(37, 187, 155);
+                    "
+                    type="primary"
+                    @click="cancleJoinContest(contest.contestid)"
+                    v-else-if="
+                      cmpNowTime(contest.enddate) === true &&
+                      joinSet.has(contest.contestid) === true &&
+                      getContestStatus(contest) === '未开始'
+                    "
+                    >已报名
+                  </a-button>
+                  <a-button
+                    size="large"
+                    style="
+                      color: white;
+                      width: 150px;
+                      margin-right: 20px;
+                      background-color: rgb(37, 187, 155);
+                    "
+                    type="primary"
+                    @click="
+                      joinContest(
+                        contest.contestid,
+                        contest.contestlimit,
+                        contest.contestpassword
+                      )
+                    "
+                    v-else-if="cmpNowTime(contest.enddate) === true"
+                    >报名</a-button
+                  >
+                  <a-button
+                    size="large"
+                    style="
+                      color: white;
+                      width: 150px;
+                      margin-right: 20px;
+                      background-color: rgb(166, 164, 164);
+                    "
+                    type="primary"
+                    @click="viewContest(contest.contestid)"
+                    v-else
+                    >回顾比赛</a-button
+                  >
+                  <div class="countdown">
+                    <Countdown
+                      :startdate="contest.startdate"
+                      :enddate="contest.enddate"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
       <!-- <a-button @click="dialogVisible = true" >uye</a-button> -->
@@ -209,6 +209,10 @@ import axios from "axios";
 import { ElDialog, ElInput } from "element-plus";
 
 import Countdown from "../others/Countdown.vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
+import { Modal } from "ant-design-vue";
+import router from "@/router/router";
 export default {
   name: "Card",
   components: {
@@ -222,16 +226,28 @@ export default {
   },
 
   methods: {
+    showLogin() {
+      console.log("Show Login");
+      Modal.confirm({
+        title: "您未登录",
+        icon: createVNode(ExclamationCircleOutlined),
+        content: "请问是否需要跳转到登录页面进行登录？",
+        onOk() {
+          router.push({ path: "/" + "userlogin" });
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onCancel() {},
+      });
+    },
     applyAnimation() {
       //有序出现
-     
+
       for (let i = 0; i < this.contestList.length; i++) {
         setTimeout(() => {
           this.showDivs.push(i + 1);
           this.$nextTick(() => {
             const elements = document.querySelectorAll(".slide-up");
             elements.forEach((element, index) => {
-              
               const delay = index * 0.05;
               element.style.transitionDelay = `${delay}s`;
               element.classList.add("active");
@@ -276,7 +292,7 @@ export default {
     async joinContest(contestid, contestlimit, contestpassword) {
       if (contestlimit === "私密(需要密码)") {
         // 如果比赛需要密码，显示对话框
-        console.log("123");
+
         this.contestpassword = contestpassword;
         this.dialogVisible = true;
         this.contestid = contestid; // 添加这一行
@@ -299,6 +315,11 @@ export default {
       this.password = "";
     },
     async registerContest(contestid) {
+      if (localStorage.getItem("user") === "null") {
+        this.showLogin();
+        return;
+      }
+
       await axios
         .post(`${SERVER_URL}/contest/join/personal`, {
           contestid: contestid,
@@ -360,7 +381,8 @@ export default {
     },
     async checkJoinState() {
       this.joinSet.clear(); //清空一下
-      if (!localStorage.getItem("user")) return;
+      if (localStorage.getItem("user") === null) return;
+      console.log("比赛列表界面，用户已经登陆", localStorage.getItem("user"));
       //查询一下用户的报名信息
       await axios
         .get(`${SERVER_URL}/contest/query/join/personal`, {

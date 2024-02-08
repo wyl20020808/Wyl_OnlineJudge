@@ -73,6 +73,7 @@ const ModuleUserInfo = ({
           message: "再见！" + userinfo.username,
           type: "success",
         });
+        localStorage.setItem('user', null);//同步本地数据
       } catch (error) {
         // context.dispatch("notice", {
         //   title: 'Error',
@@ -103,21 +104,26 @@ const ModuleUserInfo = ({
               loginState: "true"
             }
             )
-            sleep(500).then(() => {
-              window.location = `${SERVER}`;
+            sleep(1000).then(() => {
+              if (document.referrer) {
+                window.location.href = document.referrer;
+              } else {
+                // 如果没有referrer信息，可以选择回到首页或其他页面
+                window.location.href = '/';
+              }
             })
 
             // let user = JSON.parse(localStorage.getItem('user'));
             // console.log(user)
             // router.push({name:'home'})
-          } else if (response.data === 0) {
+          } else if (response.data === "passworderror") {
             // alert("抱歉，您输入的密码有误！" )
             context.dispatch("notice", {
               title: 'Error',
               message: "密码错误！",
               type: 'error',
             })
-          } else if (response.data === -1) {
+          } else if (response.data === "backenderror") {
             // alert("服务器异常，请稍后再试")
             context.dispatch("notice", {
               title: 'Error',

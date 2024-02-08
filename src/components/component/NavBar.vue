@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-layout class="overflow-visible" style="height: 56px">
+    <v-layout class="overflow-visible" style="height: 50px">
       <v-bottom-navigation
         height="50"
         v-model="value"
@@ -112,6 +112,7 @@ import { SERVER, SERVER_URL } from "../../js/functions/config";
 import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
+import isLogin from "@/js/functions/login.js";
 export default {
   components: {
     HomeFilled,
@@ -130,7 +131,7 @@ export default {
   watch: {
     $route(to, from) {
       this.updateNavState();
-      console.log(this.value)
+    
       localStorage.setItem('nav',this.value);
     },
   },
@@ -185,7 +186,7 @@ export default {
     if (localStorage.getItem("user")) {
       //如果登录了的话
       this.getUnreadMessage();
-      console.log(localStorage.getItem("user"))
+
       await axios.post(`${SERVER_URL}/user/query`,{
         userid:JSON.parse(localStorage.getItem("user")).userid,
       })
@@ -234,6 +235,7 @@ export default {
       router.push({ path: "/" + total });
     },
     async getUnreadMessage() {
+      if(!isLogin)return;
       //统计一下未读的消息
       await axios
         .get(`${SERVER_URL}/message/query/unread`, {
@@ -258,8 +260,7 @@ export default {
         query: { userid: JSON.parse(localStorage.getItem("user")).userid },
       });
     },
-    logout() {
-      console.log("logout");
+    async logout() {
       const userinfo = JSON.parse(localStorage.getItem("user"));
 
       this.$store.dispatch("SynchronizeInfo", {
@@ -267,8 +268,10 @@ export default {
         loginState: false,
       });
       localStorage.setItem("user", null);
+
       sleep(500).then(() => {
-        window.location = `${SERVER}`;
+        localStorage.setItem("user", null);
+        location.reload();
       });
       // router.push({ name: "home" });
     },

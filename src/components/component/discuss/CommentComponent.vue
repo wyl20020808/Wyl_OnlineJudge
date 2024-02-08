@@ -1,9 +1,9 @@
 <template>
-  <a-row>
+  <a-row v-if="isLogin">
     <a-col :span="1">
       <img
-      @click="goToUser(myUserid)"
-        style="width: 50px; border-radius: 50%;cursor: pointer;"
+        @click="goToUser(myUserid)"
+        style="width: 50px; border-radius: 50%; cursor: pointer"
         :src="userpicture"
         alt="Avatar"
       />
@@ -32,7 +32,15 @@
       </div>
     </a-col>
   </a-row>
-  <a-row style="width: 98%" justify="space-between">
+  <a-row v-else>
+    <a-button v-if="props.reply"  style="color: gray" type="primary" disabled
+      >请先登录再进行回复</a-button
+    >
+    <a-button v-else  style="color: gray" type="primary" disabled
+      >请先登录再进行评论</a-button
+    >
+  </a-row>
+  <a-row v-if="isLogin" style="width: 98%" justify="space-between">
     <a-col> </a-col>
     <a-col>
       <el-button
@@ -42,12 +50,18 @@
         type="primary"
         >取消</el-button
       >
-      <el-button @click="saveComment" style="color: white" type="primary"
-      v-if="props.reply"
+      <el-button
+        @click="saveComment"
+        style="color: white"
+        type="primary"
+        v-if="props.reply"
         >回复</el-button
       >
-      <el-button @click="saveComment" style="color: white;width: 80px;" type="primary"
-      v-else
+      <el-button
+        @click="saveComment"
+        style="color: white; width: 80px"
+        type="primary"
+        v-else
         >评论</el-button
       >
     </a-col>
@@ -70,11 +84,17 @@ import router from "@/router/router";
 import axios from "axios";
 import { getNowTime } from "@/js/functions/TimeAbout";
 import { SERVER, SERVER_URL } from "@/js/functions/config";
+
+import { isLogin } from "@/js/functions/login";
 const props = defineProps({
   discuss: Object,
   reply: Boolean,
 });
-const myUserid = JSON.parse(localStorage.getItem("user")).userid;
+
+const myUserid =
+  localStorage.getItem("user") === "null"
+    ? ""
+    : JSON.parse(localStorage.getItem("user")).userid;
 const emit = defineEmits();
 const addComment = (obj) => {
   emit("addComment", obj);
@@ -86,8 +106,14 @@ const cancleComment = () => {
   emit("cancleComment", true);
 };
 
-const userpicture = JSON.parse(localStorage.getItem("user")).userpicture;
-const username = JSON.parse(localStorage.getItem("user")).username;
+const userpicture =
+  localStorage.getItem("user") === "null"
+    ? ""
+    : JSON.parse(localStorage.getItem("user")).userpicture;
+const username =
+  localStorage.getItem("user") === "null"
+    ? ""
+    : JSON.parse(localStorage.getItem("user")).username;
 let store = useStore();
 
 const route = useRoute();
@@ -109,21 +135,21 @@ async function saveComment() {
     content: discuss.value.content,
     type: discuss.value.type,
     target: props.discuss.id, //我的评论目标是谁，id和名字就不存了，因为在显示的时候可以获取到
-    targetname:props.discuss.username,
-    targettype:props.discuss.type,
-    targetuserid:props.discuss.userid,
+    targetname: props.discuss.username,
+    targettype: props.discuss.type,
+    targetuserid: props.discuss.userid,
     createtime: getNowTime(),
     edittime: getNowTime(),
     userid: JSON.parse(localStorage.getItem("user")).userid,
     username: JSON.parse(localStorage.getItem("user")).username,
     userpicture: JSON.parse(localStorage.getItem("user")).userpicture,
-    discussid: props.discuss.id,//存一下依赖的那个id是多少
-    discusstitle:props.discuss.title,
+    discussid: props.discuss.id, //存一下依赖的那个id是多少
+    discusstitle: props.discuss.title,
   };
   if (props.reply) {
     //如果是回复
-    data.type = 'reply';
-    data.discussid =  props.discuss.discussid;
+    data.type = "reply";
+    data.discussid = props.discuss.discussid;
     data.discusstitle = props.discuss.discusstitle;
   }
   //   if(modifyed()){//如果改过了，就修改时间
@@ -139,9 +165,7 @@ async function saveComment() {
         //是评论还是回复
         addReply(res.data);
         cancleComment();
-      }
-      else
-      addComment(res.data);
+      } else addComment(res.data);
       console.log(res.data, "回复完之后的结果");
       discuss.value.content = "";
       store.dispatch("notice", {

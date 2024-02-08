@@ -24,16 +24,16 @@ export default {
     floatButton,
   },
   async created() {
-    await axios
-      .post(`${SERVER_URL}/user/query`, {
-        userid: 17,
-      })
-      .then((res) => {
-        localStorage.setItem("user", JSON.stringify(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // await axios
+    //   .post(`${SERVER_URL}/user/query`, {
+    //     userid: 17,
+    //   })
+    //   .then((res) => {
+    //     localStorage.setItem("user", JSON.stringify(res.data));
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   },
 };
 </script>

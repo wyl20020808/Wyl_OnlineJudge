@@ -13,7 +13,9 @@
 
 <script>
 import router from '@/router/router';
-
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
+import { Modal } from "ant-design-vue";
 import ContestListComponent from '../component/contest/ContestListComponent.vue';
 export default {
   name: "Competition",
@@ -22,7 +24,24 @@ export default {
   },
 
   methods:{ 
+    showLogin() {
+      console.log("Show Login");
+      Modal.confirm({
+        title: "您未登录",
+        icon: createVNode(ExclamationCircleOutlined),
+        content: "请问是否需要跳转到登录页面进行登录？",
+        onOk() {
+          router.push({ path: "/" + "userlogin" });
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onCancel() {},
+      });
+    },
     createContest(){
+      if (localStorage.getItem("user") === "null") {
+        this.showLogin();
+        return;
+      }
       router.push({
         path: '/contest/create',
       })

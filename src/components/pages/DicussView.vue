@@ -59,7 +59,7 @@ import { SearchOutlined, PlusOutlined } from "@ant-design/icons-vue";
 import { onMounted, ref } from "vue";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
-
+import { showLogin } from "@/js/functions/login";
 const columns = [
   {
     title: "标题",
@@ -118,6 +118,10 @@ function jumpTodiscuss(data, column) {
   }
 }
 function jump(total) {
+  if(localStorage.getItem("user") === "null"){
+    showLogin();
+    return;
+  }
   router.push({ path: "/" + total });
 }
 onMounted(async () => {

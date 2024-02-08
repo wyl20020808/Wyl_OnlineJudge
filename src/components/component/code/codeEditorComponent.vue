@@ -813,7 +813,13 @@ const checkIfPassedSample = () => {
     isPassedSample.value = true;
   } else isPassedSample.value = false;
 };
+import { isLogin } from "@/js/functions/login";
+import { warningMessage } from "@/js/functions/common";
 const runCode = async () => {
+  if(!isLogin){
+    warningMessage("请先登录再执行代码");
+    return;
+  }
   isPassedSample.value = false;
   checkIfJudgeSample(); //判断是不是在自测
   source_code.value = trimEnd(source_code.value);
@@ -984,6 +990,10 @@ const loadSample = async (index) => {
 };
 let judgeInfo = ref([]);
 const submitCode = async () => {
+  if(!isLogin){
+    warningMessage("请先登录再提交代码");
+    return;
+  }
   judgeEnd.value = false;
   isPassedSample.value = false;
   source_code.value = source_code.value.trimEnd();

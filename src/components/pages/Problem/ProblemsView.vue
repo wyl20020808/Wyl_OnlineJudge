@@ -111,6 +111,7 @@ import { Plus } from "@element-plus/icons-vue";
 
 import ProblemListViewVue from "@/components/component/problem/ProblemListView.vue";
 import { sleep } from "@/js/functions/TimeAbout";
+import { isLogin } from '@/js/functions/login';
 export default {
   components: {
     ProblemListViewVue,
@@ -188,7 +189,7 @@ export default {
       }
     },
     validateLogon() {
-      if (JSON.parse(localStorage.getItem("user")).userloginstate !== "true") {
+      if (!isLogin) {
         this.centerDialogVisible = true;
         return;
       }

@@ -248,6 +248,9 @@ import { SERVER, SERVER_URL } from "@/js/functions/config";
 import CommentComponent from "./CommentComponent.vue";
 import ReplyComponent from "./ReplyComponent.vue";
 import CollectChoiceComponent from "../User/CollectChoiceComponent.vue";
+import {warningMessage} from "@/js/functions/common"
+import { isLogin } from "@/js/functions/login";
+import { message } from 'ant-design-vue';
 
 let store = useStore();
 const md = new MarkdownIt({ html: true }).use(mk);
@@ -285,6 +288,7 @@ const deleteReply = (id) => {
 
 const belongCollectSet = ref(-1);
 const getCollectStatus = async () => {
+  if(localStorage.getItem("user") === "null")return;
   await axios
     .get(`${SERVER_URL}/collect/query`, {
       //查询我是否收藏了这篇文章
@@ -309,6 +313,10 @@ const handleCollectThing = (id) => {
   collectComment(props.discuss.id, id);
 };
 const chooseCollectSet = async () => {
+  if(!isLogin){
+    warningMessage("请先登录");
+    return;
+  }
   //用来打开和关闭
   if (myDiscussState.value.collect) {
     //如果收藏过了
@@ -395,7 +403,7 @@ let myDiscussState = ref({
   dislike: false,
   collect: false,
   funny: false,
-  userid: JSON.parse(localStorage.getItem("user")).userid,
+  userid:localStorage.getItem("user") === "null" ? 0 :JSON.parse(localStorage.getItem("user")).userid,
   discussid: props.discuss.id,
 });
 function jump(total) {
@@ -416,6 +424,10 @@ async function updateDiscuss(special, detal) {
     });
 }
 async function changeState(idx) {
+  if(!isLogin){
+    warningMessage("请先登录");
+    return;
+  }
   //更新每篇文章的喜欢等情况
   if (idx === 0) {
     if (myDiscussState.value.dislike) {
@@ -497,6 +509,7 @@ async function getReply() {
     });
 }
 async function getDiscussState() {
+  if(localStorage.getItem("user") === "null")return;
   await axios
     .get(`${SERVER_URL}/discuss/state/query`, {
       params: {

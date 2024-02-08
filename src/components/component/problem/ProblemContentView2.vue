@@ -67,39 +67,51 @@
                 >[{{ $route.query.problemchar }}] {{ problemcontent.title }}
               </a-col>
             </a-row>
-            <a-row class="nowrap-row" style="margin-top: 20px">
-              <a-col :offset="3">
+            <a-row class="nowrap-row" style="margin-top: 20px;display: flex;justify-content: space-between;">
+              <a-row v-if="isLogin" style="width: 50%;">
+                <a-col :offset="6">
+                  <a-button
+                    @click="submitProblem"
+                    style="color: white"
+                    type="primary"
+                    >提交答案</a-button
+                  >
+                </a-col>
+                <a-col>
+                  <a-button
+                    @click="editProblem"
+                    style="color: white; margin-left: 10px"
+                    ghost
+                    >编辑题目</a-button
+                  >
+                </a-col>
+                <a-col>
+                  <a-button
+                    v-if="!collected"
+                    @click="chooseCollectSet()"
+                    style="color: white; margin-left: 10px"
+                    ghost
+                    >收藏题目</a-button
+                  >
+                  <a-button
+                    v-else
+                    @click="collectProblem('yes', belongCollectSet)"
+                    style="color: white; margin-left: 10px"
+                    ghost
+                    >取消收藏</a-button
+                  >
+                </a-col>
+              </a-row>
+              <a-row v-else style="margin-left: 12.5%;">
                 <a-button
-                  @click="submitProblem"
-                  style="color: white"
-                  type="primary"
-                  >提交答案</a-button
-                >
-              </a-col>
-              <a-col>
-                <a-button
-                  @click="editProblem"
-                  style="color: white; margin-left: 10px"
-                  ghost
-                  >编辑题目</a-button
-                >
-              </a-col>
-              <a-col>
-                <a-button
-                  v-if="!collected"
-                  @click="chooseCollectSet()"
-                  style="color: white; margin-left: 10px"
-                  ghost
-                  >收藏题目</a-button
-                >
-                <a-button
-                  v-else
-                  @click="collectProblem('yes', belongCollectSet)"
-                  style="color: white; margin-left: 10px"
-                  ghost
-                  >取消收藏</a-button
-                >
-              </a-col>
+                    @click="submitProblem"
+                    style="color: white"
+                    type="primary"
+                    disabled
+                    >请先登录再提交</a-button
+                  >
+              </a-row>
+              <a-row style="margin-right: 7%;">
               <a-col
                 v-if="!$route.query.contestid"
                 style="
@@ -110,14 +122,14 @@
                   height: 100%;
                   margin-right: 5px;
                 "
-                :offset="12"
+                
               >
                 <span style="color: white; display: block">提交</span>
                 <span style="color: white; display: block; font-weight: bold">{{
                   problemcontent.submitcount
                 }}</span>
               </a-col>
-              <a-col v-else :offset="12"></a-col>
+          
               <a-col v-if="!$route.query.contestid">
                 <a-divider
                   type="vertical"
@@ -188,6 +200,7 @@
                 >
               </a-col>
             </a-row>
+            </a-row>
           </div>
           <div class="center1">
             <a-row>
@@ -204,53 +217,54 @@
                       <v-md-preview
                         style="font-size: 16px"
                         :text="
-                          parsedDescription(formattedText(problemcontent.background))
+                          parsedDescription(
+                            formattedText(problemcontent.background)
+                          )
                         "
                       ></v-md-preview>
-                      
                     </a-col>
                   </a-row>
-                  <a-row
-                    
-                  >
+                  <a-row>
                     <a-col>
                       <h5 style="font-weight: bold">题目描述</h5>
 
                       <v-md-preview
-                  
-                        style="font-size: 16px;"
+                        style="font-size: 16px"
                         :text="
-                          parsedDescription(formattedText(problemcontent.description))
+                          parsedDescription(
+                            formattedText(problemcontent.description)
+                          )
                         "
                       ></v-md-preview>
-                      
                     </a-col>
                   </a-row>
-                  <a-row >
+                  <a-row>
                     <a-col>
                       <h5 style="font-weight: bold">输入格式</h5>
                       <v-md-preview
                         style="font-size: 16px"
                         :text="
-                          parsedDescription(formattedText(problemcontent.inputformat))
+                          parsedDescription(
+                            formattedText(problemcontent.inputformat)
+                          )
                         "
                       ></v-md-preview>
-                     
                     </a-col>
                   </a-row>
-                  <a-row >
+                  <a-row>
                     <a-col>
                       <h5 style="font-weight: bold">输出格式</h5>
                       <v-md-preview
                         style="font-size: 16px"
                         :text="
-                          parsedDescription(formattedText(problemcontent.outputformat))
+                          parsedDescription(
+                            formattedText(problemcontent.outputformat)
+                          )
                         "
                       ></v-md-preview>
-                      
                     </a-col>
                   </a-row>
-                  <a-row >
+                  <a-row>
                     <a-col>
                       <h5 style="font-weight: bold">输入输出样例</h5>
                     </a-col>
@@ -258,7 +272,6 @@
                   <a-row
                     v-for="(sample, index) in problemSample"
                     :key="sample.input + sample.output"
-                    
                   >
                     <a-col :span="11">
                       <a-row type="flex" justify="space-between">
@@ -486,6 +499,7 @@ export default {
       collected: false,
       openCollcetSet: false,
       belongCollectSet: 1,
+      isLogin: localStorage.getItem("user") !== "null",
     };
   },
   methods: {
@@ -639,6 +653,9 @@ export default {
       // });
     },
     async getCollectStatus() {
+      if (localStorage.getItem("user") === "null") {
+        return;
+      }
       await axios
         .get(`${SERVER_URL}/collect/query`, {
           //查询是否收藏了这道题
@@ -701,6 +718,7 @@ export default {
       .catch((error) => {
         console.log(error);
       });
+    if (localStorage.getItem("user") === "null") return;
     let type = "judge";
     let params = {
       userid: JSON.parse(localStorage.getItem("user")).userid,
@@ -784,7 +802,7 @@ p {
   outline: none;
 }
 
-.github-markdown-body{
+.github-markdown-body {
   padding: 0 0 0 0 !important;
 }
 </style>

@@ -1,5 +1,6 @@
 package com.wyl.backend.classes.user.Controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wyl.backend.classes.LoginJWT.JwtUtil;
@@ -100,6 +101,9 @@ public class UserController {
                 if(Objects.equals(u.getUsername(), userInfo.getUsername())){
                     if(Objects.equals(u.getPassword(), userInfo.getPassword())){
                         String token = JwtUtil.generateToken(String.valueOf(u.getUserid()));
+
+                        // 会话登录：参数填写要登录的账号id，建议的数据类型：long | int | String， 不可以传入复杂类型，如：User、Admin 等等
+                        StpUtil.login(u.getUserid());
 
                         // 返回JWT
                         return token + " " +  u.getUserid();

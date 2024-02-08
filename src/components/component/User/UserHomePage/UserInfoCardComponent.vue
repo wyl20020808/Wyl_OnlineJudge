@@ -63,7 +63,7 @@
       <a-col>
         <a-row style="margin-top: 60px; margin-right: 20px">
           <a-col
-            v-if="parseInt(userid) !== parseInt(myinfo.userid)"
+            v-if="!isLogin || isLogin && parseInt(userid) !== parseInt(myinfo.userid)"
             style="z-index: 1000; margin-right: 10px"
           >
             <a-tooltip title="私聊" color="rgb(52, 152, 219)">
@@ -314,6 +314,9 @@ import UserTrendComponent from "../UserTrendComponent.vue";
 import UserMineComponentVue from '../UserMineComponent.vue';
 import UserContestComponent from "../UserContestComponent.vue";
 import UserCollectComponent from "../UserCollectComponent.vue";
+
+import { isLogin } from '@/js/functions/login';
+import { warningMessage } from '@/js/functions/common';
 export default {
   components: {
     MessageTwoTone,
@@ -326,11 +329,11 @@ export default {
   data() {
     return {
       noticeInfo: "",
-      userPicture: JSON.parse(localStorage.getItem("user")).userpicture,
+      userPicture: "",
       userinfo: {},
       userextra: {},
       fansed: false,
-      myinfo: JSON.parse(localStorage.getItem("user")),
+      myinfo: localStorage.getItem("user") === "null" ? 0 : JSON.parse(localStorage.getItem("user")),
       userid: this.$route.query.userid,
       tab: 1,
     };
@@ -348,6 +351,10 @@ export default {
       router.push({ path: "/" + total });
     },
     async messageConnect() {
+      if(!isLogin){
+        warningMessage("请先登录");
+        return;
+      }
       await axios.post(`${SERVER_URL}/message/add/connect`, {
         belong: this.myinfo.userid,
         target: this.userid,
@@ -379,6 +386,9 @@ export default {
         });
     },
     async checkFans() {
+      if(!isLogin){
+        return;
+      }
       await axios
         .get(`${SERVER_URL}/userfans/query/fans`, {
           params: {
@@ -396,6 +406,9 @@ export default {
         });
     },
     async getUserInfo() {
+      if(!this.$route.query.userid){
+        return;
+      }
       await axios
         .get(`${SERVER_URL}/userextra/query/id`, {
           params: {
@@ -421,6 +434,10 @@ export default {
         });
     },
     async addFans() {
+      if(!isLogin){
+        warningMessage("请先登录");
+        return;
+      }
       let fansuserid = JSON.parse(localStorage.getItem("user")).userid;
       let userid = this.$route.query.userid;
       // if (parseInt(userid) === parseInt(fansuserid)) {
