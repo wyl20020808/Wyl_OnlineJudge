@@ -63,7 +63,10 @@
       <a-col>
         <a-row style="margin-top: 60px; margin-right: 20px">
           <a-col
-            v-if="!isLogin || isLogin && parseInt(userid) !== parseInt(myinfo.userid)"
+            v-if="
+              !isLogin ||
+              (isLogin && parseInt(userid) !== parseInt(myinfo.userid))
+            "
             style="z-index: 1000; margin-right: 10px"
           >
             <a-tooltip title="私聊" color="rgb(52, 152, 219)">
@@ -135,9 +138,21 @@
             >
               <a-tab-pane key="1" tab="主页"> </a-tab-pane>
               <a-tab-pane key="2" tab="动态"></a-tab-pane>
-              <a-tab-pane key="3" tab="我的"></a-tab-pane>
-              <a-tab-pane key="4" tab="比赛"></a-tab-pane>
-              <a-tab-pane key="5" tab="收藏"></a-tab-pane> </a-tabs
+              <a-tab-pane
+                v-if="isLogin && parseInt(userid) === parseInt(myinfo.userid)"
+                key="3"
+                tab="我的"
+              ></a-tab-pane>
+              <a-tab-pane
+                v-if="isLogin && parseInt(userid) === parseInt(myinfo.userid)"
+                key="4"
+                tab="比赛"
+              ></a-tab-pane>
+              <a-tab-pane
+                v-if="isLogin && parseInt(userid) === parseInt(myinfo.userid)"
+                key="5"
+                tab="收藏"
+              ></a-tab-pane> </a-tabs
           ></a-col>
           <a-col>
             <a-row>
@@ -274,12 +289,18 @@
         >
           <UserHomeComponentVue :userid="userid" />
         </a-col>
-        <a-col style="padding: 10px;" v-if="tab === 2">
+        <a-col style="padding: 10px" v-if="tab === 2">
           <UserTrendComponent :userid="userid" />
         </a-col>
-        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 3"><UserMineComponentVue :userid="userid"/> </a-col>
-        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 4"><UserContestComponent :userid="userid"/> </a-col>
-        <a-col style="width: 100%;margin-left: 20px;" v-if="tab === 5"><UserCollectComponent :userid="userid"/> </a-col>
+        <a-col style="width: 100%; margin-left: 20px" v-if="tab === 3"
+          ><UserMineComponentVue :userid="userid" />
+        </a-col>
+        <a-col style="width: 100%; margin-left: 20px" v-if="tab === 4"
+          ><UserContestComponent :userid="userid" />
+        </a-col>
+        <a-col style="width: 100%; margin-left: 20px" v-if="tab === 5"
+          ><UserCollectComponent :userid="userid" />
+        </a-col>
       </div>
     </a-row>
   </div>
@@ -311,12 +332,12 @@ import { MessageTwoTone } from "@ant-design/icons-vue";
 import router from "@/router/router";
 import UserHomeComponentVue from "../UserHomeComponent.vue";
 import UserTrendComponent from "../UserTrendComponent.vue";
-import UserMineComponentVue from '../UserMineComponent.vue';
+import UserMineComponentVue from "../UserMineComponent.vue";
 import UserContestComponent from "../UserContestComponent.vue";
 import UserCollectComponent from "../UserCollectComponent.vue";
 
-import { isLogin } from '@/js/functions/login';
-import { warningMessage } from '@/js/functions/common';
+import { isLogin } from "@/js/functions/login";
+import { warningMessage } from "@/js/functions/common";
 export default {
   components: {
     MessageTwoTone,
@@ -328,12 +349,16 @@ export default {
   },
   data() {
     return {
+      isLogin:isLogin,
       noticeInfo: "",
       userPicture: "",
       userinfo: {},
       userextra: {},
       fansed: false,
-      myinfo: localStorage.getItem("user") === "null" ? 0 : JSON.parse(localStorage.getItem("user")),
+      myinfo:
+        localStorage.getItem("user") === "null"
+          ? 0
+          : JSON.parse(localStorage.getItem("user")),
       userid: this.$route.query.userid,
       tab: 1,
     };
@@ -341,6 +366,8 @@ export default {
   async created() {
     await this.getUserInfo();
     await this.checkFans();
+  
+    // console.log(parseInt(this.userid) === parseInt(this.myinfo.userid),this.userid,this.myinfo.userid)
   },
 
   methods: {
@@ -351,7 +378,7 @@ export default {
       router.push({ path: "/" + total });
     },
     async messageConnect() {
-      if(!isLogin){
+      if (!isLogin) {
         warningMessage("请先登录");
         return;
       }
@@ -386,7 +413,7 @@ export default {
         });
     },
     async checkFans() {
-      if(!isLogin){
+      if (!isLogin) {
         return;
       }
       await axios
@@ -406,7 +433,7 @@ export default {
         });
     },
     async getUserInfo() {
-      if(!this.$route.query.userid){
+      if (!this.$route.query.userid) {
         return;
       }
       await axios
@@ -434,7 +461,7 @@ export default {
         });
     },
     async addFans() {
-      if(!isLogin){
+      if (!isLogin) {
         warningMessage("请先登录");
         return;
       }

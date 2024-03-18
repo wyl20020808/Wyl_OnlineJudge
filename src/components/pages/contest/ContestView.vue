@@ -72,7 +72,7 @@
         </a-row>
       </a-card>
     </a-col>
-    <a-col style="margin-top: 20px; margin-left: 20px">
+    <a-col v-if="userGrade >= grade" style="margin-top: 20px; margin-left: 20px">
       <a-button @click="editCompetition" style="display: flex; align-items: center"
         ><EditOutlined />编辑比赛</a-button
       >
@@ -108,7 +108,14 @@ export default {
     EditOutlined,
   },
   data() {
+    let userGrade = 1;
+  
+    if(localStorage.getItem("user")!=="null") {
+      userGrade = JSON.parse(localStorage.getItem("user")).grade;
+    }
     return {
+      grade : 1000,
+      userGrade,
       activeKey: "1",
       contest: {},
       contestid: this.$route.query.contestid, //这里可能需要重构，因为有可能用户从浏览器输入比赛id进入比赛页面
@@ -122,18 +129,11 @@ export default {
           contestid: this.$route.query.contestid,
         },
 
-        //  @GetMapping("/query/contest")
-        // public Contest queryContest(@RequestParam int contestid){
-        //     Contest result = new Contest();
-        //     result.setContestcontent(contestContentSQL.selectById(contestid));
-        //     result.setContestadmin(contestAdminSQL.selectList(new QueryWrapper<ContestAdmin>().eq("contestid", contestid)));;
-        //     result.setContestproblem(contestProblemSQL.selectList(new QueryWrapper<ContestProblem>().eq("contestid", contestid)));
-        //     return result;
-        // }
+        
       })
       .then((res) => {
         this.contest = res.data;
-
+        this.grade = this.contest.contestcontent.grade;
         // console.log(this.contest, new Date());
       })
       .catch((err) => {

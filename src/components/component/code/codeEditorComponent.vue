@@ -1,13 +1,13 @@
 <template>
-  <a-row>
-    <a-col>
-      <a-row>
-        <a-col>
+  <a-row style="width:100%">
+    <a-col :span="24">
+      <a-row style="width:100%">
+        <a-col :span="24">
           <div
             style="
               background-color: white;
               padding: 15px;
-              width: 1140px;
+              width: 54%;
               border-bottom: 1px solid rgb(217, 216, 216);
             "
           >
@@ -43,9 +43,9 @@
           <!-- <div  style="position: absolute;bottom: 0px;;width: 1140px;background-color: rgb(255, 255, 255);height: 5px;"></div> -->
         </a-col>
       </a-row>
-      <a-row
-        ><a-col>
-          <div :style="editorStyle" ref="editor">
+      <a-row style="width: 100%;"
+        ><a-col :span="24">
+          <div style="width: 54%;" :style="editorStyle" ref="editor">
             <div
               v-if="showAutocomplete && items.length > 0"
               :style="{
@@ -69,13 +69,13 @@
           </div>
         </a-col></a-row
       >
-      <a-row>
-        <a-col>
+      <a-row style="width:100%">
+        <a-col :span=24>
           <div
             style="
               background-color: white;
               padding: 15px;
-              width: 1140px;
+              width: 54%;
               border-bottom: 1px solid rgb(217, 216, 216);
               border-top: 1px solid rgb(217, 216, 216);
             "
@@ -129,11 +129,11 @@
         </a-col>
       </a-row>
       <a-row style="margin-top: 20px">
-        <a-col>
+        <a-col :span=24>
           <div
             style="
               border-radius: 10px;
-              width: 1140px;
+              width: 54%;
               background-color: white;
               color: black;
               margin-bottom: 20px;
@@ -767,7 +767,7 @@ const editorStyle = computed(() => {
     };
   } else {
     return {
-      width: "1140px",
+   
     };
   }
 });

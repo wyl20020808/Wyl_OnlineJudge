@@ -41,6 +41,16 @@
               />
             </a-space>
           </a-col>
+          <a-col class="input-container" :offset="1" :span="6">
+            <label for="name">比赛等级：</label>
+            <a-select
+              ref="select"
+              v-model:value="grade"
+              style="width: 200px"
+              :options=grades
+              @focus="focus"
+            ></a-select>
+          </a-col>
         </a-row>
         <a-row style="margin-top: 20px">
           <a-col class="input-container" :offset="1">
@@ -236,6 +246,7 @@ export default {
         createtime: getNowTime(),
         contestpassword: this.contestpassword,
         description: this.contestdescription,
+        grade:this.grade,
       };
       if (this.$route.query.contestid) {
         //更新
@@ -357,12 +368,22 @@ export default {
     },
   },
   data() {
+    const grades = [];
+    //如果可以到这个界面说明已经登陆 当然目前还不完善
+    let userGrade = JSON.parse(localStorage.getItem("user")).grade;
+    for(let i = 1; i <= userGrade; i++){
+      grades.push({
+                  value: i,
+                  label: i,
+                })
+    }
     return {
       contestFormat: [
         { value: "ACM/ICPC", label: "ACM/ICPC" },
         { value: "IOI", label: "IOI", disabled: true },
         { value: "OI", label: "OI", disabled: true },
       ],
+
       focus: () => {
         console.log("focus");
       },
@@ -387,6 +408,8 @@ export default {
 
         this.fetch(val, "user", (d) => (this.adminsdata = d));
       },
+      grades,
+      grade:1,//等级
       title: "", //比赛题目
       contestdate: "", //比赛日期
       contestformat: "", //比赛模式

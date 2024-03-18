@@ -21,6 +21,7 @@ public class UserInfo {
     private String usermotto;
     private String nickname;
     private String userpicture;
+    private int grade;
     @TableField(select = false)
     private String special;//更新单个数据，借助它来写
 

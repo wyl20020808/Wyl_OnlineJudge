@@ -113,7 +113,7 @@ import { SERVER, SERVER_URL } from "../../js/functions/config";
 import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
-import isLogin from "@/js/functions/login.js";
+import {isLogin} from "@/js/functions/login.js";
 export default {
   components: {
     HomeFilled,

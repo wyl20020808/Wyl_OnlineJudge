@@ -4,7 +4,7 @@
     <a-col :span="15" :offset="0" class="contest-list">
       <ContestListComponent />
     </a-col >
-    <a-col :offset="6">
+    <a-col v-if="userGrade >= 100"  :offset="6">
       <a-button @click="createContest" style="color: white;background-color:rgb(37, 187, 155);" type="primary">+ 创建比赛</a-button>
     </a-col>
   </a-row>
@@ -14,7 +14,7 @@
 <script>
 import router from '@/router/router';
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-import { createVNode } from "vue";
+import { createVNode,onMounted } from "vue";
 import { Modal } from "ant-design-vue";
 import ContestListComponent from '../component/contest/ContestListComponent.vue';
 export default {
@@ -22,7 +22,7 @@ export default {
   components: {
     ContestListComponent,
   },
-
+  
   methods:{ 
     showLogin() {
       console.log("Show Login");
@@ -46,7 +46,20 @@ export default {
         path: '/contest/create',
       })
     }
-  }
+  },
+  onMounted(){
+
+  },
+  data(){
+    let userGrade = 1;
+    if(localStorage.getItem("user")!=="null") {
+      userGrade = JSON.parse(localStorage.getItem("user")).grade;
+    }
+    return {
+      userGrade,
+
+    }
+  },
 };
 </script>
 

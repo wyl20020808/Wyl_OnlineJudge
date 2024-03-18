@@ -27,7 +27,7 @@
                 >
               </a-radio-group>
             </a-col>
-            <a-col style="margin-left: 570px">
+            <a-col v-if="userGrade>=100" style="margin-left: 570px">
               <el-button
                 @click="validateLogon"
                 class=""
@@ -155,7 +155,14 @@ export default {
     const {
       algorithmsAndDataStructuresOptions,
     } = require("../../../js/values/value");
+
+    let userGrade = 1;
+  
+    if(localStorage.getItem("user")!=="null") {
+      userGrade = JSON.parse(localStorage.getItem("user")).grade;
+    }
     return {
+      userGrade,
       questionBank: "loj",
       centerDialogVisible: false,
       difficultys,

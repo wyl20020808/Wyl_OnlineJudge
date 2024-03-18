@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
         "com.wyl.backend.classes.message.SQL",
         "com.wyl.backend.classes.discuss",
         "com.wyl.backend.classes.Collect",
+        "com.wyl.backend.classes.limit",
 })
 public class BackendApplication {
     public static void main(String[] args) {

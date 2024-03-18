@@ -30,4 +30,5 @@ public class ContestContent {
     private int joinpeople;
 
     private  String description;
+    private int grade;
 }

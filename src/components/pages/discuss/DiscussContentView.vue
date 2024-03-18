@@ -25,8 +25,8 @@
         <a-col
           ><h3 style="font-family: SimSun;">{{ discuss.title }}</h3></a-col
         >
-        <a-col
-          ><a-button
+        <a-col v-if="isMe">
+          <a-button
             @click="editDiscuss"
             style="display: flex; align-items: center"
             ><img src="../../../assets/static/pictures/edit.png" width="23" />
@@ -78,6 +78,7 @@
 </template>
 <!-- 2023年10月12日14:57:40 -->
 <script setup>
+
 import { getNowTime } from "@/js/functions/TimeAbout";
 import { onBeforeUnmount, onMounted, onBeforeMount } from "vue";
 import router from "@/router/router";
@@ -93,11 +94,13 @@ import CommentComponent from "@/components/component/discuss/CommentComponent.vu
 import { sleep } from "@/js/functions/TimeAbout";
 import { isLogin } from "@/js/functions/login";
 import { warningMessage } from "@/js/functions/common";
+import { async } from "@kangc/v-md-editor";
 let route = useRoute();
 let id = ref(1);
 let type = ref("discuss");
 let discuss = ref({});
 let comment = ref([]);
+let isMe = ref(false);
 
 const onAddComment = (value) => {
   comment.value.push(value);
@@ -127,6 +130,7 @@ function deleteComment(value) {
 function jump(total) {
   router.push({ path: "/" + total });
 }
+
 async function getDiscuss() {
   //获取当前的讨论
   await axios
@@ -177,6 +181,7 @@ onBeforeMount(async () => {
   await getDiscuss();
   await getComment();
   addBrowse();
+  isMe.value =isLogin && parseInt(JSON.parse(localStorage.getItem('user')).userid) === parseInt( discuss.value.userid);
 });
 </script>
 

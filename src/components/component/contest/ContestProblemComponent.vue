@@ -1,96 +1,105 @@
 <template>
-  <a-table :dataSource="datas" :pagination="false">
-    <a-table-column
-      title="题号"
-      dataIndex="problemchar"
-      key="problemchar"
-      width="100px"
-      align="center"
-    />
-    <a-table-column
-      title="题目名称"
-      dataIndex="problemname"
-      key="problemname"
-      align="center"
-    >
-      <template v-slot="{ record }">
-        <div
-          class="hoverable"
-          @click="viewProblem(record.problemid, record.problemchar)"
-        >
-          {{ record.problemname }}
-        </div>
-      </template>
-    </a-table-column>
-    <a-table-column
-      title="通过率"
-      dataIndex="passrate"
-      key="passrate"
-      align="center"
-    >
-      <template v-slot="{ record }">
-        <div>
-          {{
-            (submitCount.has(record.problemchar)
-              ? submitCount.get(record.problemchar).get("acceptCount")
-              : 0) +
-            "/" +
-            (submitCount.has(record.problemchar)
-              ? submitCount.get(record.problemchar).get("submitCount")
-              : 0)
-          }}
-        </div>
-      </template>
-    </a-table-column>
-    <a-table-column
-      title="我的状态"
-      dataIndex="state"
-      key="state"
-      align="center"
-    >
-      <template v-slot="{ record }">
-        <div
-          style="display: flex; align-items: center; justify-content: center"
-        >
+  <div v-if="!timesUp" style="min-height: 250px;align-items: center;display: flex;justify-content: center;">
+  <timeDown  :startdate="startDate"/>
+  </div>
+  <!-- 需要弄一个倒计时的东西，这里只是做了一个权限的测试，目前的权限不太行，哈哈哈 -->
+  <div v-else>
+    <a-table :dataSource="datas" :pagination="false">
+      <a-table-column
+        title="题号"
+        dataIndex="problemchar"
+        key="problemchar"
+        width="100px"
+        align="center"
+      />
+      <a-table-column
+        title="题目名称"
+        dataIndex="problemname"
+        key="problemname"
+        align="center"
+      >
+        <template v-slot="{ record }">
           <div
-            v-if="getStyle(record) === 'color:#25bb9b'"
-            :style="getStyle(record)"
-            style="display: flex; align-items: center"
+            class="hoverable"
+            @click="viewProblem(record.problemid, record.problemchar)"
           >
-            <CheckOutlined /> 通过
+            {{ record.problemname }}
           </div>
+        </template>
+      </a-table-column>
+      <a-table-column
+        title="通过率"
+        dataIndex="passrate"
+        key="passrate"
+        align="center"
+      >
+        <template v-slot="{ record }">
+          <div>
+            {{
+              (submitCount.has(record.problemchar)
+                ? submitCount.get(record.problemchar).get("acceptCount")
+                : 0) +
+              "/" +
+              (submitCount.has(record.problemchar)
+                ? submitCount.get(record.problemchar).get("submitCount")
+                : 0)
+            }}
+          </div>
+        </template>
+      </a-table-column>
+      <a-table-column
+        title="我的状态"
+        dataIndex="state"
+        key="state"
+        align="center"
+      >
+        <template v-slot="{ record }">
           <div
-            v-else-if="getStyle(record) === 'color:#25bb9c'"
-            :style="getStyle(record)"
-            style="display: flex; align-items: center"
+            style="display: flex; align-items: center; justify-content: center"
           >
-            <CheckOutlined /> 通过
+            <div
+              v-if="getStyle(record) === 'color:#25bb9b'"
+              :style="getStyle(record)"
+              style="display: flex; align-items: center"
+            >
+              <CheckOutlined /> 通过
+            </div>
+            <div
+              v-else-if="getStyle(record) === 'color:#25bb9c'"
+              :style="getStyle(record)"
+              style="display: flex; align-items: center"
+            >
+              <CheckOutlined /> 通过
+            </div>
+            <div
+              v-else
+              :style="getStyle(record)"
+              style="display: flex; align-items: center"
+            >
+              未通过
+            </div>
           </div>
-          <div
-            v-else
-            :style="getStyle(record)"
-            style="display: flex; align-items: center"
-          >
-            未通过
-          </div>
-        </div>
-      </template>
-    </a-table-column>
-  </a-table>
+        </template>
+      </a-table-column>
+    </a-table>
+  </div>
 </template>
 
 <script>
+import timeDown from "../others/timeCountdown/timeDown.vue"
 import { CheckOutlined } from "@ant-design/icons-vue";
-import { defineComponent } from "vue";
+import { defineComponent, onMounted } from "vue";
 import { Table } from "ant-design-vue";
 import router from "@/router/router";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
+import { isLogin } from "@/js/functions/login";
 export default defineComponent({
   components: {
     "a-table": Table,
     "a-table-column": Table.Column,
     CheckOutlined,
+    timeDown,
   },
   props: {
     contest: {
@@ -103,6 +112,9 @@ export default defineComponent({
       datas: [],
       submitCount: new Map(),
       AC: new Map(),
+      hasPower: false,
+      timesUp:false,//判断是否到达比赛的时间
+      startDate:"123",
     };
   },
   methods: {
@@ -170,9 +182,32 @@ export default defineComponent({
         }
       }
     },
+    compareTime(specificDateTime) {
+      const now = new Date();
+      const targetDateTime = new Date(specificDateTime);
+      if (now >= targetDateTime) {
+        return true; // 当前时间晚于给定时间
+      }
+      return false; // 当前时间早于给定时间
+    },
+    checkHasPower(grade) {//检测是否有权限
+      if (isLogin === false) {
+        return;
+      }
+      let userGrade = JSON.parse(localStorage.getItem("user")).grade;
+   
+      if (parseInt(userGrade) >= parseInt(grade)) {
+        this.hasPower = true;
+      }
+    },
   },
   watch: {
     async contest(newVal, oldVal) {
+      this.checkHasPower(this.contest.contestcontent.grade);
+      // console.log(this.hasPower,"有权利吗")
+      this.timesUp = this.compareTime(this.contest.contestcontent.startdate)//判断一下是否到了比赛时间
+      this.startDate = this.contest.contestcontent.startdate
+      console.log(this.startDate,"比赛时间到了吗")
       await axios
         .get(`${SERVER_URL}/contest/query/alljudge`, {
           params: {
@@ -201,7 +236,9 @@ export default defineComponent({
       }
     },
   },
-  async created() {},
+  async onMounted() {
+    //先要验证权限是否满足
+  },
 });
 </script>
 
@@ -216,4 +253,5 @@ export default defineComponent({
   filter: brightness(1.3);
   text-decoration: underline;
 }
+
 </style>

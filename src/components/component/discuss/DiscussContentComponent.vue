@@ -520,7 +520,7 @@ async function getDiscussState() {
     .then((res) => {
       if (res.data) {
         myDiscussState.value = res.data;
-        console.log(myDiscussState.value, "从后端获取到的discustate数据");
+        // console.log(myDiscussState.value, "从后端获取到的discustate数据");
       }
     })
     .catch((err) => {
@@ -532,7 +532,7 @@ watch(
   myDiscussState,
   async (newValue, oldValue) => {
     // 在 myDiscussState.value 的属性发生变化时执行逻辑
-    console.log(`myDiscussState 变化了：${oldValue} -> ${newValue}`);
+    // console.log(`myDiscussState 变化了：${oldValue} -> ${newValue}`);
     myDiscussState.value.discussid = props.discuss.id;
     await axios
       .post(`${SERVER_URL}/discuss/state/update`, myDiscussState.value)

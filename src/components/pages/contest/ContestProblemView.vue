@@ -16,7 +16,7 @@
             class="hoverable"
             @click="back"
             style="color: white"
-            >比赛</a-breadcrumb-item
+            >比赛2</a-breadcrumb-item
           >
           <a-breadcrumb-item style="color: white">{{
             problemcontent.title

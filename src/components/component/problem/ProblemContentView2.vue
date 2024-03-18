@@ -444,8 +444,8 @@
           </div>
         </a-col></a-row
       >
-      <a-row style="margin-top: 20px">
-        <a-col :offset="3">
+      <a-row style="margin-top: 20px;width: 100%;">
+        <a-col :offset="3" :span="24" style="width: 100%;">
           <codeEditorComponent
             ref="editor"
             :problemsample="problemSample"

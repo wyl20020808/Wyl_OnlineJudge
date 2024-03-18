@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table style="min-height: 250px;">
     <thead style="background-color: #e8e8e8">
       <tr>
         <th

@@ -1,5 +1,5 @@
 <template>
-  <div style="color:gray;">{{ countdownText }}</div>
+  <div class="noCountdown" style="color:gray;">{{ countdownText }}</div>
 </template>
 
 <script>
@@ -42,3 +42,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.noCountdown{
+  font-size: 14px;
+
+  font-weight: 100; /* 加粗 */
+
+  margin-bottom: 0px; /* 与下方文字的间距 */
+}
+</style>

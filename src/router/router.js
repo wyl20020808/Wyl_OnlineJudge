@@ -183,9 +183,9 @@ const router = createRouter({
 let fresh = false;
 router.beforeEach(async (to, from, next) => {
 
-    const shouldContinue = await checkIsLogin(to);
+    // const shouldContinue = await checkIsLogin(to);
     
-      next();
+    next();
     
 });
 
