@@ -387,8 +387,8 @@ export default {
         target: this.userid,
         belongname: this.myinfo.username,
         targetname: this.userinfo.nickname,
-        connecttime: this.getNowTime(),
-        latestconnecttime: this.getNowTime(),
+        connecttime: getNowTime(),
+        latestconnecttime: getNowTime(),
         targetpicture: this.userinfo.userpicture,
       });
       router.push({ path: "/message" });

@@ -10,17 +10,17 @@
       >
         <v-btn @click="jump('')">
           <v-icon><HomeFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px; margin-top: 0px">主页</span>
+          <span style="font-size: 16px; margin-top: 0px">直播课</span>
         </v-btn>
-        <v-btn @click="jump('problems')">
+        <v-btn @click="jump('infoManage')">
           <v-icon
             ><img src="../../assets/static/pictures/题库.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 0px">题库</span>
+          <span style="font-size: 16px; margin-top: 0px">信息管理</span>
         </v-btn>
-        <v-btn @click="jump('contest')">
+        <v-btn @click="jump('shopping')">
           <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
-          <span style="font-size: 16px; margin-top: 0px">比赛</span>
+          <span style="font-size: 16px; margin-top: 0px">商城</span>
         </v-btn>
         <v-btn @click="jump('ranklist')">
           <v-icon
@@ -51,7 +51,7 @@
         >
           <el-dropdown>
             <span class="el-dropdown-link">
-              <img class="avatar" :src="userpicture" alt="Avatar" />
+              <img class="avatar2" :src="userpicture" alt="Avatar" />
               <a-badge v-if="unRead > 0" dot></a-badge>
               <el-icon class="el-icon--right">
                 <arrow-down />
@@ -65,7 +65,9 @@
                   </div></el-dropdown-item
                 >
                 <el-dropdown-item
-                  ><router-link :to="{ name: 'home' }" class="dropdown-item"
+                  ><router-link
+                    :to="{ name: 'liveClass' }"
+                    class="dropdown-item"
                     ><el-icon><Setting /></el-icon> &ensp;设置</router-link
                   ></el-dropdown-item
                 >
@@ -113,7 +115,8 @@ import { SERVER, SERVER_URL } from "../../js/functions/config";
 import { sleep } from "@/js/functions/TimeAbout.js";
 import router from "@/router/router";
 import axios from "axios";
-import {isLogin} from "@/js/functions/login.js";
+import { isLogin } from "@/js/functions/login.js";
+import WebSocketService from "@/websocket";
 export default {
   components: {
     HomeFilled,
@@ -162,29 +165,34 @@ export default {
       }
     },
     userloginstate: function () {
-      let user = localStorage.getItem("user");
-      if (user) {
-        return JSON.parse(user).userloginstate;
+      let user = JSON.parse(localStorage.getItem("user"));
+      let userloginstate = user?.userloginstate ?? "false";
+      if (userloginstate === "false") {
+        return  "false"  ;
       } else {
-        return "false";
+        return "true";
       }
     },
     userpicture: function () {
-      let user = localStorage.getItem("user");
-      if (user) {
-        return JSON.parse(user).userpicture;
+      let user = JSON.parse(localStorage.getItem("user"));
+      let userpicture = user?.userpicture ?? "false";
+      if (userpicture) {
+        return userpicture;
       } else {
         return ""; // 返回一个默认的图片URL或者空字符串
       }
     },
   },
-
+  async onMounted() {
+    
+  },
   async created() {
     this.updateNavState();
     window.onbeforeunload = () => {
       // console.log(userinfo.userloginstate)
     };
     if (localStorage.getItem("user")) {
+      if(localStorage.getItem("user")?.userid ?? false === false)return;
       //如果登录了的话
       this.getUnreadMessage();
 
@@ -201,15 +209,18 @@ export default {
     }
   },
   methods: {
+    sendMessage() {
+      WebSocketService.sendMessage("实时通信！");
+    },
     updateNavState() {
       switch (this.currentPath) {
         case "/":
           this.value = 0;
           break;
-        case "/problems":
+        case "/infoManage":
           this.value = 1;
           break;
-        case "/contest":
+        case "/shopping":
           this.value = 2;
           break;
         case "/ranklist":
@@ -306,7 +317,7 @@ export default {
   width: 100%;
 }
 
-.avatar {
+.avatar2 {
   border-radius: 50%;
   width: 40px;
   height: 40px;

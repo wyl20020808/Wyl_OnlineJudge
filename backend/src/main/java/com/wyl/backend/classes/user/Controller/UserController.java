@@ -76,6 +76,9 @@ public class UserController {
             return "error";
         }
     }
+    public void insertUser(UserInfo info){
+        int cnt = userOperator.insert(info);
+    }
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
         LocalDateTime now = LocalDateTime.now();
@@ -94,9 +97,9 @@ public class UserController {
 
     @PostMapping("/logout")
     public String logout(@RequestBody UserInfo userInfo) {
-        System.out.println(StpUtil.getLoginId() + "退出的id");
-        StpUtil.logout();
-        return "usernotexist";
+//        System.out.println(StpUtil.getLoginId() + "退出的id");
+//        StpUtil.logout();
+        return "yes";
     }
     @PostMapping("/checkLogin")
     public Boolean checkLogin() {

@@ -1,11 +1,25 @@
+
 const { defineConfig } = require('@vue/cli-service')
 
+module.exports = {
+  
+};
+
 module.exports = defineConfig({
-  transpileDependencies: true,
   devServer: {
-    port: 80,
-    
+    port:80,
+    proxy: {
+      '/prod-api': {
+        target: 'https://tea.kedaoi.cn',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/prod-api': ''
+        }
+      }
+    }
   },
+  transpileDependencies: true,
+
   chainWebpack: config => {
     const svgRule = config.module.rule('svg')
 

@@ -60,6 +60,7 @@
                 @change="onSelect"
                 size="5"
                 style="width: 200px"
+                
               >
                 <option v-for="item in items" :key="item" :value="item">
                   {{ item }}

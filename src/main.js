@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import router from './router/router.js'
 import store from './store/mainStore.js'
@@ -13,6 +12,9 @@ import VueMarkdownEditor from '@kangc/v-md-editor';
 import '@kangc/v-md-editor/lib/style/base-editor.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 import '@kangc/v-md-editor/lib/theme/style/github.css';
+
+//2024年6月24日08:12:08 引入elementui
+import ElementPlus from 'element-plus'
 
 // highlightjs 核心代码
 import hljs from 'highlight.js/lib/core';
@@ -130,16 +132,16 @@ app.directive('focus', {
   })
 
 
-app.config.errorHandler = (err, instance, info) => {
-  // 检查错误信息，决定是否忽略
-  if (err.message.includes("ResizeObserver loop completed with undelivered notifications")) {
-    // 忽略这个错误
-    console.log("Ignored ResizeObserver error");
-  } else {
-    // 对于其他错误，可以抛出异常或者使用console.error记录错误
-    console.error(err, instance, info);
-  }
-};
+// app.config.errorHandler = (err, instance, info) => {
+//   // 检查错误信息，决定是否忽略
+//   if (err.message.includes("ResizeObserver loop completed with undelivered notifications")) {
+//     // 忽略这个错误
+//     console.log("Ignored ResizeObserver error");
+//   } else {
+//     // 对于其他错误，可以抛出异常或者使用console.error记录错误
+//     // console.error(err, instance, info);
+//   }
+// };
 import axios from 'axios'
 // // 全局配置axios的 头部 token传递 2024年2月8日17:14:30
 // axios.interceptors.request.use(
@@ -157,10 +159,12 @@ import axios from 'axios'
 //     return Promise.reject(error);
 //   }
 // );
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
   
 app.use(router).use(ElementPlus).use(vuetify).use(store).use(Antd)
 app.use(VMdEditor).use(VMdPreview)
 app.use(VMdPreviewHtml)
 //2023年10月9日09:59:18
 app.use(VueCodemirror).mount('#app')
+import WebSocketService from "@/websocket";
+WebSocketService.connect();

@@ -4,9 +4,10 @@ package com.wyl.backend;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
+@EnableScheduling
 @CrossOrigin
 @SpringBootApplication
 @EnableTransactionManagement
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
         "com.wyl.backend.classes.discuss",
         "com.wyl.backend.classes.Collect",
         "com.wyl.backend.classes.limit",
+        "com.wyl.backend.keda.classes",
+        "com.wyl.backend.keda.classes.auxiliary.api",
+        "com.wyl.backend.keda.classes.auxiliary.websocket"
 })
 public class BackendApplication {
     public static void main(String[] args) {

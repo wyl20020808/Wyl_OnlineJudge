@@ -319,6 +319,7 @@ const getMessageConnect = async () => {
       console.log(err);
     });
 };
+//这个逻辑比较拉胯
 const queryMessage = async () => {
   //处理实时接受消息
   let userid = userinfo.value.userid;

@@ -96,6 +96,17 @@
             <artifactId>sa-token-spring-boot-starter</artifactId>
             <version>1.37.0</version>
         </dependency>
+<!--    2024年7月8日18:10:29    websocket-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+<!--2024年7月8日12:00:01 JSON操作后端爬虫-->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
 
         <!--        -->
         <dependency>

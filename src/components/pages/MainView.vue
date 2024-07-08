@@ -22,6 +22,7 @@
 </template>
 
 <script>
+
 import axios from 'axios';
 import NoticeVue from '../component/Home/Notice.vue';
 import { SERVER_URL } from '@/js/functions/config';

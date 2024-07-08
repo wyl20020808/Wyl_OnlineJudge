@@ -27,16 +27,21 @@ import codeEditorComponent from "@/components/component/code/codeEditorComponent
 import UserSettingView from "../components/pages/User/UserSettingView.vue"
 import UserCollectSetView from "../components/pages/User/UserCollectSetView.vue"
 import YozoFile from "@/components/component/YozoFile/YozoFile.vue"
+import liveClassMain from '../components/keda/liveClass/liveClassMain.vue'
+import infoManage from '../components/keda/infoManage/infoManageMain.vue'
+import shopping from "../components/keda/shopping/shoppingMain.vue"
+import goodsDeatail from "../components/keda/shopping/goodsDeatil.vue"
+import classRoom from "../components/keda/liveClass/classRoom.vue"
 const routes = [
   {
-    path: '/yozoFile/',
-    name: 'yozoFile',
-    component: YozoFile
+    path: '/goodsDeatail',
+    name: 'goodsDeatail',
+    component: goodsDeatail
   },
   {
     path: '/',
-    name: 'home',
-    component: MainView
+    name: 'liveClass',
+    component: liveClassMain
   },
   {
     path: '/code/',
@@ -44,9 +49,9 @@ const routes = [
     component: codeEditorComponent
   },
   {
-    path: '/contest/',
-    name: 'contest',
-    component: CompetitionView
+    path: '/shopping',
+    name: 'shopping',
+    component: shopping
   },
   {
     path: '/evaluationqueue/',
@@ -54,9 +59,9 @@ const routes = [
     component: EvaluationQueueView
   },
   {
-    path: '/problems/',
-    name: 'problems',
-    component: ProblemsView
+    path: '/infoManage',
+    name: 'infoManage',
+    component: infoManage
   },
   {
     path: '/ranklist/',
@@ -74,9 +79,10 @@ const routes = [
     component: UserInfoView
   },
   {
-    path: '/createproblem/',
-    name: 'createproblem',
-    component: CreateProblemView
+    path: '/classRoom',
+    name: 'classRoom',
+    component: classRoom,
+    // props: "true"
   },
   {
     path: '/problemdetail/',

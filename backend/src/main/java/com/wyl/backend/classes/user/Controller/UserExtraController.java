@@ -51,7 +51,9 @@ public class UserExtraController {
         return
                 userExtraOperator.selectOne(query);
     }
-
+    public void insertUserExtra(UserExtra userextr){
+        userExtraOperator.insert(userextr);
+    }
     @PostMapping("/synchronizeinfo")//用于同步两个表中id的信息
     public void insert(@RequestBody  UserExtra userextra){
         List<UserInfo> userInfoList = userOperator.selectList(null);

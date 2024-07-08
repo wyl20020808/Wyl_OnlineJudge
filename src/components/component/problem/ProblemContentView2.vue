@@ -28,7 +28,7 @@
                   <a-breadcrumb-item
                     v-else
                     class="hoverable2"
-                    @click="jump('/problems')"
+                    @click="jump('/infoManage')"
                     style="color: white"
                     >题库</a-breadcrumb-item
                   >
@@ -266,7 +266,7 @@
                   </a-row>
                   <a-row>
                     <a-col>
-                      <h5 style="font-weight: bold">输入输出样例</h5>
+                      <h5 style="font-weight: bold">样例</h5>
                     </a-col>
                   </a-row>
                   <a-row
@@ -444,7 +444,9 @@
           </div>
         </a-col></a-row
       >
-      <a-row style="margin-top: 20px;width: 100%;">
+       </a-col
+  ></a-row>
+  <a-row style="margin-top: 20px;width: 100%;">
         <a-col :offset="3" :span="24" style="width: 100%;">
           <codeEditorComponent
             ref="editor"
@@ -452,8 +454,7 @@
             :problemcontent="problemcontent"
           />
         </a-col>
-      </a-row> </a-col
-  ></a-row>
+      </a-row>
   <CollectChoiceComponent
     @collectThing="handleCollectThing"
     :open="openCollcetSet"

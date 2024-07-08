@@ -232,7 +232,7 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-    },
+    }, 
     creatContest: async function () {
       let contestcontent = {
         userid: JSON.parse(localStorage.getItem("user")).userid,
@@ -247,7 +247,7 @@ export default {
         contestpassword: this.contestpassword,
         description: this.contestdescription,
         grade:this.grade,
-      };
+      };  
       if (this.$route.query.contestid) {
         //更新
         contestcontent.contestid = this.$route.query.contestid;

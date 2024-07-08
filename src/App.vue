@@ -14,8 +14,9 @@ import NavBar from "./components/component/NavBar.vue";
 import MainView from "./components/pages/MainView.vue";
 import { SERVER_URL } from "./js/functions/config";
 import floatButton from "./components/component/floatButton/floatButton.vue";
-import { computed, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useRoute } from "vue-router";
+import WebSocketService from "@/websocket";
 export default {
   name: "App",
   components: {
@@ -23,7 +24,9 @@ export default {
     MainView,
     floatButton,
   },
-  async created() {
+  async onMounted() {
+
+    
     // await axios
     //   .post(`${SERVER_URL}/user/query`, {
     //     userid: 17,
