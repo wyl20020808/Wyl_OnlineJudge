@@ -7,7 +7,7 @@
             style="
               background-color: white;
               padding: 15px;
-              width: 54%;
+              /* width: 54%; */
               border-bottom: 1px solid rgb(217, 216, 216);
             "
           >
@@ -45,7 +45,7 @@
       </a-row>
       <a-row style="width: 100%;"
         ><a-col :span="24">
-          <div style="width: 54%;" :style="editorStyle" ref="editor">
+          <div  :style="editorStyle" ref="editor">
             <div
               v-if="showAutocomplete && items.length > 0"
               :style="{
@@ -76,7 +76,7 @@
             style="
               background-color: white;
               padding: 15px;
-              width: 54%;
+        
               border-bottom: 1px solid rgb(217, 216, 216);
               border-top: 1px solid rgb(217, 216, 216);
             "
@@ -134,7 +134,7 @@
           <div
             style="
               border-radius: 10px;
-              width: 54%;
+             
               background-color: white;
               color: black;
               margin-bottom: 20px;
@@ -323,7 +323,7 @@
                   margin-top: 10px;
                   margin-bottom: 20px;
                 "
-                ><label style="font-size: 18px" for="name">编译器输出</label>
+                ><label style="font-size: 18px;color:gray" for="name">编译器输出</label>
                 <a-typography-paragraph>
                   <pre style="font-size: 14px">{{
                     decodeBase64(compileoutput)
@@ -430,12 +430,22 @@ import "codemirror/theme/zenburn.css";
 import { useRoute } from "vue-router";
 import { sample } from "lodash";
 
+
+
+// Example usage:
+// const inputText = "这是一个测试输入字符串，用来计算API使用费用。This is a test input string.";
+// const outputText = "这是一个测试输出字符串。This is a test output string.";
+// const cost = calculatePriceInCNY(inputText, outputText, 'gpt-4', 7.2); // Assuming exchange rate is 7.2
+// console.log(`The cost for the input and output text using GPT-4 is: ${cost} 角`);
+
 const props = defineProps({
   problemsample: Array,
   problemcontent: Object,
 });
+
 let store = useStore();
 // 用户定义的变量或函数
+
 let input = ref("");
 let output = ref("");
 const editor = ref(null);
@@ -666,7 +676,7 @@ async function saveProblemCode(code) {
   let problemcode = {
     userid: JSON.parse(localStorage.getItem("user")).userid,
     code: code,
-    problemid: props.problemcontent.problemid,
+    problemid: props.problemcontent.problemid ? props.problemcontent.problemid:0,
     lasteditortime: time,
   };
   await axios
@@ -682,7 +692,7 @@ async function queryProblemCode() {
     .get(`${SERVER_URL}/problem/query/problemcode`, {
       params: {
         userid: JSON.parse(localStorage.getItem("user")).userid,
-        problemid: props.problemcontent.problemid,
+        problemid: props.problemcontent.problemid ? props.problemcontent.problemid : 0,
       },
     })
     .then((res) => {
@@ -816,6 +826,10 @@ const checkIfPassedSample = () => {
 };
 import { isLogin } from "@/js/functions/login";
 import { warningMessage } from "@/js/functions/common";
+const anaysisResult = ref("")
+const anaysisCodeByAI = async () => {
+  
+}
 const runCode = async () => {
   if(!isLogin){
     warningMessage("请先登录再执行代码");
@@ -837,8 +851,8 @@ const runCode = async () => {
   codeStatus.value = "upload";
   let formData = new FormData();
   formData.append("source_code", source_code.value);
-  console.log(props.problemcontent.problemid, input.value);
-  formData.append("problemId", parseInt(props.problemcontent.problemid));
+  // console.log(props.problemcontent.problemid, input.value);
+  formData.append("problemId", parseInt(props.problemcontent.problemid ? props.problemcontent.problemid : 0));
   formData.append("languageId", parseInt(selectedLanguage.value));
   formData.append("stdin", input.value);
   codeStatus.value = "running";
@@ -853,6 +867,7 @@ const runCode = async () => {
       if (res.data.status.description === "Compilation Error") {
         codeStatus.value = res.data.status.description;
         compileoutput = res.data.compile_output;
+        anaysisCodeByAI();
       } else codeStatus.value = "finished";
       judgeData.value = res.data;
       console.log(res.data);
@@ -916,7 +931,7 @@ let judgestate = "Accepted";
 let compileoutput = "";
 const saveJudgeInfo = async (judgedata, submittime) => {
   judgestate = "Accepted";
-  let problemid = props.problemcontent.problemid;
+  let problemid = props.problemcontent.problemid ? props.problemcontent.problemid : 0;
   //保存评测信息到数据库
   addSubmitCount(problemid, JSON.parse(localStorage.getItem("user")).userid);
   let language = "";
@@ -1015,7 +1030,7 @@ const submitCode = async () => {
   let formData = new FormData();
   let time = getNowTime();
   formData.append("source_code", source_code.value);
-  formData.append("problemId", parseInt(props.problemcontent.problemid));
+  formData.append("problemId", parseInt(props.problemcontent.problemid ? props.problemcontent.problemid : 0));
   formData.append("languageId", parseInt(selectedLanguage.value));
   formData.append("submittime", time); //为了同步
   formData.append(
@@ -1032,7 +1047,7 @@ const submitCode = async () => {
   // 设置interval
   let intervalId = setInterval(async () => {
     let data = new FormData();
-    data.append("problemId", parseInt(props.problemcontent.problemid));
+    data.append("problemId", parseInt(props.problemcontent.problemid ? props.problemcontent.problemid : 0));
     data.append("submittime", time); //为了同步
     data.append(
       "userid",

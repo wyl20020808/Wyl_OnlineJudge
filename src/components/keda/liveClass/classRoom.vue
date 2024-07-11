@@ -76,7 +76,7 @@ import { useRoute } from "vue-router";
 // import { tr } from "element-plus/es/locale";
 const route = useRoute();
 
-const courseId = route.query.classid;
+const courseId = route.query.courseid;
 
 const CourseStudentInfo = ref({});
 
@@ -131,7 +131,7 @@ const fetchClassList = async () => {
   try {
     const response = await axios.get(`${SERVER_URL}/course/query/info`, {
       params: {
-        courseId,
+        courseId: courseId ? courseId.toString() : undefined,
       },
     });
     CourseStudentInfo.value = response.data;

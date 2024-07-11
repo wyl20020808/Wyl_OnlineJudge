@@ -28,11 +28,16 @@
       <template #title>Navigator Four</template>
     </el-menu-item>
   </el-menu> -->
-
-  <a-row style="align-items: center; justify-content: center; margin-top: 200px;">
-    <a-col >
-      <h1>小编正在开发中，敬请期待！</h1>
-
+ <!-- <a-row>
+  <iframe  style="width:1000px;height: 500px" src="https://kedaoi.cn/p"></iframe>
+ </a-row> -->
+  <a-row style="justify-content: center;align-items: center; margin-top: 20px;">
+    <a-col :span="18" >
+      <codeEditorComponent
+            ref="editor"
+            :problemsample="[]"
+            :problemcontent="123"
+          />
 
     </a-col>
   </a-row>
@@ -40,6 +45,7 @@
 
 <script setup>
 import { ref } from "vue";
+import codeEditorComponent from "../component/code/codeEditorComponent.vue"
 import {
   Document,
   Menu as IconMenu,

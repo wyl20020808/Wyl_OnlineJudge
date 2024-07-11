@@ -32,10 +32,17 @@ import infoManage from '../components/keda/infoManage/infoManageMain.vue'
 import shopping from "../components/keda/shopping/shoppingMain.vue"
 import goodsDeatail from "../components/keda/shopping/goodsDeatil.vue"
 import classRoom from "../components/keda/liveClass/classRoom.vue"
+import addGood from "../components/keda/shopping/addGood.vue"
 const routes = [
   {
-    path: '/goodsDeatail',
-    name: 'goodsDeatail',
+    path: '/addGood',
+    name: 'addGood',
+    component: addGood,
+    props:"true"
+  },
+  {
+    path: '/goodsDetail',
+    name: 'goodsDetail',
     component: goodsDeatail
   },
   {

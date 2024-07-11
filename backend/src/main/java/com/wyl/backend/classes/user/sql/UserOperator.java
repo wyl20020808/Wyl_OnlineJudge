@@ -9,9 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface UserOperator extends BaseMapper<UserInfo> {
-    @Insert("INSERT INTO userinfo(registertime, username, password,useremail) " +
-            "VALUES(#{userinfo.registertime}, #{userinfo.username}, #{userinfo.password},#{userinfo.useremail})")
-    int insert(@Param("userinfo") UserInfo userinfo);
+
     @Select("SELECT * FROM userinfo")
     List<UserInfo> select();
 

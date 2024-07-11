@@ -7,12 +7,21 @@ import com.wyl.backend.classes.message.MessageConntect;
 import com.wyl.backend.classes.message.SQL.MessageConnectSQL;
 import com.wyl.backend.classes.message.SQL.MessageSQL;
 import com.wyl.backend.classes.user.Controller.UserController;
+import com.wyl.backend.classes.utils.JsonUtil;
+import com.wyl.backend.keda.classes.auxiliary.api.ChatGPT;
+import com.wyl.backend.keda.classes.auxiliary.api.HttpPostRequest;
+import com.wyl.backend.keda.classes.auxiliary.websocket.MyWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +75,26 @@ public class MessageController {
 //        this.emitters.put(clientId, emitter);
 //        return emitter;
 //    }
+    public void sendMessage(Message message) {//系统给用户发消息
+        //发消息之前，看看链接有没有建立
+        QueryWrapper<MessageConntect> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("belong", message.getReceiver())
+                .eq("target", message.getSender())       ;
+        if(messageConnectSQL.selectList(queryWrapper).size() > 0)
+            messageSQL.insert(message);
+        else{
+            //注意这里的逻辑是反的
+            //如果链接没有建立，则建立链接
+            MessageConntect messageConntect = new MessageConntect();
+            messageConntect.init(message.getReceiver(), message.getSender(),message.getSendername(),"可达信奥",message.getSenderpicture(),new HttpPostRequest().getCurrentBeijingTime(),message.getMessage(),new HttpPostRequest().getCurrentBeijingTime());
+
+            messageConnectSQL.insert(messageConntect);
+            messageSQL.insert(message);
+        }
+    }
+    public void addMessageConnect(MessageConntect messageConnect) {
+        messageConnectSQL.insert(messageConnect);
+    }
     @GetMapping("/querychange")
     public Message queryMessageChange(@RequestParam int receiver){//查找第一个没有加载的元素
         QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
@@ -101,7 +130,8 @@ public class MessageController {
                 .set("readed", "true");
         messageSQL.update(null,updateWrapper);
     }
-
+    @Autowired
+    private ChatGPT chatGPT;
     @PostMapping("/haveload")
     public void haveLoad(@RequestBody Message message) {//更新消息状态，设置为已经加载
         UpdateWrapper<Message> updateWrapper = new UpdateWrapper<>();
@@ -111,27 +141,32 @@ public class MessageController {
                 .set("loaded", "true");
         messageSQL.update(null,updateWrapper);
     }
+    public  String getCurrentBeijingTime() {
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
 
-    @PostMapping(value = "/send")
-    public void send(@RequestBody Message message) {//接收新消息
+        // 将当前时间转换为北京时区
+        ZonedDateTime beijingTime = now.atZone(ZoneId.of("Asia/Shanghai"));
+
+        // 定义标准格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 格式化时间
+        String formattedTime = beijingTime.format(formatter);
+
+        return formattedTime;
+    }
+    public void Send(Message message) throws Exception {//接收新消息
         //同时还要更新最后联系时间和最后的消息
+        myWebSocketHandler.noticeNewMessage(JsonUtil.ObjectToJsonString(message));//给前端反馈，来新消息了
         UpdateWrapper<MessageConntect> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("belong", message.getSender())
                 .eq("target", message.getReceiver())
                 .set("latestconnecttime", message.getSendtime())
-        .set("latestmessage", message.getMessage());
+                .set("latestmessage", message.getMessage());
         messageConnectSQL.update(null,updateWrapper);
 
-        //还要向前端发送数据更新，只发送给接收者
-//        SseEmitter emitter = this.emitters.get(message.getReceiver());
-//        if (emitter != null) {
-//            try {
-//
-//                emitter.send(message);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+
         //还要更新对方和我的连接，因为我给他发了消息那么他那里也需要有连接
         MessageConntect messageConntect = new MessageConntect();
         messageConntect.setBelong(message.getReceiver());
@@ -143,7 +178,50 @@ public class MessageController {
         messageConntect.setTargetpicture(message.getSenderpicture());
         messageConntect.setConnecttime(message.getSendtime());
         addConnect(messageConntect);
+
+
         messageSQL.insert(message);
+    }
+    @Autowired
+    private MyWebSocketHandler myWebSocketHandler;
+    @PostMapping(value = "/send")
+    public void send(@RequestBody Message message) throws Exception {//接收新消息
+        //同时还要更新最后联系时间和最后的消息
+        myWebSocketHandler.noticeNewMessage(JsonUtil.ObjectToJsonString(message));//给前端反馈，来新消息了
+        UpdateWrapper<MessageConntect> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("belong", message.getSender())
+                .eq("target", message.getReceiver())
+                .set("latestconnecttime", message.getSendtime())
+        .set("latestmessage", message.getMessage());
+        messageConnectSQL.update(null,updateWrapper);
+
+
+        //还要更新对方和我的连接，因为我给他发了消息那么他那里也需要有连接
+        MessageConntect messageConntect = new MessageConntect();
+        messageConntect.setBelong(message.getReceiver());
+        messageConntect.setTarget(message.getSender());
+        messageConntect.setLatestconnecttime(message.getSendtime());
+        messageConntect.setLatestmessage(message.getMessage());
+        messageConntect.setTargetname(message.getSendername());
+        messageConntect.setBelongname(userController.getUsername(message.getReceiver()));
+        messageConntect.setTargetpicture(message.getSenderpicture());
+        messageConntect.setConnecttime(message.getSendtime());
+        addConnect(messageConntect);
+
+        messageSQL.insert(message);
+
+        if(message.getReceiver() == 88888){
+           String back = chatGPT.sendPostRequest(message.getMessage(),0);
+            Message temp = new Message();
+            temp.init(88888, message.getSender(),  "ChatGPT-3.5",back, getCurrentBeijingTime(),"http://localhost:8088/images/88888.jpg");
+            Send(temp);
+        }else if(message.getReceiver() == 99999){//
+           String back = chatGPT.sendPostRequest(message.getMessage(),1);
+           Message temp = new Message();
+           temp.init(99999, message.getSender(), "ChatGPT-4.0",back,  getCurrentBeijingTime(),"http://localhost:8088/images/99999.png");
+           Send(temp);
+        }
+
     }
 
     @GetMapping(value = "/query")//查询两个人之间的记录

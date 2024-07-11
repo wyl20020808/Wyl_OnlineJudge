@@ -125,6 +125,23 @@ import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 import _ from "lodash";
 import { sleep } from "@/js/functions/TimeAbout";
+
+// Wrap the ResizeObserver callback to catch errors
+const originalResizeObserver = ResizeObserver;
+
+ResizeObserver = function(callback) {
+  const wrappedCallback = function(entries, observer) {
+    try {
+      callback(entries, observer);
+    } catch (e) {
+      console.error('ResizeObserver error caught:', e);
+      // Prevent the error from being thrown
+    }
+  };
+  return new originalResizeObserver(wrappedCallback);
+};
+
+
 let store = useStore();
 let discuss = ref({
   title: "",

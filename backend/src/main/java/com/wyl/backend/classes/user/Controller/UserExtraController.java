@@ -28,8 +28,12 @@ public class UserExtraController {
     private UserExtraOperator userExtraOperator;
     @Autowired
     private UserOperator userOperator;
+
+   public void addTrophy(int userid,int count){
+         userExtraOperator.incrementTrophyCont(userid,count);
+   }
     @PostMapping("/update/special")
-    public void updateSpecial(@RequestBody UserExtra userExtra){
+    public void updateSpecial(@RequestBody UserExtra userExtra,@RequestParam(required = false) int count){
         System.out.println(userExtra.toString());
          if(userExtra.getSpecial().equals("submitcount"))
              userExtraOperator.incrementSubmitCount(userExtra.getUserid());
@@ -41,6 +45,8 @@ public class UserExtraController {
              update.eq("userid",userExtra.getUserid());
              update.set("editorstyle",userExtra.getEditorstyle());
              userExtraOperator.update(null,update);
+         }else if(userExtra.getSpecial().equals("trophycount")){
+             addTrophy(userExtra.getUserid(),count);
          }
     }
     @GetMapping("/query/id")

@@ -1,8 +1,8 @@
 <template>
-  <a-row style="margin-left: 150px; margin-top: 10px">
-    <a-col>
-      <el-card>
-        <el-scrollbar style="width: 250px" height="555px">
+  <a-row style="margin-top: 20px; align-items: center; justify-content: center">
+    <a-col :span="4">
+      <el-card style="width: 100%; min-height: 785px">
+        <el-scrollbar style="width: 100%; min-height: 100%">
           <a-list
             v-if="data.length > 0"
             item-layout="horizontal"
@@ -12,9 +12,7 @@
               <a-list-item
                 @click="handleChoose(item.userid)"
                 class="hover-shadow"
-                :class="{
-                  choose: chooseTarget === item.userid,
-                }"
+                :class="{ choose: chooseTarget === item.userid }"
                 v-on:mouseover="isHovered = true"
                 v-on:mouseout="isHovered = false"
               >
@@ -36,9 +34,7 @@
                     />
                   </template>
                 </a-list-item-meta>
-                <a-badge :count="item.unread" class="item">
-                  </a-badge
-                >
+                <a-badge :count="item.unread" class="item"></a-badge>
               </a-list-item>
             </template>
           </a-list>
@@ -49,15 +45,33 @@
       </el-card>
     </a-col>
 
-    <a-col>
+    <a-col :span="15" style="margin-top: 20px">
       <a-row>
-        <el-scrollbar ref="scrollbar" height="410px">
-          <el-card style="min-height: 410px; min-width: 850px">
+        <el-scrollbar ref="scrollbar" height="600px" style="min-width: 101%">
+          <el-card style="min-height: 600px; min-width: 100%">
             <div
               style="text-align: center; font-size: 20px; width: 100%; top: 0"
             >
               {{ targetName }}
             </div>
+            <div
+              @click="loadMoreMessages"
+              style="
+                padding: 10px;
+                text-align: center;
+                cursor: pointer;
+                color: #2234;
+              "
+            >
+              <template v-if="loading">
+                <a-spin />
+                <span style="color: gray"
+                  >信息加载中</span
+                >
+              </template>
+              <template v-else> 查看更多消息 </template>
+            </div>
+
             <div
               v-for="(message, index) in messages"
               :key="message.time"
@@ -78,49 +92,91 @@
                   :avatar="message.senderpicture"
                 >
                   <template #content>
-                    <el-card
-                      style="
-                        max-width: 200px;
-                        word-wrap: break-word; /* 这会让长单词在达到最大宽度时换行 */
-                      "
-                    >
+                    <a-card>
+                    <v-md-preview
+                      :text="parsedDescription(message.message)"
+                    ></v-md-preview>
+                  </a-card>
+                    <!-- <el-card style="max-width: 400px; word-wrap: break-word">
                       {{ message.message }}
-                    </el-card>
+                    </el-card> -->
                   </template>
                 </a-comment>
               </div>
             </div>
+            <div
+              v-if="isToAI"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%; /* 确保子元素的高度与父元素一致 */
+              "
+            >
+              <a-spin />
+              <span style="color: gray; margin-bottom: 7px; margin-left: 5px"
+                >AI回复中，需要回复的信息越长，加载时间越长哦~</span
+              >
+            </div>
           </el-card>
         </el-scrollbar>
       </a-row>
-      <a-row style="margin-top: 0px">
-        <a-textarea
-          style="width: 850px"
-          v-model:value="messageInput"
-          placeholder="消息"
-          :auto-size="{ minRows: 8, maxRows: 20 }"
-          @keydown.enter.prevent="sendMessage"
-          @keydown.ctrl.enter="insertNewLine"
-          show-count
-          :maxlength="114514"
-          :addonAfter="{
-            text: '发送',
-            onClick: sendMessage,
-          }"
-        />
-        <a-button @click="sendMessage">发送</a-button>
+      <a-row style="margin-top: 0px; width: 105%">
+        <a-col :span="23"
+          ><a-textarea
+            style="width: 100%; border-radius: 0, 0, 0, 0"
+            v-model:value="messageInput"
+            placeholder="按回车键发送消息"
+            :auto-size="{ minRows: 8, maxRows: 20 }"
+            @keydown.enter.prevent="checkTrophy"
+            @keydown.ctrl.enter="insertNewLine"
+            show-count
+            :maxlength="114514"
+            :addonAfter="{ text: '发送', onClick: sendMessage }"
+        /></a-col>
+        <!-- <a-col><a-button @click="sendMessage">发送</a-button></a-col> -->
       </a-row>
     </a-col>
   </a-row>
-</template>
 
+  <a-modal v-model:open="open" title="温馨提示" @ok="handleOk">
+    <p>本次预估花费超过{{ preCost }} 奖杯，确认要和AI对话吗？</p>
+  </a-modal>
+</template>
 <script setup>
+import MarkdownIt from "markdown-it";
+import "markdown-it-texmath/css/texmath.css";
+import mk from "markdown-it-katex";
 import { onBeforeUnmount, watchEffect } from "vue";
 import { ref, onMounted, nextTick } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import axios from "axios";
 import { SERVER_URL } from "@/js/functions/config";
 import { getNowTime } from "@/js/functions/TimeAbout";
+import { defineExpose } from "vue";
+
+import { computed, watch } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+
+const message = computed(() => store.getters.getNewMessage.get("message"));
+const confirmSendToAi = ref(false);
+watch(message, async (newVal, oldValue) => {
+  if (newVal.message) {
+    await addMessage(newVal);
+    console.log("希望加入信息", newVal.message);
+  }
+});
+const open = ref(false);
+const showModal = () => {
+  open.value = true;
+};
+const handleOk = async () => {
+  await sendMessage();
+  isToAI.value = true;
+  open.value = false;
+};
 let scrollbar = ref(null);
 let isHovered = ref(false);
 let messageInput = ref("");
@@ -133,53 +189,124 @@ let getIndex = ref(new Map());
 let targetName = ref("");
 let source = ref(null);
 let timer = ref(null);
+let MessageCount = ref(new Map()); // 每个对话选择加载了多少条
+const md = new MarkdownIt({ html: true }).use(mk);
 
+const cost = ref({
+  input: "not",
+  output: "",
+  model: "gpt-3.5",
+});
+function calculatePriceInCNY(
+  inputString,
+  outputString,
+  model = "gpt-3.5",
+  exchangeRate = 7.27
+) {
+  // Function to estimate the number of tokens based on character type
+  const estimateTokens = (text) => {
+    let tokenCount = 0;
+    console.log("传进来的参数是：", text, text.length, text.charAt(0));
+    for (let i = 0; i < text.length; i++) {
+      let char = text.charAt(i);
+      // console.log(tokenCount,char,'需要的奖杯数',char)
+      if (char.match(/[\u4e00-\u9fff]/)) {
+        tokenCount += 2; // Chinese characters count as 2 tokens
+      } else if (char.match(/[a-zA-Z0-9]/)) {
+        tokenCount += 0.5; // English letters and digits count as 0.5 tokens
+      } else {
+        tokenCount += 1; // Punctuation and others count as 1 token
+      }
+    }
+
+    return Math.ceil(tokenCount);
+  };
+
+  const inputTokens = estimateTokens(inputString);
+
+  const outputTokens = estimateTokens(outputString);
+
+  let pricePerInputToken, pricePerOutputToken;
+
+  if (model === "gpt-4") {
+    pricePerInputToken = 0.03 / 1000;
+    pricePerOutputToken = 0.06 / 1000;
+  } else {
+    pricePerInputToken = 0.0015 / 1000;
+    pricePerOutputToken = 0.002 / 1000;
+  }
+
+  const inputCostUSD = inputTokens * pricePerInputToken;
+  const outputCostUSD = outputTokens * pricePerOutputToken;
+  const totalCostUSD = inputCostUSD + outputCostUSD;
+  // console.log(inputTokens,"要消耗多少个",pricePerInputToken,pricePerOutputToken)
+  const totalCostCNY = totalCostUSD * exchangeRate;
+  const totalCostJiao = Math.ceil(totalCostCNY * 10);
+
+  return totalCostJiao;
+}
+const preCost = ref(0);
+const isToAI = ref(false);
+const checkTrophy = async () => {
+  let target = data.value[getIndex.value.get(chooseTarget.value)].userid;
+  if (target === 99999 || target === 88888) {
+    
+    cost.value.input = messageInput.value; //设置输入大小
+    if (target === 99999) cost.value.model = "gpt-4";
+  } else {
+    sendMessage();
+    return;
+  }
+  preCost.value = calculatePriceInCNY(
+    cost.value.input,
+    cost.value.output,
+    cost.value.model
+  );
+  try {
+    const response = await axios.get(`${SERVER_URL}/userextra/query/id`, {
+      params: {
+        userid: JSON.parse(localStorage.getItem("user")).userid,
+      },
+    });
+
+    if (response.data.trophy < preCost.value) {
+      store.dispatch("notice", {
+        title: "奖杯不足",
+        message: `您的奖杯数量不足，您的输入需要花费${preCost.cost}个奖杯，但是您只有${response.data.trophy}个奖杯`,
+        type: "success",
+      });
+    } else {
+      showModal(); //打开确认框
+    }
+  } catch (error) {}
+};
+function parsedDescription(content) {
+  return md.render(String(content));
+}
 const handleRead = async (message) => {
   await axios
-    .post(`${SERVER_URL}/message/haveread`, message) //标记为已读
+    .post(`${SERVER_URL}/message/haveread`, message) // 标记为已读
     .then((res) => {})
     .catch((err) => {
       console.log(err);
     });
 };
+
 const handleLoad = async (message) => {
   await axios
-    .post(`${SERVER_URL}/message/haveload`, message) //设置一下已经加载过了
+    .post(`${SERVER_URL}/message/haveload`, message) // 设置一下已经加载过了
     .then((res) => {})
     .catch((err) => {
       console.log(err);
     });
 };
-// const loadAllConnectMessage = async () =>{
-//   await axios.get(`${SERVER_URL}/message/query/all`,{
-//     params:{
-//       receiver:userinfo.value.userid,
-//     }
-//   })
-//   .then(temp => {
-//     let had = new Set();
-//     let res = temp.data;
-//     for(let i=0;i<res.length;i++){//存放消息
-//       let sender = res[i].sender;
-//       if(had.has(sender)){
-//         allMessage.value[sender].push(res[i]);
-//       }else{
-//         allMessage.value[sender] = [res[i]];
-//         had.add(sender);
-//       }
-//     }
-//     // console.log(allMessage.value)
-//   })
-//   .catch(err =>{
-//     console.log(err);
-//   })
-// }
+
 const handleChoose = async (userid) => {
   chooseTarget.value = userid;
   data.value[getIndex.value.get(userid)].unread = 0;
   await axios
     .get(`${SERVER_URL}/message/query`, {
-      //查询两个人的发消息记录
+      // 查询两个人的发消息记录
       params: {
         sender: userinfo.value.userid,
         receiver: userid,
@@ -188,19 +315,65 @@ const handleChoose = async (userid) => {
     .then(async (res) => {
       let data2 = res.data;
       messages.value = [];
-      for (let i = 0; i < data2.length; i++) {
+      let initialLoad = MessageCount.value.get(userid) || 10;
+      let len = data2.length;
+      for (let i = Math.max(0, len - initialLoad); i < len; i++) {
+        //从最新发送的逻辑开始
         messages.value.push(data2[i]);
         await handleRead(data2[i]);
         await handleLoad(data2[i]);
       }
+      MessageCount.value.set(userid, initialLoad);
       targetName.value = data.value[getIndex.value.get(userid)].name;
-      
+
       scrollToBottom();
     })
     .catch((err) => {
       console.log(err);
     });
 };
+
+let loading = ref(false); // 新增loading状态
+
+const loadMoreMessages = async () => {
+  loading.value = true; // 开始加载动画
+  let currentLoad = MessageCount.value.get(chooseTarget.value) || 10;
+  let newLoad = currentLoad + 10;
+  MessageCount.value.set(chooseTarget.value, newLoad);
+  const oldScrollHeight = scrollbar.value.scrollHeight;
+  // 模拟加载时间
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  await axios
+    .get(`${SERVER_URL}/message/query`, {
+      params: {
+        sender: userinfo.value.userid,
+        receiver: chooseTarget.value,
+        limit: newLoad,
+      },
+    })
+    .then(async (res) => {
+      let data2 = res.data;
+      messages.value = [];
+      let len = data2.length;
+      for (let i = Math.max(0, len - newLoad); i < len; i++) {
+        messages.value.push(data2[i]);
+        await handleRead(data2[i]);
+        await handleLoad(data2[i]);
+      }
+      nextTick(() => {
+        const newScrollHeight = scrollbar.value.scrollHeight;
+        scrollbar.value.scrollTop = newScrollHeight - oldScrollHeight - 250; // 保持滚动位置
+      });
+      MessageCount.value.set(chooseTarget.value, newLoad);
+      loading.value = false; // 停止加载动画
+    })
+    .catch((err) => {
+      console.log(err);
+      loading.value = false; // 出错也停止加载动画
+    });
+};
+
 const scrollToBottom = () => {
   nextTick(() => {
     if (scrollbar.value) {
@@ -208,62 +381,67 @@ const scrollToBottom = () => {
     }
   });
 };
+
 const sendMessage = async () => {
   if (event.ctrlKey) {
-    // 如果按下了Ctrl键，不发送消息
     return;
   }
+
   let now = getNowTime();
   let senderpicture = userinfo.value.userpicture;
 
   let target = data.value[getIndex.value.get(chooseTarget.value)].userid;
+
   let message = {
     sender: userinfo.value.userid,
     receiver: target,
     message: messageInput.value,
     sendtime: now,
     sendername: userinfo.value.nickname,
-    senderpicture, //数据库里要存真的
+    senderpicture,
   };
-  await axios
+  const res = axios
     .post(`${SERVER_URL}/message/send`, message)
-    .then((res) => {
-      messages.value.push(message);
-      data.value[getIndex.value.get(chooseTarget.value)].message =
-        messageInput.value;
-      scrollToBottom();
-    })
+    .then((res) => {})
     .catch((err) => {
       console.log(err);
     });
+  messages.value.push(message);
+  data.value[getIndex.value.get(chooseTarget.value)].message =
+    messageInput.value;
+  scrollToBottom();
   messageInput.value = "";
 };
+
 const index = () => {
   return getIndex.value.get(chooseTarget.value);
 };
+
 const insertNewLine = () => {
   event.preventDefault();
-  // 在这里处理插入新行的逻辑
   messageInput.value += "\n";
 };
+
 const shouldShowTime = (index) => {
   if (index === 0) return true;
   const prevMessage = messages.value[index - 1];
   const currMessage = messages.value[index];
-  const diff = currMessage.time - prevMessage.time;
-  return diff > 5 * 60 * 1000; // 如果两条消息的时间差大于5分钟，就显示时间
+  const diff = new Date(currMessage.sendtime) - new Date(prevMessage.sendtime);
+  // console.log(currMessage.sendtime, prevMessage.sendtime, diff);
+  return diff > 3 * 60 * 1000;
 };
+
 const formatTime = (time) => {
-  // 这里是你的时间格式化函数，你可以根据你的需求来实现它
   return new Date(time).toLocaleString();
 };
+
 const updateIndex = () => {
   for (let i = 0; i < data.value.length; i++) {
     getIndex.value.set(data.value[i].userid, i);
   }
 };
+
 const getUnReadMessage = async () => {
-  //获取一下所有的未读消息
   await axios
     .get(`${SERVER_URL}/message/query/unread`, {
       params: {
@@ -272,18 +450,18 @@ const getUnReadMessage = async () => {
     })
     .then((res) => {
       let data2 = res.data;
-      // console.log(data2);
       for (let i = 0; i < data2.length; i++) {
         let sender = data2[i].sender;
-        let index = getIndex.value.get(sender); //这个人的下标
+        let index = getIndex.value.get(sender);
         data.value[index].unread += 1;
-        handleLoad(data2[i]);//标记一下这个消息被加载过了
+        handleLoad(data2[i]);
       }
     })
     .catch((err) => {
       console.log(err);
     });
 };
+
 const getMessageConnect = async () => {
   await axios
     .get(`${SERVER_URL}/message/query/connect`, {
@@ -294,84 +472,120 @@ const getMessageConnect = async () => {
     .then(async (res) => {
       let temp = res.data;
       temp.sort((a, b) => {
-        // 将时间字符串转换为Date对象
         const dateA = new Date(a.latestconnecttime);
         const dateB = new Date(b.latestconnecttime);
-        // 按照时间的降序排序
         return dateB - dateA;
       });
       for (let i = 0; i < temp.length; i++) {
         data.value.push({
-          userid: temp[i].target, //就是对方的id
-          name: temp[i].targetname, //对方的名字
-          // picture: temp[i].targetpicture,
-          picture:temp[i].targetpicture,
+          userid: temp[i].target,
+          name: temp[i].targetname,
+          picture: temp[i].targetpicture,
           time: temp[i].latestconnecttime,
           message: temp[i].latestmessage,
-          unread: 0, //没有读的消息
+          unread: 0,
         });
-        getIndex.value.set(temp[i].target, i); //设置一下每个对话者id对应下标的信息
+        getIndex.value.set(temp[i].target, i);
       }
-      await handleChoose(data.value[0].userid); //默认选择最早的那个，然后更新消息
+      await handleChoose(data.value[0].userid);
       scrollToBottom();
     })
     .catch((err) => {
       console.log(err);
     });
 };
-//这个逻辑比较拉胯
+const calcCost = async () => {
+  //根据汇率计算花了多少角
+  let thisCost = calculatePriceInCNY(
+    cost.value.input,
+    cost.value.output,
+    cost.value.model
+  );
+  let data = null;
+  try {
+    data = {
+      special: "trophycount",
+      userid: JSON.parse(localStorage.getItem("user")).userid,
+    };
+  } catch (error) {}
+  await axios.post(`${SERVER_URL}/userextra/update/special`, data, {
+    params:{
+      count: thisCost * -1,
+    }
+   
+  }).then(res => {
+    store.dispatch("notice", {
+        title: "响应成功",
+        message: `您的奖杯数量已更新，您花费了${thisCost}个奖杯`,
+        type: "success",
+       
+      });
+  })
+};
+
+const addMessage = async (message) => {
+  try {
+    let userid = userinfo.value.userid;
+    console.log(!message.receiver || !userid, message.receiver, !userid);
+    if (!message.receiver || !userid) return;
+    console.log("扫测试");
+    if (parseInt(message.receiver) !== parseInt(userid)) {
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  isToAI.value = false;
+  let target = message.sender;
+  if (!getIndex.value.has(target)) {
+    data.value.unshift({
+      userid: target,
+      name: message.sendername,
+      picture:
+        "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
+      time: message.sendtime,
+      message: message.message,
+    });
+    updateIndex();
+  } else {
+    let index = getIndex.value.get(target);
+    data.value[index].time = message.sendtime;
+    data.value[index].message = message.message;
+    let temp = data.value.splice(index, 1)[0];
+    data.value.unshift(temp);
+    updateIndex();
+  }
+  if (cost.value.input !== "not") {
+    //计算一下花费
+    // cost.value.input = messageInput.value //这里不能写，因为这里被清楚了，用之前的就行，发之前存储了的
+    cost.value.output = message.message;
+
+    calcCost();
+  }
+  handleLoad(message);
+  try {
+    if (target !== data.value[index()].userid) {
+      let index = getIndex.value.get(target);
+      data.value[index].unread += 1;
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  messages.value.push(message);
+  scrollToBottom();
+  await handleRead(message);
+};
+
 const queryMessage = async () => {
-  //处理实时接受消息
   let userid = userinfo.value.userid;
   await axios
-    .get(`${SERVER_URL}/message/querychange?receiver=${userid}`) //监听后端数据库的变化
+    .get(`${SERVER_URL}/message/querychange?receiver=${userid}`)
     .then(async (event) => {
       let message = event.data;
-      if (!message.receiver) return; //如果不是我们希望的数据
-      if (message.receiver !== userid) {
-        //不是我接收的消息就无所谓
-        return;
-      }
-      //判断一下消息列表里面现在有没有新来的这个人
-      let target = message.sender; //发送者
-      if (!getIndex.value.has(target)) {
-        //没有就要新增一个
-        data.value.unshift({
-          userid: target, //就是对方的id
-          name: message.sendername, //对方的名字
-          picture:
-            "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/mirror-assets/16bd473a5dfbad9687e~tplv-t2oaga2asx-jj-mark:60:60:0:0:q75.avis",
-          time: message.sendtime, //最后的时间
-          message: message.message, //最后的消息
-        });
-        updateIndex(); //更新一下索引
-      } else {
-        //如果有就要更新
-        let index = getIndex.value.get(target); //找一下它的下标
-        data.value[index].time = message.sendtime; //更新时间
-        data.value[index].message = message.message; //更新消息
-        let temp = data.value.splice(index, 1)[0]; //从数组中移除元素
-        data.value.unshift(temp); //将元素添加到数组的开头
-        updateIndex(); //更新一下索引，因为上面的ifelse修改了
-      }
-      
-      handleLoad(message); //更新一下已加载
-      // console.log('更新了已加载')
-      if (target !== data.value[index()].userid) {
-        // console.log('更新加载数量')
-        //如果不是当前聊天的消息，就处理一下未读数量
-        let index = getIndex.value.get(target);
-        data.value[index].unread += 1;
-        return;
-      }
-      console.log('新增消息')
-      //如果是当前聊天的消息，就要新增消息
-      messages.value.push(
-        message
-      );
-      scrollToBottom();
-      //并且还要把这条消息标为已读
-      await handleRead(message);
+      addMessage(message);
     })
     .catch((err) => {
       console.log(err);
@@ -385,13 +599,13 @@ onMounted(async () => {
   if (timer.value) {
     clearInterval(timer.value);
   } else {
-    setTimeout(() => {
-      timer.value = setInterval(queryMessage, 1000);
-    }, 5000);
+    queryMessage();
+    // setTimeout(() => {
+    //   timer.value = setInterval(queryMessage, 1000000);
+    // }, 50000000);
   }
-  await getMessageConnect(); //读取我的连接列表
-
-  await getUnReadMessage(); //读取我的未读情况列表
+  await getMessageConnect();
+  await getUnReadMessage();
 });
 
 onBeforeRouteLeave((to, from, next) => {
@@ -408,39 +622,20 @@ onBeforeUnmount(() => {
     timer.value = null;
   }
 });
-// watchEffect(
-//   () => {
-//     if (messages.value.length > 0) {
-//       scrollToBottom();
-//     }
-//   },
-//   { deep: true }
-// );
 </script>
-
 <style scoped>
 .choose {
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.1
-  ); /* 这会添加一个透明度为 0.1 的黑色背景，看起来像灰色阴影 */
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .hover-shadow:hover {
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.1
-  ); /* 这会添加一个透明度为 0.1 的黑色背景，看起来像灰色阴影 */
+  background-color: rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
 .message-container {
-  width: 800px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* 修改这里 */
+  align-items: flex-start;
 }
 
 .message-time {

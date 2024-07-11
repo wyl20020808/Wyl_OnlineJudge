@@ -7,6 +7,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.wyl.backend.classes.message.Controller.MessageController;
+import com.wyl.backend.classes.message.Message;
+import com.wyl.backend.classes.user.Controller.UserController;
+import com.wyl.backend.classes.user.Controller.UserExtraController;
+import com.wyl.backend.classes.user.userinfo.UserExtra;
+import com.wyl.backend.classes.user.userinfo.UserInfo;
 import com.wyl.backend.keda.classes.auxiliary.SQL.studentMapper;
 import com.wyl.backend.keda.classes.auxiliary.websocket.MyWebSocketHandler;
 import net.sf.jsqlparser.expression.StringValue;
@@ -17,6 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @CrossOrigin
@@ -30,7 +40,9 @@ public class HttpPostRequest {
     @Autowired
     private MyWebSocketHandler webSocketHandler;
 
-    private int[] alluids;
+    private String  bearer =
+            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6ImUyNjQ5NWMzLTU5NDgtNDEyZS1hY2M2LTU2Yzg0ZWYyMDg0ZCJ9.VufKAzqI1xJWvzkzideb-1I2LXBdJDieNhZDKwWPnY_PAVjOnXN05dDfq5ZUJqVhWg2xm1dRS46CZiAIAgZF8w";
+                private int[] alluids;
     @Scheduled(fixedRate = 20000) // 每20秒执行一次
     public void sendPeriodicMessages() {
         try {
@@ -64,7 +76,7 @@ public class HttpPostRequest {
             connection.setRequestProperty("Accept", "application/json, text/plain, */*");
             connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br, zstd");
             connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9");
-            connection.setRequestProperty("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjU0MTFkYzc0LTdhMGQtNDI2Mi1hNDgwLTY4NWI4NjVmMmUwMCJ9.jWzwAXviApOu2HwIWmhi84rYYyxAtDaQZvTFu80BTaVGE-AWL0AfnALYS4qKKUpra6ZsEVHnPXiEEOtb2dIMaA");
+            connection.setRequestProperty("Authorization", bearer);
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
             connection.setDoOutput(true);
 
@@ -110,7 +122,44 @@ public class HttpPostRequest {
 
     public  void sendMessageToWeb(student x) throws IOException {
         webSocketHandler.broadcast(x);
+
         System.out.println("定时任务执行，消息已发送");
+    }
+    public  String getCurrentBeijingTime() {
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+
+        // 将当前时间转换为北京时区
+        ZonedDateTime beijingTime = now.atZone(ZoneId.of("Asia/Shanghai"));
+
+        // 定义标准格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 格式化时间
+        String formattedTime = beijingTime.format(formatter);
+
+        return formattedTime;
+    }
+    @Autowired
+    private MessageController messageController;
+    public void sendMessageToAcer(student x){
+        String text = "恭喜你！你刚刚AC了P" + x.getPid()+ "，因此奖励您两个奖杯，已放入您的资产中~ 请继续加油努力哦！";
+        Message temp = new Message();
+        temp.init(66666, x.getUid(),"可达信奥", text,getCurrentBeijingTime(),"http://localhost:8088/images/0.png");
+        messageController.sendMessage(temp);
+
+    }
+        @Autowired
+        private UserExtraController userExtraController;
+
+    public void studentAcNew(student x) throws IOException {
+        sendMessageToWeb(x);//给前端发消息
+        //给孩子加两个奖杯
+        userExtraController.addTrophy(x.getUid(), 2);
+
+        //系统给用户发消息
+        sendMessageToAcer(x);
+        //建立和用户的链接
     }
     public  void insertToDataBase(ArrayList<student> info) throws IOException {
         ArrayList<student> had = (ArrayList<student>) studentMapper.selectList(null);
@@ -118,12 +167,12 @@ public class HttpPostRequest {
         Set<student> infoOnly = new HashSet<>(info);
         infoOnly.removeAll(had);
 
-        System.out.println("Students in info but not in had: " + infoOnly);
+//        System.out.println("Students in info but not in had: " + infoOnly);
         sendMessageToWeb(info.get(0));
         for(student x : infoOnly){
-            if(x.getScore() == 100){
+            if(x.getScore() == 100){//新ac题了
                 studentMapper.insert(x);
-                sendMessageToWeb(x);
+                studentAcNew(x);
             }
 
         }
@@ -202,7 +251,8 @@ public class HttpPostRequest {
 
         return allPids;
     }
-
+    @Autowired
+    private UserController userController;
     public  int[] extractIds(String jsonData) {
         JSONObject jsonObject = new JSONObject(jsonData);
         JSONArray rows = jsonObject.getJSONArray("rows");
@@ -211,7 +261,13 @@ public class HttpPostRequest {
         for (int i = 0; i < rows.length(); i++) {
             JSONObject row = rows.getJSONObject(i);
             ids[i] = row.getInt("_id"); // 假设_id总是存在并且是整数
-
+            //加入用户，如果没有的话
+            System.out.println("nima" + ids[i]);
+            UserInfo temp = new UserInfo();
+            temp.setUserid(ids[i]);
+            temp.setUsername(row.getString("uname"));
+            temp.setRegistertime(row.getString("regat"));
+            userController.insertUser(temp);
         }
 
         return ids;
@@ -231,7 +287,7 @@ public class HttpPostRequest {
             connection.setRequestProperty("Accept", "application/json, text/plain, */*");
             connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br, zstd");
             connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9");
-            connection.setRequestProperty("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjU0MTFkYzc0LTdhMGQtNDI2Mi1hNDgwLTY4NWI4NjVmMmUwMCJ9.jWzwAXviApOu2HwIWmhi84rYYyxAtDaQZvTFu80BTaVGE-AWL0AfnALYS4qKKUpra6ZsEVHnPXiEEOtb2dIMaA");
+            connection.setRequestProperty("Authorization", bearer);
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
             connection.setDoOutput(true);
@@ -293,7 +349,7 @@ public class HttpPostRequest {
             connection.setRequestProperty("Accept", "application/json, text/plain, */*");
             connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br, zstd");
             connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9");
-            connection.setRequestProperty("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjU0MTFkYzc0LTdhMGQtNDI2Mi1hNDgwLTY4NWI4NjVmMmUwMCJ9.jWzwAXviApOu2HwIWmhi84rYYyxAtDaQZvTFu80BTaVGE-AWL0AfnALYS4qKKUpra6ZsEVHnPXiEEOtb2dIMaA");
+            connection.setRequestProperty("Authorization", bearer);
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
             // Check response code and read response
@@ -336,7 +392,7 @@ public class HttpPostRequest {
             connection.setRequestProperty("Accept", "application/json, text/plain, */*");
             connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br, zstd");
             connection.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9");
-            connection.setRequestProperty("Authorization", "Bearer eyJhbGciOiJIUzUxMiJ9.eyJsb2dpbl91c2VyX2tleSI6IjU0MTFkYzc0LTdhMGQtNDI2Mi1hNDgwLTY4NWI4NjVmMmUwMCJ9.jWzwAXviApOu2HwIWmhi84rYYyxAtDaQZvTFu80BTaVGE-AWL0AfnALYS4qKKUpra6ZsEVHnPXiEEOtb2dIMaA");
+            connection.setRequestProperty("Authorization", bearer);
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
 
             // Check response code and read response

@@ -102,9 +102,9 @@ public class JudgeController {
 
 
     @PostMapping("/judgeone")
-    public Judge0Result judgeJustone(String stdin,long problemId, String source_code, int languageId){
-        Judge0Result judgeResultToUser = judgeService.judgeOnlyOne(stdin,problemId, source_code, languageId);
-        log.info("代码运行成功=>{}",problemId);
+    public Judge0Result judgeJustone(String stdin, String source_code, int languageId){
+        Judge0Result judgeResultToUser = judgeService.judgeOnlyOne(stdin,source_code, languageId);
+
         return judgeResultToUser;
     }
 

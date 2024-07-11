@@ -123,7 +123,7 @@ public class JudgeServiceImpl implements JudgeService {
          * @return
          */
         //这个函数是用来运行代码的
-        public Judge0Result judgeOnlyOne (String stdin,long problemId, String source_code, int language_id){
+        public Judge0Result judgeOnlyOne (String stdin,String source_code, int language_id){
             Map<String, String> MachineToToken = new ConcurrentHashMap<>();
             Map<String, String> TokenToMachine = new ConcurrentHashMap<>();
             int timelimit;

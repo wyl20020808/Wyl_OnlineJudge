@@ -72,3 +72,18 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: true
+
+spring:
+  ai:
+    openai:
+      base-url: https://api.openai.com/
+      api-key: sk-xxx
+      embedding:
+        options:
+          model: text-davinci-003
+      chat:
+        #指定某一个API配置(覆盖全局配置)
+        api-key: sk-CJFWmw6jUnXhX2EYF60670A0317048A69eB0025e32A655C5
+        base-url: https://api.gpts.vin/v1
+        options:
+          model: gpt-3.5-turbo # 模型配置

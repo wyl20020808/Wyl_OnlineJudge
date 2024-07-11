@@ -3,6 +3,7 @@ import App from './App.vue'
 import 'element-plus/dist/index.css'
 import router from './router/router.js'
 import store from './store/mainStore.js'
+
 import 'bootstrap/dist/css/bootstrap.css'
 import { nextTick } from 'vue'
 import Antd from 'ant-design-vue'
@@ -97,6 +98,16 @@ const vuetify = createVuetify({
   },
 })
 
+
+// 忽略问题 2024年7月9日20:59:57
+window.onerror = function(message, source, lineno, colno, error) {
+  console.error("Error caught: ", message, source, lineno, colno, error);
+  // Prevent the error from being displayed on the page
+  return true;
+};
+
+
+
 // hljs.registerLanguage('json', json);
 // hljs.registerLanguage('cpp', cpp);
 // hljs.registerLanguage('cpp', javascript);
@@ -167,4 +178,4 @@ app.use(VMdPreviewHtml)
 //2023年10月9日09:59:18
 app.use(VueCodemirror).mount('#app')
 import WebSocketService from "@/websocket";
-WebSocketService.connect();
+WebSocketService.connect(store);

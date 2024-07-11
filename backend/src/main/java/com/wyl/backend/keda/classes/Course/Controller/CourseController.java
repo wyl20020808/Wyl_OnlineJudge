@@ -1,6 +1,10 @@
 package com.wyl.backend.keda.classes.Course.Controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.wyl.backend.classes.user.Controller.UserExtraController;
+import com.wyl.backend.classes.user.sql.UserExtraOperator;
+import com.wyl.backend.classes.user.userinfo.UserExtra;
 import com.wyl.backend.keda.classes.Course.CourseInfo;
 import com.wyl.backend.keda.classes.Course.CourseStudentInfo;
 import com.wyl.backend.keda.classes.Course.SQL.CourseInfoMapper;
@@ -26,11 +30,12 @@ public class CourseController {
     @PostMapping(value = "/update")
     public CourseInfo updateCourse(@RequestBody CourseInfo courseInfo) {
         if (courseInfoMapper.selectCount(new QueryWrapper<CourseInfo>().eq("course_name", courseInfo.getCourseName())) != 0) {
+
             courseInfoMapper.updateById(courseInfo);
         } else {
             courseInfoMapper.insert(courseInfo);
             courseInfo = courseInfoMapper.selectOne(new QueryWrapper<CourseInfo>().eq("create_time",courseInfo.getCreateTime()));
-            syncStudentsToCourse(courseInfo);
+            syncStudentsToCourse(courseInfo);//创建课程学生奖杯信息
         }
         return courseInfoMapper.selectById(courseInfo.getId());
     }
@@ -68,11 +73,25 @@ public class CourseController {
         }
         return courseStudentInfoMapper.selectList(queryWrapper);
     }
+    @Autowired
+    private UserExtraOperator userExtraOperator;
+    public void syncTrophy(CourseStudentInfo courseStudenInfo){
+        List<CourseStudentInfo> x = courseStudentInfoMapper.selectList(new QueryWrapper<CourseStudentInfo>().eq("student_id", courseStudenInfo.getStudentId()));
+        int cnt = 0;
+        for(CourseStudentInfo i : x){//统计所有奖杯，效率偏低，但是不会出错
+            cnt += i.getTrophyCount();
+        }
+        UserExtra temp = userExtraOperator.selectOne(new QueryWrapper<UserExtra>().eq("userid", courseStudenInfo.getStudentId()));//获取到这个学生
+        temp.setTrophy(cnt);
+        System.out.println("ceshi1" + temp.toString());
 
+        userExtraOperator.updateById(temp);//更新奖杯信息
+    }
     @PostMapping(value = "/update/courseinfo")
-    public CourseStudentInfo updateCourseInfo(@RequestBody CourseStudentInfo courseStudenInfo) {
+    public CourseStudentInfo updateCourseInfo(@RequestBody CourseStudentInfo courseStudenInfo) {//更新同步数据
         if (courseStudentInfoMapper.selectCount(new QueryWrapper<CourseStudentInfo>().eq("id", courseStudenInfo.getId())) != 0) {
             courseStudentInfoMapper.updateById(courseStudenInfo);
+            syncTrophy(courseStudenInfo);
         } else {
             courseStudentInfoMapper.insert(courseStudenInfo);
 //            courseInfo = courseStudentInfoMapper.selectOne(new QueryWrapper<CourseStudentInfo>().eq("create_time",courseInfo.getCreateTime()));

@@ -1,3 +1,4 @@
+// 在你的组件中
 <template>
   <div>
     <v-layout class="overflow-visible" style="height: 50px">
@@ -19,7 +20,8 @@
           <span style="font-size: 16px; margin-top: 0px">信息管理</span>
         </v-btn>
         <v-btn @click="jump('shopping')">
-          <v-icon><TrophyFilled style="font-size: 25px" /></v-icon>
+          <v-icon><img src="../../assets/static/pictures/商城.png" width="30"
+            /></v-icon>
           <span style="font-size: 16px; margin-top: 0px">商城</span>
         </v-btn>
         <v-btn @click="jump('ranklist')">
@@ -30,9 +32,9 @@
         </v-btn>
         <v-btn @click="jump('tissue')">
           <v-icon
-            ><img src="../../assets/static/pictures/acm.png" width="30"
+            ><img src="../../assets/static/pictures/代码编辑器.png" width="30"
           /></v-icon>
-          <span style="font-size: 16px; margin-top: 0px">工作室</span>
+          <span style="font-size: 16px; margin-top: 0px">在线编辑器</span>
         </v-btn>
         <v-btn @click="jump('evaluationqueue')">
           <v-icon><HourglassFilled style="font-size: 25px" /></v-icon>
@@ -95,7 +97,9 @@
       </v-bottom-navigation>
     </v-layout>
   </div>
+
 </template>
+
 <script>
 import {
   Setting,
@@ -117,6 +121,9 @@ import router from "@/router/router";
 import axios from "axios";
 import { isLogin } from "@/js/functions/login.js";
 import WebSocketService from "@/websocket";
+import { mapState,mapActions } from 'vuex';
+import store from '@/store/mainStore.js'
+
 export default {
   components: {
     HomeFilled,
@@ -130,7 +137,6 @@ export default {
   },
   data: () => ({
     value: 0,
-    unRead: 0,
   }),
   watch: {
     $route(to, from) {
@@ -140,6 +146,8 @@ export default {
     },
   },
   computed: {
+    ...mapState(['unRead']),
+   
     currentPath() {
       return this.$route.path;
     },
@@ -187,30 +195,38 @@ export default {
     
   },
   async created() {
+    // this.$store.dispatch('addUnRead', 1);
     this.updateNavState();
     window.onbeforeunload = () => {
       // console.log(userinfo.userloginstate)
     };
+    // console.log("有没有获取");
     if (localStorage.getItem("user")) {
-      if(localStorage.getItem("user")?.userid ?? false === false)return;
+      console.log("有没有获取");
+      if(!JSON.parse(localStorage.getItem("user")).userid)return;
       //如果登录了的话
+      console.log("有没有获取2");
       this.getUnreadMessage();
 
-      await axios
-        .post(`${SERVER_URL}/user/query`, {
-          userid: JSON.parse(localStorage.getItem("user")).userid,
-        })
-        .then((res) => {
-          localStorage.setItem("user", JSON.stringify(res.data));
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      // await axios
+      //   .post(`${SERVER_URL}/user/query`, {
+      //     userid: JSON.parse(localStorage.getItem("user")).userid,
+      //   })
+      //   .then((res) => {
+      //     // localStorage.setItem("user", JSON.stringify(res.data));
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
     }
   },
   methods: {
+    ...mapActions({
+    setUnRead: 'setUnRead', // Action from namespaced userInfo module
+    notice: 'notice', // Action from the root store
+  }),
     sendMessage() {
-      WebSocketService.sendMessage("实时通信！");
+     
     },
     updateNavState() {
       switch (this.currentPath) {
@@ -246,7 +262,11 @@ export default {
     jump(total) {
       router.push({ path: "/" + total });
     },
+
     async getUnreadMessage() {
+      console.log(mapState["unRead"],"有吗")
+      
+      // const isLogin = localStorage.getItem("user");
       if (!isLogin) return;
       //统计一下未读的消息
       await axios
@@ -256,8 +276,11 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.data.length);
-          if (response.data) this.unRead += response.data.length;
+          console.log(response.data.length,"未读消息数量");
+          if (response.data) {
+            this.setUnRead(response.data.length);
+            // this.$store.dispatch('setUnread', response.data.length);
+          }
         })
         .catch((err) => {
           console.log(err);

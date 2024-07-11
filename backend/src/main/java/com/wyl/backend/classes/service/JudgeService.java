@@ -45,5 +45,5 @@ public interface JudgeService {
      */
     JudgeResultToUser judgeProblem(long problemId, String source, int language_id);
 
-    Judge0Result judgeOnlyOne(String stdin, long problemId, String sourceCode, int languageId);
+    Judge0Result judgeOnlyOne(String stdin, String sourceCode, int languageId);
 }

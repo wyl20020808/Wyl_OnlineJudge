@@ -10,7 +10,9 @@ import lombok.Data;
 @TableName("userinfo")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
-    @TableId(value = "userid")
+    @TableId(value = "id")
+    private int id;
+    @TableField(value = "userid")
     private int userid;
     private String username;
     private String userloginstate;
@@ -24,5 +26,4 @@ public class UserInfo {
     private int grade;
     @TableField(select = false)
     private String special;//更新单个数据，借助它来写
-
 }

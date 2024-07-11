@@ -10,6 +10,8 @@ import lombok.Data;
 @TableName("userextra")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserExtra {
+    @TableId(value = "id")
+    private int id;
     private int extraid;
     private int userid;
     private int submitcount;
@@ -19,6 +21,7 @@ public class UserExtra {
     private int rating;
     private int ranking;
     private String editorstyle;
+    private int trophy = 0;
     @TableField(exist = false)
     private String special;
 

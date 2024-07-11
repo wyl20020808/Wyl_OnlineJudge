@@ -8,7 +8,7 @@ import lombok.Data;
 @TableName("messageconnect")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageConntect {
-    private int id;
+//    private int id;
     private int belong;
     private int target;
     private String belongname;
@@ -17,4 +17,18 @@ public class MessageConntect {
     private String latestmessage;
     private String latestconnecttime;
     private String targetpicture;
+
+    public void init(int belong, int target, String belongname, String targetname, String targetpicture,String connecttime, String latestmessage, String latestconnecttime) {
+        this.belong = belong;
+        this.target = target;
+        this.belongname = belongname;
+        this.targetname = targetname;
+        this.targetpicture = targetpicture;
+
+        this.connecttime = connecttime;
+
+        this.latestmessage = latestmessage;
+
+        this.latestconnecttime = latestconnecttime;
+    }
 }

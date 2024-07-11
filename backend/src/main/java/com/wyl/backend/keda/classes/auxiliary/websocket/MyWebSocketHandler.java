@@ -1,11 +1,13 @@
 package com.wyl.backend.keda.classes.auxiliary.websocket;
 
+import com.wyl.backend.classes.message.Message;
 import com.wyl.backend.keda.classes.auxiliary.api.student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
@@ -38,7 +40,16 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     public void broadcast(student x) throws IOException {
         for (WebSocketSession session : sessions) {
             if (session.isOpen()) {
-                session.sendMessage(new TextMessage("您因为AC了P" + x.getPid() + "，所以您获得了两个奖杯" ));
+
+                session.sendMessage(new TextMessage(x.getUid() + " " + x.getPid()));
+            }
+        }
+    }
+    public void noticeNewMessage(String message) throws IOException {
+        for (WebSocketSession session : sessions) {
+            if (session.isOpen()) {
+
+                session.sendMessage(new TextMessage(message));
             }
         }
     }

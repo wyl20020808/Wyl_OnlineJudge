@@ -4,6 +4,7 @@ import { ElNotification } from 'element-plus'
 import { sleep } from "@/js/functions/TimeAbout";
 import { SERVER_URL, SERVER } from "../../js/functions/config"
 const ModuleUserInfo = ({
+  namespaced: true,
   state: {
     userid: "",
     username: "",
@@ -14,6 +15,7 @@ const ModuleUserInfo = ({
     userloginstate: "false",
     userisadmin: "false",
     userpicture: "",
+    unread:2,
   },
   getters: {
 
@@ -56,12 +58,17 @@ const ModuleUserInfo = ({
           })
         });
     },
+    async addUnreadCnt(context,cnt){
+      const user = localStorage.getItem('user');
+      user.unread += cnt;
+      localStorage.setItem('user', JSON.stringify(user));
+    },
     async SynchronizeInfo(context, info) {
       try {
         const response = await axios.post(`${SERVER_URL}/user/query`, info.userinfo);
         response.data.userloginstate = info.loginState;
         localStorage.setItem('user', JSON.stringify(response.data));//同步本地数据
-
+        // console.log(response.data);
         await axios.post(`${SERVER_URL}/user/synchronize/userinfo`, response.data);
         context.dispatch("notice", {
           title: 'Success',
@@ -74,6 +81,37 @@ const ModuleUserInfo = ({
           type: "success",
         });
         localStorage.setItem('user', null);//同步本地数据
+      } catch (error) {
+        // context.dispatch("notice", {
+        //   title: 'Error',
+        //   message: "服务器后端有异常！ " + error,
+        //   type: 'error',
+        // });
+      }
+    },
+    async SynchronizeInfo_login(context, info) {
+      try {
+        console.log("ues")
+        const response = await axios.post(`${SERVER_URL}/user/query`, info.userinfo);
+       
+        response.data.userloginstate = info.loginState;
+    
+        localStorage.setItem('user', JSON.stringify(response.data));//同步本地数据
+        
+        console.log(JSON.parse(localStorage.getItem('user')));
+        // console.log(response.data);
+        // await axios.post(`${SERVER_URL}/user/synchronize/userinfo`, response.data);
+        context.dispatch("notice", {
+          title: 'Success',
+          message: "数据同步成功！ ",
+          type: 'success',
+        });
+        // context.dispatch("notice", {
+        //   title: "退出成功！",
+        //   message: "再见！" + userinfo.username,
+        //   type: "success",
+        // });
+        // localStorage.setItem('user', null);//同步本地数据
       } catch (error) {
         // context.dispatch("notice", {
         //   title: 'Error',
@@ -99,8 +137,8 @@ const ModuleUserInfo = ({
             userinfo.userid = response.data.split(" ")[1];//空格后面的是id
             response.data = response.data.split(" ")[0]
             localStorage.setItem("token",response.data);
-            // console.log(userinfo.username)
-            context.dispatch("SynchronizeInfo", {
+            // console.log(response.data,"abcd")
+            context.dispatch("SynchronizeInfo_login", {
               userinfo,
               loginState: "true"
             }

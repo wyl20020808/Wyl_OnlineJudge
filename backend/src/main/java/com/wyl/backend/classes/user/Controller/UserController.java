@@ -1,6 +1,8 @@
 package com.wyl.backend.classes.user.Controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wyl.backend.classes.LoginJWT.JwtUtil;
@@ -41,11 +43,12 @@ public class UserController {
         return false;
     }
     public String getUsername(int userid) {
-        return userOperator.selectById(userid).getUsername();
+        return userOperator.selectOne(new QueryWrapper<UserInfo>().eq("userid",userid)).getUsername();
     }
     @PostMapping("/query")
     public UserInfo queryUserInfo(@RequestBody UserInfo userInfo) {
-        return userOperator.selectById(userInfo.getUserid());
+
+        return userOperator.selectOne(new QueryWrapper<UserInfo>().eq("userid", userInfo.getUserid()));
     }
     @GetMapping("/query/all")
     public List<User> queryUserAll() {
@@ -76,8 +79,16 @@ public class UserController {
             return "error";
         }
     }
-    public void insertUser(UserInfo info){
+    public void insertUser(UserInfo info){//新增用户，并且同步增加用户额外信息
+        List<UserInfo> had = userOperator.selectList(null);
+        for(UserInfo x : had){//插入之前判断一下有没有
+            if(x.getUserid() == info.getUserid())
+                return;
+        }
         int cnt = userOperator.insert(info);
+        UserExtra temp = new UserExtra();
+        temp.setUserid(info.getUserid());
+        userExtraOperator.insert(temp);
     }
     @PostMapping("/signin")
     public String signIn(@RequestBody UserInfo userInfo) {
@@ -90,6 +101,7 @@ public class UserController {
         }
 
         int cnt = userOperator.insert(userInfo);
+        insertUser(userInfo);//同步信息
         if(cnt > 0)
             return "注册成功";
         return "error";
